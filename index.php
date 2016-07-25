@@ -3,15 +3,13 @@ include('connection.php');
 include('css.php');
 ?>
 <html lang="en">
-<title></title>
-<head>
+<title>Home Page</title>
 
-</head>
 <body>
+<br><br><br><br><br><br><br><br>
+<div style="text-align: center;">
+    <a href="forms/registration.php" class='btn btn-danger'>Registration</a>
+</div>
 
-
-<button class='btn btn-danger' data-toggle='modal' data-target='#Delete'><i
-        class='fa fa-trash fa-1x'>testing</i>
-</button>
 </body>
 </html>
