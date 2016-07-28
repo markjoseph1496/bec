@@ -1,10 +1,12 @@
 <?php
 include('connection.php');
-include('css.php');
 ?>
 <html lang="en">
 <title>Home Page</title>
-
+<head>
+    <!-- Bootstrap CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet"/>
+</head>
 <body>
 <br><br><br><br><br><br><br><br>
 <div style="text-align: center;">

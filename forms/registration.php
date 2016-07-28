@@ -12,7 +12,7 @@ include('../connection.php');
     <meta charset="utf-8">
 
     <?php
-    include('../css.text');
+    include('../css.php');
     ?>
 
 </head>
@@ -32,30 +32,90 @@ include('../connection.php');
                 <br>
 
                 <div class="row">
-                    <div class="col-md-2">
+                    <div class="col-md-6">
                         <label>First Name <span>(*)</span></label>
 
                         <div class="form-group">
-                            <input type="text" class="form-control" id="FirstName" name="FirstName">
-                        </div>
-                    </div>
-
-                    <div class="col-md-2">
-                        <label>Middle Name <span></span></label>
-
-                        <div class="form-group">
-                            <input type="text" class="form-control" id="LastName" name="LastName">
-                        </div>
-                    </div>
-
-                    <div class="col-md-2">
-                        <label>Last Name <span>(*)</span></label>
-
-                        <div class="form-group">
-                            <input type="text" class="form-control" id="LastName" name="LastName">
+                            <input type="text" class="form-control text-capitalize" id="txtFirstName" name="txtFirstName" placeholder="Your First Name" maxlength="20">
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Middle Name <span></span></label>
+
+                        <div class="form-group">
+                            <input type="text" class="form-control text-capitalize" id="txtMiddleName" name="txtMiddleName" placeholder="Your Middle Name" maxlength="20">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Last Name <span>(*)</span></label>
+
+                        <div class="form-group">
+                            <input type="text" class="form-control text-capitalize" id="txtLastName" name="txtLastName" placeholder="Your Last Name" maxlength="20">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Initials <span>(*)</span></label>
+
+                        <div class="form-group">
+                            <input class="form-control uppercase" type="text" id="txtInitials" name="txtInitials" maxlength="3" placeholder="EX: ABC">
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <h5>Complete Address</h5>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Street/House No. <span>(*)</span></label>
+
+                        <div class="form-group">
+                            <input class="form-control text-capitalize" type="text" id="txtInitials" name="txtInitials" maxlength="20">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label>Province <span>(*)</span></label>
+
+                        <div class="form-group">
+                            <select id="City" name="City" class="form-control" style="width:100%; height:34px;">
+                                <option value="">- Please select one -</option>
+                                <option value="Caloocan City">Caloocan City</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label>City/Municipality <span>(*)</span></label>
+
+                        <div class="form-group">
+                            <select id="City" name="City" class="form-control" style="width:100%; height:34px;">
+                                <option value="">- Please select one -</option>
+                                <option value="Caloocan City">Caloocan City</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label>Barangay <span>(*)</span></label>
+
+                        <div class="form-group">
+                            <select id="City" name="City" class="form-control" style="width:100%; height:34px;">
+                                <option value="">- Please select one -</option>
+                                <option value="Caloocan City">Caloocan City</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <hr>
                 <div class="row">
                     <div class="col-md-6">
                         <label>Birthdate <span>(*)</span></label>
@@ -87,26 +147,11 @@ include('../connection.php');
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <label>Address <span>(*)</span></label>
-
-                        <div class="form-group">
-                            <div class="controls">
-                                <select id="City" name="City" class="form-control" style="width:100%; height:34px;">
-                                    <option value="">- Please select one -</option>
-                                    <option value="Caloocan City">Caloocan City</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <br><br>
 
                 <div class="hr5" style="margin-top:40px;margin-bottom:40px;"></div>
-                <div class
-                "row">
+                <div class="row">
                 <div class="col-md-6">
                     <label><b>By clicking the "Sign Up" button, I certify that I have read and agree to the <a
                                 href="" target="_blank">Terms of Use</a>.</b></label>
