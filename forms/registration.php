@@ -39,6 +39,13 @@ include('../connection.php');
                             <input type="text" class="form-control text-capitalize" id="txtFirstName" name="txtFirstName" placeholder="Your First Name" maxlength="20">
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <label>First Name <span>(*)</span></label>
+
+                        <div class="form-group">
+                            <input type="text" class="form-control text-capitalize" id="txtFirstName" name="txtFirstName" placeholder="Your First Name" maxlength="20">
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
@@ -152,20 +159,20 @@ include('../connection.php');
 
                 <div class="hr5" style="margin-top:40px;margin-bottom:40px;"></div>
                 <div class="row">
-                <div class="col-md-6">
-                    <label><b>By clicking the "Sign Up" button, I certify that I have read and agree to the <a
-                                href="" target="_blank">Terms of Use</a>.</b></label>
+                    <div class="col-md-6">
+                        <label><b>By clicking the "Sign Up" button, I certify that I have read and agree to the <a
+                                    href="" target="_blank">Terms of Use</a>.</b></label>
+                    </div>
+                    <div class="col-md-6">
+                        &nbsp;
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    &nbsp;
-                </div>
-            </div>
 
-            <div class="row">
-                <button type="submit" name="btnSave" class="btn-system btn-large border-btn" style="float:right;">Sign Up</button>
+                <div class="row">
+                    <button type="submit" name="btnSave" class="btn-system btn-large border-btn" style="float:right;">Sign Up</button>
+                </div>
             </div>
         </div>
-    </div>
     </div>
     <!-- End content -->
 
