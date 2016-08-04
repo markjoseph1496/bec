@@ -435,8 +435,8 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="ui red message">Please fill out all the informations asked. Don't leave anything blank.</div>
+                            <br>
+                            <!-- <div class="ui red message">Please fill out all the informations asked. Don't leave anything blank.</div> -->
                             <button class="ui right floated huge inverted red button">SUBMIT</button>
                         </form>
                     </div>
