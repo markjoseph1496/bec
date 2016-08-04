@@ -391,31 +391,6 @@
                                 </div>
                             </div>
 
-                            <table class="ui unstackable table">
-                                <thead>
-                                <tr>
-                                    <th>Company Name</th>
-                                    <th>Imm. Supervisor</th>
-                                    <th>Address</th>
-                                    <th>Contact No.</th>
-                                    <th class="right aligned"></th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>a</td>
-                                    <td>a</td>
-                                    <td>a</td>
-                                    <td>a</td>
-                                    <td class="right aligned">
-                                        <button class="ui icon red button">
-                                            <i class="trash icon"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-
                             <div class="ui secondary segment">
                                 <div class="field">
                                     <label>Contact Person to notify in case of Emergency (member of the family, friend, roommate)</label>
