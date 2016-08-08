@@ -63,7 +63,6 @@
 
 <body>
 
-
 <div class="pusher">
     <div id="home" class="ui inverted vertical masthead center aligned segment">
         <div class="ui text container">
