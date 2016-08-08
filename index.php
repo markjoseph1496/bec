@@ -94,6 +94,18 @@
 
                             <div class="ui form">
                                 <div class="field">
+                                    <label>Branch Code</label>
+
+                                    <div class="fields">
+                                        <div class="three wide field">
+                                            <select class="ui fluid dropdown" id="" name="">
+                                                <option value="" selected="selected">Please Select One</option>
+                                                <option value="1">B000</option>
+                                                <option value="2">Sample Branch Code Only</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <br>
                                     <label>Name</label>
 
                                     <div class="fields">
@@ -117,10 +129,6 @@
                                                 <option value="" selected="selected">Please Select One</option>
                                                 <option value="abc">abc</option>
                                             </select>
-                                            <script type="text/javascript">
-                                                $('select.dropdown')
-                                                    .dropdown();
-                                            </script>
                                         </div>
                                         <div class="five wide field">
                                             <label>City</label>
@@ -128,10 +136,6 @@
                                                 <option value="" selected="selected">Please Select One</option>
                                                 <option value="abc">abc</option>
                                             </select>
-                                            <script type="text/javascript">
-                                                $('select.dropdown')
-                                                    .dropdown();
-                                            </script>
                                         </div>
 
                                         <div class="five wide field">
@@ -140,10 +144,6 @@
                                                 <option value="" selected="selected">Please Select One</option>
                                                 <option value="abc">abc</option>
                                             </select>
-                                            <script type="text/javascript">
-                                                $('select.dropdown')
-                                                    .dropdown();
-                                            </script>
                                         </div>
                                         <div class="three wide field">
                                             <label>House No./Street</label>
@@ -174,10 +174,6 @@
                                                 <option value="widowed">Widowed</option>
                                                 <option value="separated">Separated</option>
                                             </select>
-                                            <script type="text/javascript">
-                                                $('select.dropdown')
-                                                    .dropdown();
-                                            </script>
                                         </div>
                                         <div class="seven wide field">
                                             <label>Gender</label>
@@ -186,10 +182,6 @@
                                                 <option value="female">Female</option>
                                                 <option value="male">Male</option>
                                             </select>
-                                            <script type="text/javascript">
-                                                $('select.dropdown')
-                                                    .dropdown();
-                                            </script>
                                         </div>
                                         <div class="two wide field">
                                             <label>Age</label>
@@ -292,19 +284,15 @@
                                         <option value="" selected="selected">Please Select One</option>
                                         <option value="0">0</option>
                                         <?php
-                                            $x = 0;
-                                            $y = 0;
-                                            for($x; $x<=20; $x++){
-                                                for($y; $y==$x; $y++){
-                                                    echo "<option value=" . $y . ">" . $y . "</option>";
-                                                }
+                                        $x = 0;
+                                        $y = 0;
+                                        for ($x; $x <= 20; $x++) {
+                                            for ($y; $y == $x; $y++) {
+                                                echo "<option value=" . $y . ">" . $y . "</option>";
                                             }
+                                        }
                                         ?>
                                     </select>
-                                    <script type="text/javascript">
-                                        $('select.dropdown')
-                                            .dropdown();
-                                    </script>
                                 </div>
                             </div>
 
@@ -465,3 +453,8 @@
 </footer>
 </body>
 </html>
+<script type="text/javascript">
+    $('select.dropdown')
+        .dropdown();
+</script>
+<script type="text/javascript"
