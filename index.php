@@ -24,10 +24,15 @@
     <link rel="stylesheet" type="text/css" href="components/transition.css">
     <link rel="stylesheet" type="text/css" href="components/rail.css">
     <link rel="stylesheet" type="text/css" href="components/sticky.css">
+    <link rel="stylesheet" type="text/css" href="components/fileinput.min.css">
+    <link rel="stylesheet" type="text/css" href="components/bootstrap.min.css">
+
 
     <script src="js/jquery-1.10.1.min.js"></script>
     <script type="text/javascript" src="components/sticky.js"></script>
     <script type="text/javascript" src="js/smoothscroll.js"></script>
+    <script src="js/fileinput.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
 
     <!-- Important!!-->
     <script type="text/javascript" src="semantic-ui/semantic.min.js"></script>
@@ -95,8 +100,10 @@
                             <div class="ui form">
                                 <div class="field">
                                     <label>Branch Code</label>
-
                                     <div class="fields">
+                                        <div class="form-group">
+                                            <input id="ProfilePicture" name="ProfilePicture" type="file" class="file file-loading" data-allowed-file-extensions='["png", "jpg", "jpeg"]'>
+                                        </div>
                                         <div class="three wide field">
                                             <select class="ui fluid dropdown" id="" name="">
                                                 <option value="" selected="selected">Please Select One</option>
