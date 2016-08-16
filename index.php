@@ -100,10 +100,8 @@
                             <div class="ui form">
                                 <div class="field">
                                     <label>Branch Code</label>
+
                                     <div class="fields">
-                                        <div class="form-group">
-                                            <input id="ProfilePicture" name="ProfilePicture" type="file" class="file file-loading" data-allowed-file-extensions='["png", "jpg", "jpeg"]'>
-                                        </div>
                                         <div class="three wide field">
                                             <select class="ui fluid dropdown" id="" name="">
                                                 <option value="" selected="selected">Please Select One</option>
@@ -113,8 +111,20 @@
                                         </div>
                                     </div>
                                     <br>
+                                    <label>ID Picture</label>
+                                    <div class="fields">
+                                        <div class="six wide field">
+                                            <div class="form-group">
+                                                <input id="idpicture" name="idpicture" type="file" class="file file-loading" data-allowed-file-extensions='["png", "jpg", "jpeg"]'>
+                                            </div>
+                                            <script>
+                                                $("#idpicture").fileinput({
+                                                    showUpload : false
+                                                });
+                                            </script>
+                                        </div>
+                                    </div>
                                     <label>Name</label>
-
                                     <div class="fields">
                                         <div class="six wide field">
                                             <input type="text" name="" placeholder="Last Name">
@@ -355,6 +365,7 @@
                                 <div class="sixteen wide field">
                                     <label>Skills</label>
                                     <input type="text" name="">
+                                    <i>(Please separate with comma.)</i>
                                 </div>
                             </div>
 
