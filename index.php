@@ -1,5 +1,9 @@
-<html lang="en">
+<?php
+include('connection.php')
+?>
 
+
+<html lang="en">
 <head>
 
     <title>Berlein Electronics Corp. | Registration</title>
@@ -94,8 +98,8 @@
             <div class="twelve wide white column">
                 <div class="ui column stackable grid container">
                     <div class="column">
-                        <form class="ui form">
-                            <h4 class="ui dividing header">Staff Information</h4>
+                        <form class="ui form" name="frmRegister" id="frmRegister" method="POST" action="add.php">
+                            <h3 class="ui dividing header">Staff Information</h3>
 
                             <div class="ui form">
                                 <div class="field">
@@ -103,15 +107,27 @@
 
                                     <div class="fields">
                                         <div class="three wide field">
-                                            <select class="ui fluid dropdown" id="" name="">
+                                            <select class="ui fluid dropdown" id="cboBranchCode" name="cboBranchCode">
                                                 <option value="" selected="selected">Please Select One</option>
-                                                <option value="1">B000</option>
-                                                <option value="2">Sample Branch Code Only</option>
+                                                <?php
+                                                $tblBRCode =
+                                                    GSecureSQL::query(
+                                                        "SELECT `BranchCode` FROM `tblbranch` ORDER BY `BranchCode` ASC",
+                                                        TRUE
+                                                    );
+                                                foreach ($tblBRCode as $value) {
+                                                    $BranchCode = $value[0];
+                                                    ?>
+                                                    <option value="<?php echo $BranchCode; ?>" ><?php echo $BranchCode; ?></option>
+                                                    <?php
+                                                }
+                                                ?>
                                             </select>
                                         </div>
                                     </div>
                                     <br>
                                     <label>ID Picture</label>
+
                                     <div class="fields">
                                         <div class="six wide field">
                                             <div class="form-group">
@@ -119,37 +135,36 @@
                                             </div>
                                             <script>
                                                 $("#idpicture").fileinput({
-                                                    showUpload : false
+                                                    showUpload: false
                                                 });
                                             </script>
                                         </div>
                                     </div>
                                     <label>Name</label>
+
                                     <div class="fields">
                                         <div class="six wide field">
-                                            <input type="text" name="" placeholder="Last Name">
+                                            <input type="text" id="txtLastName" name="txtLastName" placeholder="Last Name">
                                         </div>
                                         <div class="six wide field">
-                                            <input type="text" name="" placeholder="First Name">
+                                            <input type="text" id="txtFirstName" name="txtFirstName" placeholder="First Name">
                                         </div>
                                         <div class="six wide field">
-                                            <input type="text" name="" placeholder="Middle Name">
+                                            <input type="text" id="txtMiddleName" name="txtMiddleName" placeholder="Middle Name">
                                         </div>
                                     </div>
-
-                                    <label>Address:</label>
-
+                                    <h4 class="ui dividing header">Address</h4>
                                     <div class="fields">
                                         <div class="five wide field">
                                             <label>Province</label>
-                                            <select class="ui fluid dropdown" id="province" name="province">
+                                            <select class="ui fluid dropdown" id="cboProvince" name="cboProvince">
                                                 <option value="" selected="selected">Please Select One</option>
                                                 <option value="abc">abc</option>
                                             </select>
                                         </div>
                                         <div class="five wide field">
                                             <label>City</label>
-                                            <select class="ui fluid dropdown" id="city" name="city">
+                                            <select class="ui fluid dropdown" id="cboCity" name="cboCity">
                                                 <option value="" selected="selected">Please Select One</option>
                                                 <option value="abc">abc</option>
                                             </select>
@@ -157,34 +172,33 @@
 
                                         <div class="five wide field">
                                             <label>Barangay</label>
-                                            <select class="ui fluid dropdown" id="barangay" name="barangay">
+                                            <select class="ui fluid dropdown" id="cboBarangay" name="cboBarangay">
                                                 <option value="" selected="selected">Please Select One</option>
                                                 <option value="abc">abc</option>
                                             </select>
                                         </div>
                                         <div class="three wide field">
                                             <label>House No./Street</label>
-                                            <input type="text" name="">
+                                            <input type="text" name="txtStreet" id="txtStreet">
                                         </div>
 
                                     </div>
 
-
                                     <div class="fields">
                                         <div class="eight wide field">
                                             <label>Email</label>
-                                            <input type="text" name="" placeholder="">
+                                            <input type="text" name="txtEmail" id="txtEmail" placeholder="">
                                         </div>
                                         <div class="eight wide field">
                                             <label>Mobile No.</label>
-                                            <input type="text" name="" placeholder="">
+                                            <input type="text" name="txtMobileNo" id="txtMobileNo" placeholder="">
                                         </div>
                                     </div>
 
                                     <div class="fields">
                                         <div class="seven wide field">
                                             <label>Civil Status</label>
-                                            <select class="ui fluid dropdown" id="status" name="status">
+                                            <select class="ui fluid dropdown" id="cboStatus" name="cboStatus">
                                                 <option value="" selected="selected">Please Select One</option>
                                                 <option value="single">Single</option>
                                                 <option value="married">Married</option>
@@ -194,7 +208,7 @@
                                         </div>
                                         <div class="seven wide field">
                                             <label>Gender</label>
-                                            <select class="ui fluid dropdown" id="gender" name="gender">
+                                            <select class="ui fluid dropdown" id="cboGender" name="cboGender">
                                                 <option value="" selected="selected">Please Select One</option>
                                                 <option value="female">Female</option>
                                                 <option value="male">Male</option>
@@ -202,7 +216,7 @@
                                         </div>
                                         <div class="two wide field">
                                             <label>Age</label>
-                                            <input type="text" name="" placeholder="">
+                                            <input type="text" name="txtAge" id="txtAge" placeholder="">
                                         </div>
                                     </div>
                                 </div>
@@ -215,21 +229,21 @@
                                     <div class="fields">
                                         <div class="six wide field">
                                             <label>Name of Spouse</label>
-                                            <input type="text">
+                                            <input type="text" name="txtSpouse" id="txtSpouse">
                                         </div>
                                         <div class="six wide field">
                                             <label>Occupation</label>
-                                            <input type="text">
+                                            <input type="text" name="txtOccupation" id="txtOccupation">
                                         </div>
                                         <div class="four wide field">
                                             <label>Number of Children</label>
-                                            <input type="text">
+                                            <input type="text" name="txtNumOfChildren" id="txtNumOfChildren">
                                         </div>
                                     </div>
                                     <div class="fields">
                                         <div class="sixteen wide field">
                                             <label>Provincial/City Address of Spouse</label>
-                                            <input type="text">
+                                            <input type="text" name="txtProvinceofSpouse" id="txtProvinceofSpouse">
                                         </div>
                                     </div>
                                 </div>
@@ -238,15 +252,15 @@
                             <div class="fields">
                                 <div class="six wide field">
                                     <label>Religion</label>
-                                    <input type="text" name="">
+                                    <input type="text" name="txtReligion" id="txtReligion">
                                 </div>
                                 <div class="six wide field">
                                     <label>Birthdate</label>
-                                    <input type="date" name="">
+                                    <input type="date" name="txtBirthdate" id="txtBirthdate">
                                 </div>
                                 <div class="six wide field">
                                     <label>Birthplace</label>
-                                    <input type="text" name="">
+                                    <input type="text" name="txtBirthplace" id="txtBirthplace">
                                 </div>
                             </div>
 
@@ -254,41 +268,41 @@
                             <div class="fields">
                                 <div class="eight wide field">
                                     <label>Father's Name</label>
-                                    <input type="text" name="">
+                                    <input type="text" name="txtFather" id="txtFather">
                                 </div>
                                 <div class="eight wide field">
                                     <label>Father's Occupation</label>
-                                    <input type="text" name="">
+                                    <input type="text" name="txtFOccupation" id="txtFOccupation">
                                 </div>
                             </div>
                             <div class="fields">
                                 <div class="eight wide field">
                                     <label>Address</label>
-                                    <input type="text" name="">
+                                    <input type="text" name="txtFAddress" id="txtFAddress">
                                 </div>
                                 <div class="eight wide field">
                                     <label>Contact Number</label>
-                                    <input type="text" name="">
+                                    <input type="text" name="txtFContactNumber" id="txtFContactNumber">
                                 </div>
                             </div>
                             <div class="fields">
                                 <div class="eight wide field">
                                     <label>Mother's Name</label>
-                                    <input type="text" name="">
+                                    <input type="text" name="" id="txtMother">
                                 </div>
                                 <div class="eight wide field">
                                     <label>Mother's Occupation</label>
-                                    <input type="text" name="" placeholder="">
+                                    <input type="text" name="" id="txtMOccupation" placeholder="">
                                 </div>
                             </div>
                             <div class="fields">
                                 <div class="eight wide field">
                                     <label>Address</label>
-                                    <input type="text" name="">
+                                    <input type="text" name="" id="txtMAddress">
                                 </div>
                                 <div class="eight wide field">
                                     <label>Contact Number</label>
-                                    <input type="text" name="">
+                                    <input type="text" name="" id="txtMContactNumber">
                                 </div>
                             </div>
 
@@ -296,7 +310,7 @@
                                 <div class="three wide field">
                                     <label>Number of Siblings</label>
 
-                                    <select class="ui fluid dropdown" id="siblings" name="siblings">
+                                    <select class="ui fluid dropdown" id="txtNoSiblings" name="txtNoSiblings">
                                         <option value="" selected="selected">Please Select One</option>
                                         <option value="0">0</option>
                                         <?php
@@ -316,19 +330,19 @@
                                 <div class="fields">
                                     <div class="six wide field">
                                         <label>Name</label>
-                                        <input type="text" name="">
+                                        <input type="text" name="txtSName" id="txtSName">
                                     </div>
                                     <div class="six wide field">
                                         <label>Address</label>
-                                        <input type="text" name="">
+                                        <input type="text" name="txtSAddress" id="txtSAddress">
                                     </div>
                                     <div class="six wide field">
                                         <label>Occupation</label>
-                                        <input type="text" name="">
+                                        <input type="text" name="txtSOccupation" id="txtSOccupation">
                                     </div>
                                     <div class="six wide field">
                                         <label>Contact No.</label>
-                                        <input type="text" name="">
+                                        <input type="text" name="txtSContactNo" id="txtSContactNo">
                                     </div>
                                 </div>
                             </div>
@@ -346,25 +360,25 @@
                                 <tbody>
                                 <tr>
                                     <td>Primary</td>
-                                    <td><input type="text"></td>
-                                    <td><input type="text"></td>
+                                    <td><input type="text" id="txtPrimarySchool"></td>
+                                    <td><input type="text" id="txtPrimarySY"></td>
                                 </tr>
                                 <tr>
                                     <td>Secondary</td>
-                                    <td><input type="text"></td>
-                                    <td><input type="text"></td>
+                                    <td><input type="text" id="txtSecondarySchool"></td>
+                                    <td><input type="text" id="txtSecondarySY"></td>
                                 </tr>
                                 <tr>
                                     <td>Tertiary</td>
-                                    <td><input type="text"></td>
-                                    <td><input type="text"></td>
+                                    <td><input type="text" id="txtTertiarySchool"></td>
+                                    <td><input type="text" id="txtTertiarySY"></td>
                                 </tr>
                                 </tbody>
                             </table>
                             <div class="fields">
                                 <div class="sixteen wide field">
                                     <label>Skills</label>
-                                    <input type="text" name="">
+                                    <input type="text" name="txtSkills" id="txtSkills">
                                     <i>(Please separate with comma.)</i>
                                 </div>
                             </div>
