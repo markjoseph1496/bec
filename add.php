@@ -1,4 +1,5 @@
 <?php
+include('connection.php');
 if(isset($_POST['cboBranchCode'])){
     $BranchCode = $_POST['cboBranchCode'];
     $Picture = $_POST['idpicture'];
@@ -20,20 +21,18 @@ if(isset($_POST['cboBranchCode'])){
     $ProvinceofSpouse = $_POST['txtProvinceofSpouse'];
     $Religion = $_POST['txtReligion'];
     $Birthdate = $_POST['txtBirthdate'];
-    $BirthPlace = $_POST['txtBirthPlace'];
+
     $Father = $_POST['txtFather'];
     $FOccupation = $_POST['txtFOccupation'];
     $FAddress = $_POST['txtFAddress'];
     $FContactNumber = $_POST['txtFContactNumber'];
-    $Mother = $_POST['txtMother'];
-    $MAddress = $_POST['txtMAddress'];
-    $MContactNumber = $_POST['txtMContactNumber'];
+
 
 
     GSecureSQL::query(
         "INSERT INTO tblemployeeinfo",
         FALSE,
-        "sssssssssssissssssssssssss",
+        "ssssssssssssssssssssss",
         $FirstName,
         $MiddleName,
         $LastName,
@@ -52,9 +51,10 @@ if(isset($_POST['cboBranchCode'])){
         $ProvinceofSpouse,
         $Religion,
         $Birthdate,
-        $BirthPlace,
         $Father,
-        $
+        $FOccupation,
+        $FAddress,
+        $FContactNumber
     );
 
 
