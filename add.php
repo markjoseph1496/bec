@@ -27,10 +27,8 @@ if(isset($_POST['cboBranchCode'])){
     $FAddress = $_POST['txtFAddress'];
     $FContactNumber = $_POST['txtFContactNumber'];
 
-
-
     GSecureSQL::query(
-        "INSERT INTO tblemployeeinfo",
+        "INSERT INTO tblemployeeinfo (FirstName, MiddleName, LastName, Province, City, Barangay, Street, Email, MobileNumber, CivilStatus, Gender, Age, Spouse, Occupation, NumOfChildren, ProvinceofSpouse, Religion, Birthdate, Father, FOccupation, FAddress, FContactNumber) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
         FALSE,
         "ssssssssssssssssssssss",
         $FirstName,
@@ -56,6 +54,4 @@ if(isset($_POST['cboBranchCode'])){
         $FAddress,
         $FContactNumber
     );
-
-
 }

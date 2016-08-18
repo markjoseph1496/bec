@@ -109,19 +109,7 @@ include('connection.php')
                                         <div class="three wide field">
                                             <select class="ui fluid dropdown" id="cboBranchCode" name="cboBranchCode">
                                                 <option value="" selected="selected">Please Select One</option>
-                                                <?php
-                                                $tblBRCode =
-                                                    GSecureSQL::query(
-                                                        "SELECT `BranchCode` FROM `tblbranch` ORDER BY `BranchCode` ASC",
-                                                        TRUE
-                                                    );
-                                                foreach ($tblBRCode as $value) {
-                                                    $BranchCode = $value[0];
-                                                    ?>
-                                                    <option value="<?php echo $BranchCode; ?>" ><?php echo $BranchCode; ?></option>
-                                                    <?php
-                                                }
-                                                ?>
+                                                <option value="1" >Please Select One</option>
                                             </select>
                                         </div>
                                     </div>
