@@ -1,0 +1,76 @@
+.tabletitle {
+    color: #000000;
+    padding: 7px;
+    border: 1px solid  #E5E4E2;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+
+thead {
+    display: table-header-group;
+    vertical-align: middle;
+    border-color: inherit;
+    height:20px;
+}
+
+.Applicants tr:nth-of-type(2n+1), .tablelist tr:nth-of-type(2n+1) {
+    background: none repeat scroll 0 0 #f3eeee;
+}
+tr {
+    display: table-row;
+    vertical-align: inherit;
+    border-color: inherit;
+}
+td, th {
+    text-align: center;
+    padding: 7px 10px;
+}
+
+td, th {
+    display: table-cell;
+    vertical-align: inherit;
+}
+
+.tcenter {
+    text-align: center;
+}
+.header_advertising{
+    padding:3px;
+    border: 1px solid #E5E4E2;
+}
+.header2_advertising{
+    padding:5px;
+    border: 1px solid #E5E4E2;
+
+}
+.filtersearch{
+    margin-top: 20px;
+    margin-left: 30px;
+}
+/*#date_from{
+    width:250px;
+}*/
+
+.date_to{
+    width:250px;
+    margin-left: 300px;
+    margin-top: -60px;
+} 
+/*#date_to{
+  margin-top: -29px;
+}*/
+#label{
+  margin-left: -40px;
+  margin-top: 30px;
+} 
+.total{
+    padding:10px;
+    border: 1px solid #E5E4E2;
+    width: 334px;
+    margin-left: 747px;
+    
+}
