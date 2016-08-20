@@ -25,10 +25,10 @@ class GSecureSQLConfig
             );
         } else {
             return array(
-                'host' => 'localhost:3306',
-                'user' => 'root',
-                'pass' => '',
-                'db' => 'becdb'
+                'host' => '31.220.110.2',
+                'user' => 'u412994236_bec',
+                'pass' => 'sX5eDJOHupKMu5nCL5',
+                'db' => 'u412994236_bec'
             );
         }
     }
