@@ -64,7 +64,7 @@ include('connection.php');
     </div>
 </nav>
 
-<form method="POST" name="frmSubmit" id="frmSubmit" action="#">
+<form method="POST" name="frmSubmitCash" id="frmSubmitCash" action="Transactions.php">
     <div id="content">
         <div class="container">
             <div class="big-title text-center">
@@ -75,7 +75,8 @@ include('connection.php');
                 <div class="col-md-6">
                     <label>OR. Number</label>
                     <div class="form-group">
-                        <input type="text" class="form-control" id="ORNumber" name="ORNumber">
+                        <input type="hidden" name="Cash" value="Cash">
+                        <input type="text" class="form-control" id="ORNumber" name="ORNumber" required>
                     </div>
                 </div>
             </div>
@@ -84,7 +85,7 @@ include('connection.php');
                     <label>Customer Name</label>
                     <div class="form-group">
                         <div class="controls">
-                            <input type="text" class="form-control" name="Birthday" id="Birthday">
+                            <input style="text-transform: capitalize" type="text" class="form-control" name="CustomerName" id="CustomerName" required>
                         </div>
                     </div>
                 </div>
@@ -94,9 +95,21 @@ include('connection.php');
                     <label>Model Unit 1</label>
                     <div class="form-group">
                         <div class="controls">
-                            <select id="ModelUnit[]" name="ModelUnit[]" class="form-control" style="width:100%; height:34px;">
+                            <select id="ModelUnit1" name="ModelUnit1" class="form-control" style="width:100%; height:34px;" required>
                                 <option value="">- Please select one -</option>
-                                <option value="Caloocan City">Caloocan City</option>
+                                <?php
+                                $ModelUnit1 =
+                                    GSecureSQL::query(
+                                        "SELECT Model FROM unitstbl WHERE Brand = 'Oppo'",
+                                        TRUE
+                                    );
+                                foreach($ModelUnit1 as $value1){
+                                    $ModelUnit = $value1[0];
+                                    ?>
+                                    <option value="<?php echo $ModelUnit; ?>"><?php echo $ModelUnit; ?></option>
+                                    <?php
+                                }
+                                ?>
                             </select>
                         </div>
                     </div>
@@ -105,7 +118,8 @@ include('connection.php');
                     <label>Quantity</label>
                     <div class="form-group">
                         <div class="controls">
-                            <input type="number" class="form-control" name="Quantity[]" id="Quantity[]" min="1" max="50">
+                            <input type="hidden" name="Price1" id="Price1">
+                            <input type="number" class="form-control" name="Quantity1" id="Quantity1" min="1" max="50" required>
                         </div>
                     </div>
                 </div>
@@ -113,7 +127,8 @@ include('connection.php');
                     <label>Total Price</label>
                     <div class="form-group">
                         <div class="controls">
-                            <input type="text" class="form-control" name="TotalPrice[]" id="TotalPrice[]" disabled>
+                            <input type="hidden" id="TotalPrice1hid" name="TotalPrice1hid" value="">
+                            <input type="text" class="form-control" name="TotalPrice1" id="TotalPrice1" disabled>
                         </div>
                     </div>
                 </div>
@@ -123,9 +138,21 @@ include('connection.php');
                     <label>Model Unit 2</label>
                     <div class="form-group">
                         <div class="controls">
-                            <select id="ModelUnit[]" name="ModelUnit[]" class="form-control" style="width:100%; height:34px;">
+                            <select id="ModelUnit2" name="ModelUnit2" class="form-control" style="width:100%; height:34px;">
                                 <option value="">- Please select one -</option>
-                                <option value="Caloocan City">Caloocan City</option>
+                                <?php
+                                $ModelUnit2 =
+                                    GSecureSQL::query(
+                                        "SELECT Model FROM unitstbl WHERE Brand = 'Oppo'",
+                                        TRUE
+                                    );
+                                foreach($ModelUnit2 as $value1){
+                                    $ModelUnit = $value1[0];
+                                    ?>
+                                    <option value="<?php echo $ModelUnit; ?>"><?php echo $ModelUnit; ?></option>
+                                    <?php
+                                }
+                                ?>
                             </select>
                         </div>
                     </div>
@@ -134,7 +161,8 @@ include('connection.php');
                     <label>Quantity</label>
                     <div class="form-group">
                         <div class="controls">
-                            <input type="number" class="form-control" name="Quantity[]" id="Quantity[]" min="1" max="50">
+                            <input type="hidden" id="TotalPrice2hid" name="TotalPrice2hid" value="">
+                            <input type="number" class="form-control" name="Quantity2" id="Quantity2" min="1" max="50">
                         </div>
                     </div>
                 </div>
@@ -142,7 +170,7 @@ include('connection.php');
                     <label>Total Price</label>
                     <div class="form-group">
                         <div class="controls">
-                            <input type="text" class="form-control" name="TotalPrice[]" id="TotalPrice[]" disabled>
+                            <input type="text" class="form-control" name="TotalPrice2" id="TotalPrice2" disabled>
                         </div>
                     </div>
                 </div>
@@ -152,9 +180,21 @@ include('connection.php');
                     <label>Model Unit 3</label>
                     <div class="form-group">
                         <div class="controls">
-                            <select id="ModelUnit[]" name="ModelUnit[]" class="form-control" style="width:100%; height:34px;">
-                                <option value="">- Please select one -</option>
-                                <option value="Caloocan City">Caloocan City</option>
+                            <select id="ModelUnit3" name="ModelUnit3" class="form-control" style="width:100%; height:34px;">
+                                <option value="" selected="selected">- Please select one -</option>
+                                <?php
+                                    $ModelUnit3 =
+                                        GSecureSQL::query(
+                                            "SELECT Model FROM unitstbl WHERE Brand = 'Oppo'",
+                                            TRUE
+                                        );
+                                        foreach($ModelUnit3 as $value1){
+                                            $ModelUnit = $value1[0];
+                                            ?>
+                                            <option value="<?php echo $ModelUnit; ?>"><?php echo $ModelUnit; ?></option>
+                                            <?php
+                                        }
+                                ?>
                             </select>
                         </div>
                     </div>
@@ -163,7 +203,7 @@ include('connection.php');
                     <label>Quantity</label>
                     <div class="form-group">
                         <div class="controls">
-                            <input type="number" class="form-control" name="Quantity[]" id="Quantity[]" min="1" max="50">
+                            <input type="number" class="form-control" name="Quantity3" id="Quantity3" min="1" max="50">
                         </div>
                     </div>
                 </div>
@@ -171,7 +211,8 @@ include('connection.php');
                     <label>Total Price</label>
                     <div class="form-group">
                         <div class="controls">
-                            <input type="text" class="form-control" name="TotalPrice[]" id="TotalPrice[]" disabled>
+                            <input type="hidden" id="TotalPrice3hid" name="TotalPrice3hid" value="">
+                            <input type="text" class="form-control" name="TotalPrice3" id="TotalPrice3" disabled>
                         </div>
                     </div>
                 </div>
@@ -201,12 +242,112 @@ include('connection.php');
 </body>
 </html>
 <script type="text/javascript">
-    $("#hiddendiv").hide()
-    $("#CBDownPayment").click(function() {
-        if($(this).is(":checked")) {
+    $("#hiddendiv").hide();
+    $("#CBDownPayment").click(function () {
+        if ($(this).is(":checked")) {
             $("#hiddendiv").show(300);
         } else {
             $("#hiddendiv").hide(200);
         }
     });
+
+
+    var ModelUnit1 = document.getElementById("ModelUnit1");
+    ModelUnit1.onchange = function(){
+        var selectedString1 = ModelUnit1.options[ModelUnit1.selectedIndex].value;
+        var data = {id:selectedString1};
+        $.post('geta.php',data,function(data){
+        var price = data;
+            var Qty = document.getElementById('Quantity1').value;
+            var TP = document.getElementById('TotalPrice1');
+            var TPhid = document.getElementById('TotalPrice1hid');
+            var TP1 = price * Qty;
+            TP.value = TP1;
+            TPhid.value = TP1;
+
+        });
+    }
+
+    var quantity1 = document.getElementById("Quantity1");
+    quantity1.onchange = function(){
+        var selectedString1 = ModelUnit1.options[ModelUnit1.selectedIndex].value;
+        var data = {id:selectedString1};
+        $.post('geta.php',data,function(data){
+            var price = data;
+            var Qty = document.getElementById('Quantity1').value;
+            var TP = document.getElementById('TotalPrice1');
+            var TPhid = document.getElementById('TotalPrice1hid');
+            var TP1 = price * Qty;
+            TP.value = TP1;
+            TPhid.value = TP1;
+
+        });
+    }
+
+
+    var ModelUnit2 = document.getElementById("ModelUnit2");
+    ModelUnit2.onchange = function(){
+        var selectedString2 = ModelUnit2.options[ModelUnit2.selectedIndex].value;
+        var data = {id:selectedString2};
+        $.post('geta.php',data,function(data){
+            var price = data;
+            var Qty = document.getElementById('Quantity2').value;
+            var TP = document.getElementById('TotalPrice2');
+            var TPhid = document.getElementById('TotalPrice2hid');
+            var TP2 = price * Qty;
+            TP.value = TP2;
+            TPhid.value = TP2;
+
+        });
+    }
+
+    var quantity2 = document.getElementById("Quantity2");
+    quantity2.onchange = function(){
+        var selectedString2 = ModelUnit2.options[ModelUnit2.selectedIndex].value;
+        var data = {id:selectedString2};
+        $.post('geta.php',data,function(data){
+            var price = data;
+            var Qty = document.getElementById('Quantity2').value;
+            var TP = document.getElementById('TotalPrice2');
+            var TPhid = document.getElementById('TotalPrice2hid');
+            var TP2 = price * Qty;
+            TP.value = TP2;
+            TPhid.value = TP2;
+
+        });
+    }
+
+
+    var ModelUnit3 = document.getElementById("ModelUnit3");
+    ModelUnit3.onchange = function(){
+        var selectedString3 = ModelUnit3.options[ModelUnit3.selectedIndex].value;
+        var data = {id:selectedString3};
+        $.post('geta.php',data,function(data){
+            var price = data;
+            var Qty = document.getElementById('Quantity3').value;
+            var TP = document.getElementById('TotalPrice3');
+            var TPhid = document.getElementById('TotalPrice3hid');
+            var TP3 = price * Qty;
+            TP.value = TP3;
+            TPhid.value = TP3;
+
+        });
+    }
+
+    var quantity3 = document.getElementById("Quantity3");
+    quantity3.onchange = function(){
+        var selectedString3 = ModelUnit3.options[ModelUnit3.selectedIndex].value;
+        var data = {id:selectedString3};
+        $.post('geta.php',data,function(data){
+            var price = data;
+            var Qty = document.getElementById('Quantity3').value;
+            var TP = document.getElementById('TotalPrice3');
+            var TPhid = document.getElementById('TotalPrice3hid');
+            var TP3 = price * Qty;
+            TP.value = TP3;
+            TPhid.value = TP3;
+
+        });
+    }
+
 </script>
