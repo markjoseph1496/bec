@@ -25,7 +25,7 @@ class GSecureSQLConfig
             );
         } else {
             return array(
-                'host' => '31.220.110.2',
+                'host' => 'mysql.hostinger.ph',
                 'user' => 'u412994236_bec',
                 'pass' => 'sX5eDJOHupKMu5nCL5',
                 'db' => 'u412994236_bec'
