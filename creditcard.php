@@ -56,8 +56,8 @@ include('connection.php');
             <a class="navbar-brand navbar-link" href="#">Berlein Electronics Corp.</a></div>
         <div class="collapse navbar-collapse" id="navcol-1">
             <ul class="nav navbar-nav">
-                <li role="presentation"><a href="Cash.php">D2 Cash</a></li>
-                <li class="active" role="presentation"><a href="CreditCard.php">D2 Credit</a></li>
+                <li role="presentation"><a href="cash.php">D2 Cash</a></li>
+                <li class="active" role="presentation"><a href="creditcard.php">D2 Credit</a></li>
                 <li role="presentation"><a href="#">D3 Units</a></li>
             </ul>
         </div>
