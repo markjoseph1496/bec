@@ -64,7 +64,7 @@ include('connection.php');
     </div>
 </nav>
 
-<form method="POST" name="frmSubmitCash" id="frmSubmitCash" action="Transactions.php">
+<form method="POST" name="frmSubmitCash" id="frmSubmitCash" action="transactions.php">
     <div id="content">
         <div class="container">
             <div class="big-title text-center">
@@ -241,6 +241,7 @@ include('connection.php');
 </form>
 </body>
 </html>
+
 <script type="text/javascript">
     $("#hiddendiv").hide();
     $("#CBDownPayment").click(function () {
