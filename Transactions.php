@@ -15,6 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $TotalPrice3 = $_POST['TotalPrice3hid'];
         $Downpayment = $_POST['Downpayment'];
 
+
         $CustomerName = ucwords($CustomerName);
 
         $TotalPrice = $TotalPrice1 + $TotalPrice2 + $TotalPrice3 + $Downpayment;
