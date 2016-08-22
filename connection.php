@@ -10,25 +10,33 @@ if($conn->connect_error){
     die("Connection Failed: " . $conn->connect_error);
 }
 
-*/
+
+
+
+
+
+                'host' => 'mysql.hostinger.ph',
+                'user' => 'u412994236_bec',
+                'pass' => 'sX5eDJOHupKMu5nCL5',
+                'db' => 'u412994236_bec'*/
 
 class GSecureSQLConfig
 {
     static function get_mysqli_config($type = NULL)
     {
-        if (strtoupper($type) == 'LOCALHOST') {
+        if (strtoupper($type) == 'localhost') {
             return array(
                 'host' => 'localhost:3306',
                 'user' => 'root',
                 'pass' => '',
-                'db' => 'e2edb'
+                'db' => 'becdb'
             );
         } else {
             return array(
-                'host' => 'mysql.hostinger.ph',
-                'user' => 'u412994236_bec',
-                'pass' => 'sX5eDJOHupKMu5nCL5',
-                'db' => 'u412994236_bec'
+                'host' => 'localhost:3306',
+                'user' => 'root',
+                'pass' => '',
+                'db' => 'becdb'
             );
         }
     }
