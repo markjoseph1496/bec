@@ -1,3 +1,6 @@
+<?php
+include('../../connection.php');
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -43,7 +46,7 @@
     <script src="../../dist/js/sb-admin-2.js"></script>
 </head>
 
-<body>
+<body onload="Units()">
 
 <div id="wrapper">
 
@@ -64,7 +67,7 @@
                                 <div class="panel-heading">
                                     <div class="row">
                                         <div class="col-xs-3">
-                                            <i class="fa fa-list-ul fa-5x"></i>
+                                            <i class="fa fa-list-alt fa-5x"></i>
                                         </div>
                                         <div class="col-xs-9 text-right">
                                             <div class="huge">Units</div>
@@ -86,7 +89,7 @@
                                 <div class="panel-heading">
                                     <div class="row">
                                         <div class="col-xs-3">
-                                            <i class="fa fa-list-ul fa-5x"></i>
+                                            <i class="fa fa-list-alt fa-5x"></i>
                                         </div>
                                         <div class="col-xs-9 text-right">
                                             <div class="huge">BM Accent</div>
@@ -108,7 +111,7 @@
                                 <div class="panel-heading">
                                     <div class="row">
                                         <div class="col-xs-3">
-                                            <i class="fa fa-list-ul fa-5x"></i>
+                                            <i class="fa fa-list-alt fa-5x"></i>
                                         </div>
                                         <div class="col-xs-9 text-right">
                                             <div class="huge">Quantum</div>
@@ -130,7 +133,7 @@
                                 <div class="panel-heading">
                                     <div class="row">
                                         <div class="col-xs-3">
-                                            <i class="fa fa-list-ul fa-5x"></i>
+                                            <i class="fa fa-list-alt fa-5x"></i>
                                         </div>
                                         <div class="col-xs-9 text-right">
                                             <div class="huge">Units</div>
@@ -199,7 +202,19 @@
                                             <div class="col-lg-4 col-xs-4">
                                                 <div class="form-group">
                                                     <label>Model / Unit</label>
-                                                    <select class="form-control">
+                                                    <select class="form-control model_name" id="model_name" name="model_name[]">
+                                                        <option selected value="">Please select one</option>
+                                                        <option>Flare S4</option>
+                                                        <option>Omega Nitro HD</option>
+                                                    </select>
+                                                    <label>Model / Unit</label>
+                                                    <select class="form-control model_name" id="model_name" name="model_name[]">
+                                                        <option selected value="">Please select one</option>
+                                                        <option>Flare S4</option>
+                                                        <option>Omega Nitro HD</option>
+                                                    </select>
+                                                    <label>Model / Unit</label>
+                                                    <select class="form-control model_name" id="model_name" name="model_name[]">
                                                         <option selected value="">Please select one</option>
                                                         <option>Flare S4</option>
                                                         <option>Omega Nitro HD</option>
@@ -315,3 +330,12 @@
 <!-- /#wrapper -->
 </body>
 </html>
+<script type="text/javascript">
+    function Units() {
+        var modelname = document.getElementsByClassName('model_name');
+        $.post('../../get.php', function (result) {
+                $('#model_name').html(result);
+            }
+        );
+    }
+</script>
