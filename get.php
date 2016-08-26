@@ -1,14 +1,14 @@
 <?php
 include('connection.php');
 
-$models =
-    GSecureSQL::query(
-        "SELECT * FROM unitstbl",
-        TRUE
-    );
+if(isset($_POST['id'])){
+    $id = $_POST['id'];
+    $unitprice =
+        GSecureSQL::query(
+            "SELECT SRP FROM unitstbl WHERE Model = '$id'",
+            TRUE
+        );
 
-foreach ($models as $value){
-    $Model = $value[1];
-
-    echo "<option value='$Model'>" . $Model . "</option>";
+    $Price = $unitprice[0][0];
+    echo $Price;
 }
