@@ -36,7 +36,7 @@ class GSecureSQLConfig
                 'host' => 'mysql.hostinger.ph',
                 'user' => 'u412994236_bec',
                 'pass' => 'sX5eDJOHupKMu5nCL5',
-                'db' => 'u412994236_bec'*/
+                'db' => 'u412994236_bec'
             );
         }
     }
