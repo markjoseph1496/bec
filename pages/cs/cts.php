@@ -420,7 +420,12 @@ $BranchCode = "B000";
     function refreshtable(){
         $('#test').load('cts.php #test');
     }
-    
+
+    setInterval(function(){
+        refreshtable();
+    }, 1000);
+
+
     function trans() {
         if (ModelUnit.value != "") {
             var selectedString = ModelUnit.options[ModelUnit.selectedIndex].value;
