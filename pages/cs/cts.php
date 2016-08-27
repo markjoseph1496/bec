@@ -423,7 +423,7 @@ $BranchCode = "B000";
 
     setInterval(function(){
         refreshtable();
-    }, 1000);
+    }, 500);
 
 
     function trans() {
