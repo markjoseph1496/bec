@@ -253,7 +253,7 @@ $BranchCode = "B000";
                                                                     <i class="fa fa-table fa-fw"></i> Items
                                                                 </div>
                                                                 <!-- /.panel-heading -->
-                                                                <div class="panel-body" style="height: 250px; overflow-y: scroll;">
+                                                                <div class="panel-body" style="height: 300px; overflow-y: scroll;">
                                                                     <table class="table table-hover" id="test">
                                                                         <thead>
                                                                         <tr>
@@ -261,32 +261,38 @@ $BranchCode = "B000";
                                                                             <th width="20%">Unit Price</th>
                                                                             <th width="10%">Qty</th>
                                                                             <th width="20%">Total Price</th>
+                                                                            <th></th>
                                                                         </tr>
                                                                         </thead>
                                                                         <tbody>
                                                                         <?php
-                                                                            $tmpsales =
-                                                                                GSecureSQL::query(
-                                                                                    "SELECT Unit, Price, Qty, TotalPrice FROM tmpsales WHERE BranchCode = ? AND Cashier = ?",
-                                                                                    TRUE,
-                                                                                    "ss",
-                                                                                    $BranchCode,
-                                                                                    $Cashier
-                                                                                );
-                                                                            foreach ($tmpsales as $val){
-                                                                                $Unit = $val[0];
-                                                                                $Price = $val[1];
-                                                                                $Qty = $val[2];
-                                                                                $TotalPrice = $val[3];
-                                                                                ?>
-                                                                                <tr>
-                                                                                    <td><?php echo $Unit ?></td>
-                                                                                    <td><?php echo $Price ?></td>
-                                                                                    <td><?php echo $Qty ?></td>
-                                                                                    <td><?php echo $TotalPrice ?></td>
-                                                                                </tr>
-                                                                        <?php
-                                                                            }
+                                                                        $tmpsales =
+                                                                            GSecureSQL::query(
+                                                                                "SELECT id, Unit, Price, Qty, TotalPrice FROM tmpsales WHERE BranchCode = ? AND Cashier = ?",
+                                                                                TRUE,
+                                                                                "ss",
+                                                                                $BranchCode,
+                                                                                $Cashier
+                                                                            );
+                                                                        foreach ($tmpsales as $val) {
+                                                                            $id = $val[0];
+                                                                            $Unit = $val[1];
+                                                                            $Price = $val[2];
+                                                                            $Qty = $val[3];
+                                                                            $TotalPrice = $val[4];
+                                                                            ?>
+                                                                            <tr>
+                                                                                <td><?php echo $Unit ?></td>
+                                                                                <td><?php echo $Price ?></td>
+                                                                                <td><?php echo $Qty ?></td>
+                                                                                <td><?php echo $TotalPrice ?></td>
+                                                                                <td>
+                                                                                    <input type="hidden" name="UnitIDinput" id="UnitIDinput" value="<?php echo $id ?>">
+                                                                                    <a onclick="btnDelete()" class="btn btn-danger"><i class="fa fa-trash"></i></a>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <?php
+                                                                        }
                                                                         ?>
                                                                         </tbody>
                                                                     </table>
@@ -296,6 +302,18 @@ $BranchCode = "B000";
                                                         </div>
 
                                                     </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-2" id="hiddendiv">
+                                                    <input type="text" class="form-control" name="Downpayment" id="Downpayment">
+                                                </div>
+                                                <div class="col-lg-4">
+                                                    <input id="CBDownPayment" type="checkbox">
+                                                    <label for="CBDownPayment"><b>With Downpayment?</b></label>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <label for="CBDownPayment"><b>With Downpayment?</b></label>
                                                 </div>
                                             </div>
                                         </div>
@@ -389,69 +407,3 @@ $BranchCode = "B000";
 <!-- /#wrapper -->
 </body>
 </html>
-<script type="text/javascript">
-    var ModelUnit = document.getElementById("model_name");
-    var Qty = document.getElementById('Quantity');
-    var Price = document.getElementById('Price');
-    var TotalPrice = document.getElementById('TotalPrice');
-    document.getElementById("Quantity").disabled = true;
-    document.getElementById("btnAdd").disabled = true;
-    var arrayq = ["Banana", "Orange", "Apple", "Mango"];
-
-    function btn() {
-        $.post('../../dd.php',
-            $('#frmUnitsCash').serialize());
-
-        /*
-         var jsonString = JSON.stringify(arrayq);
-         $.ajax({
-         type: "POST",
-         url: "../../dd.php",
-         data: {data: jsonString},
-         cache: false,
-
-         success: function (data) {
-         alert(data);
-         }
-         });
-         */
-    }
-
-    function refreshtable(){
-        $('#test').load('cts.php #test');
-    }
-
-    setInterval(function(){
-        refreshtable();
-    }, 500);
-
-
-    function trans() {
-        if (ModelUnit.value != "") {
-            var selectedString = ModelUnit.options[ModelUnit.selectedIndex].value;
-            var data = {id: selectedString};
-            $.post('../../get.php', data, function (data) {
-                var price = data;
-                var Qty = document.getElementById('Quantity').value;
-                Price.value = accounting.formatNumber(price, 2, ",", ".");
-                var tp = price * Qty;
-                tp = accounting.formatNumber(tp, 2, ",", ".");
-                TotalPrice.value = tp;
-                document.getElementById("Quantity").disabled = false;
-            });
-        } else {
-            Qty.value = "";
-            Price.value = "";
-            TotalPrice.value = "";
-            document.getElementById("Quantity").disabled = true;
-        }
-
-        if (ModelUnit.value != "" && Qty.value != "") {
-            document.getElementById("btnAdd").disabled = false;
-            document.getElementById("Quantity").disabled = false;
-        } else {
-            document.getElementById("btnAdd").disabled = true;
-            document.getElementById("Quantity").disabled = true;
-        }
-    }
-</script>

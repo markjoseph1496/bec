@@ -1,25 +1,20 @@
 <?php
-include('connection.php');
+include('../../../connection.php');
 
 $BranchCode = $_POST['BranchCode'];
 $Cashier = $_POST['Cashier'];
-$ORNumber = $_POST['ORNumber'];
-$CustomerName =$_POST['CName'];
 $ModelName = $_POST['model_name'];
 $Price = $_POST['Price'];
 $Qty = $_POST['Quantity'];
 $TotalPrice = $_POST['TotalPrice'];
 
 
-
 GSecureSQL::query(
-    "INSERT INTO tmpsales (Cashier, BranchCode, ORNumber, Customer, Unit, Price, Qty, TotalPrice) values (?,?,?,?,?,?,?,?)",
+    "INSERT INTO tmpsales (Cashier, BranchCode, Unit, Price, Qty, TotalPrice) values (?,?,?,?,?,?)",
     FALSE,
-    "ssssssss",
+    "ssssss",
     $Cashier,
     $BranchCode,
-    $ORNumber,
-    $CustomerName,
     $ModelName,
     $Price,
     $Qty,
