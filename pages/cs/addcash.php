@@ -16,7 +16,7 @@ $BranchCode = "B000";
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>SB Admin 2 - Bootstrap Admin Theme</title>
+    <title>Transactions</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -64,7 +64,7 @@ $BranchCode = "B000";
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">Blank</h1>
+                    <h1 class="page-header">Add Cash Transaction</h1>
                     <form method="POST" name="frmUnitsCash" id="frmUnitsCash">
                         <input type="hidden" value="<?php echo $Cashier ?>" name="Cashier">
                         <input type="hidden" value="<?php echo $BranchCode ?>" name="BranchCode">
@@ -162,7 +162,7 @@ $BranchCode = "B000";
                                                             <td><?php echo $TotalPrice ?></td>
                                                             <td>
                                                                 <input type="hidden" name="UnitIDinput" id="UnitIDinput" value="<?php echo $id ?>">
-                                                                <a onclick="btnDelete()" class="btn btn-danger"><i class="fa fa-trash"></i></a>
+                                                                <a class="btn btn-danger"><i class="fa fa-trash"></i></a>
                                                             </td>
                                                         </tr>
                                                         <?php
@@ -224,7 +224,7 @@ $BranchCode = "B000";
     }
 
     function refreshtable() {
-        $('#test').load('cts.php #test');
+        $('#test').load('addcash.php #test');
     }
 
     setInterval(function () {
