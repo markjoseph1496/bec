@@ -65,19 +65,19 @@ $BranchCode = "B000";
             <div class="row">
                 <div class="col-lg-12">
                     <h1 class="page-header">Add Cash Transaction</h1>
-                    <form method="POST" name="frmUnitsCash" id="frmUnitsCash">
+                    <form method="POST" name="frmUnitsCash" id="frmUnitsCash" action="a.php">
                         <input type="hidden" value="<?php echo $Cashier ?>" name="Cashier">
                         <input type="hidden" value="<?php echo $BranchCode ?>" name="BranchCode">
                         <div class="row">
                             <div class="col-lg-4 col-xs-4">
                                 <div class="form-group">
                                     <label>OR Number</label>
-                                    <input class="form-control" name="ORNumber" id="ORNumber" required>
+                                    <input class="form-control" name="ORNumber" id="ORNumber">
                                     <p class="help-block">Ex. 84956</p>
                                 </div>
                                 <div class="form-group">
                                     <label>Customer Name</label>
-                                    <input class="form-control" name="CName" id="CName" required>
+                                    <input class="form-control" name="CName" id="CName">
                                     <p class="help-block">Ex. Juan Dela Cruz</p>
                                 </div>
                             </div>
@@ -86,7 +86,7 @@ $BranchCode = "B000";
                             <div class="col-lg-4 col-xs-4">
                                 <div class="form-group">
                                     <label>Model / Unit</label>
-                                    <select class="form-control" id="model_name" name="model_name" onchange="trans()" required>
+                                    <select class="form-control" id="model_name" name="model_name" onchange="trans()">
                                         <option selected value="">Please select one</option>
                                         <?php
                                         $models =
@@ -109,14 +109,14 @@ $BranchCode = "B000";
                                 </div>
                                 <div class="form-group">
                                     <label>Quantity</label>
-                                    <input type="number" min="1" max="20" class="form-control" id="Quantity" name="Quantity" onchange="trans()" required>
+                                    <input type="number" min="1" max="20" class="form-control" id="Quantity" name="Quantity" onchange="trans()">
                                 </div>
                                 <div class="form-group">
                                     <label>Total Price</label>
                                     <input type="text" class="form-control" readonly name="TotalPrice" id="TotalPrice">
                                 </div>
                                 <div class="form-group">
-                                    <button type="button" class="btn btn-primary" onclick="btn()" id="btnAdd">Add Item</button>
+                                    <button type="button" class="btn btn-primary" id="btnAdd">Add Item</button>
                                 </div>
                             </div>
                             <div class="col-lg-8 col-xs-8">
@@ -128,58 +128,36 @@ $BranchCode = "B000";
                                             </div>
                                             <!-- /.panel-heading -->
                                             <div class="panel-body" style="height: 300px; overflow-y: scroll;">
-                                                <table class="table table-hover" id="test">
+                                                <table class="table table-hover" id="sales">
                                                     <thead>
                                                     <tr>
                                                         <th width="40%">Model / Unit</th>
                                                         <th width="20%">Unit Price</th>
                                                         <th width="10%">Qty</th>
                                                         <th width="20%">Total Price</th>
-                                                        <th></th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <?php
-                                                    $tmpsales =
-                                                        GSecureSQL::query(
-                                                            "SELECT id, Unit, Price, Qty, TotalPrice FROM tmpsales WHERE BranchCode = ? AND Cashier = ?",
-                                                            TRUE,
-                                                            "ss",
-                                                            $BranchCode,
-                                                            $Cashier
-                                                        );
-                                                    foreach ($tmpsales as $val) {
-                                                        $id = $val[0];
-                                                        $Unit = $val[1];
-                                                        $Price = $val[2];
-                                                        $Qty = $val[3];
-                                                        $TotalPrice = $val[4];
-                                                        ?>
-                                                        <tr>
-                                                            <td><?php echo $Unit ?></td>
-                                                            <td><?php echo $Price ?></td>
-                                                            <td><?php echo $Qty ?></td>
-                                                            <td><?php echo $TotalPrice ?></td>
-                                                            <td>
-                                                                <input type="hidden" name="UnitIDinput" id="UnitIDinput" value="<?php echo $id ?>">
-                                                                <a class="btn btn-danger"><i class="fa fa-trash"></i></a>
-                                                            </td>
-                                                        </tr>
-                                                        <?php
-                                                    }
-                                                    ?>
+
                                                     </tbody>
                                                 </table>
                                             </div>
                                             <!-- /.panel-body -->
                                         </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-lg-4">
-                                            <input id="CBDownPayment" type="checkbox">
-                                            <label for="CBDownPayment"><b>With Downpayment?</b></label>
-                                            <div id="hiddendiv">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <input id="CBDownPayment" type="checkbox">
+                                                <label for="CBDownPayment"><b>With Downpayment?</b></label>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div id="hiddendiv" class="col-lg-4">
                                                 <input type="text" class="form-control" name="Downpayment" id="Downpayment">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <button class="btn btn-primary" style="float: right">Submit</button>
                                             </div>
                                         </div>
                                     </div>
@@ -205,9 +183,9 @@ $BranchCode = "B000";
     $("#hiddendiv").hide();
     $("#CBDownPayment").click(function () {
         if ($(this).is(":checked")) {
-            $("#hiddendiv").show();
+            $("#hiddendiv").show(200);
         } else {
-            $("#hiddendiv").hide();
+            $("#hiddendiv").hide(300);
         }
     });
 
@@ -215,21 +193,36 @@ $BranchCode = "B000";
     var Qty = document.getElementById('Quantity');
     var Price = document.getElementById('Price');
     var TotalPrice = document.getElementById('TotalPrice');
-    document.getElementById("Quantity").disabled = true;
-    document.getElementById("btnAdd").disabled = true;
+    var btnAdd = document.getElementById("btnAdd");
+    Qty.disabled = true;
+    btnAdd.disabled = true;
 
     function btn() {
         $.post('functions/tables.php',
             $('#frmUnitsCash').serialize());
     }
 
-    function refreshtable() {
-        $('#test').load('addcash.php #test');
+    function addDataRow() {
+        var data = $('#model_name, #Price, #Quantity, #TotalPrice');
+        var row = $('<tr>');
+        for (var i = 0; i < data.length; i++) {
+            $('<td>').text(data[i].value).appendTo(row);
+        }
+        $('<input type="hidden" name="tModelName[]">').val(data[0].value).appendTo(row);
+        $('<input type="hidden" name="tPrice[]">').val(data[1].value).appendTo(row);
+        $('<input type="hidden" name="tQuantity[]">').val(data[2].value).appendTo(row);
+        $('<input type="hidden" name="tTotalPrice[]">').val(data[3].value).appendTo(row);
+        row.appendTo('#sales');
+
+        ModelUnit.value = "";
+        Qty.value = "";
+        Price.value = "";
+        TotalPrice.value = "";
+        Qty.disabled = true;
+        btnAdd.disabled = true;
     }
 
-    setInterval(function () {
-        refreshtable();
-    }, 500);
+    $('#btnAdd').click(addDataRow);
 
     function trans() {
         if (ModelUnit.value != "") {
