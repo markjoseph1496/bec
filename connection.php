@@ -34,10 +34,10 @@ class GSecureSQLConfig
             );
         } else {
             return array(
-                'host' => 'localhost:3306',
-                'user' => 'root',
-                'pass' => '',
-                'db' => 'becdb'
+                'host' => 'mysql.hostinger.ph',
+                'user' => 'u412994236_bec',
+                'pass' => 'sX5eDJOHupKMu5nCL5',
+                'db' => 'u412994236_bec'
             );
         }
     }
