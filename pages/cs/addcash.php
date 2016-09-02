@@ -91,12 +91,12 @@ $BranchCode = "B000";
                                         <?php
                                         $models =
                                             GSecureSQL::query(
-                                                "SELECT * FROM unitstbl",
+                                                "SELECT Model FROM unitstbl",
                                                 TRUE
                                             );
 
                                         foreach ($models as $value) {
-                                            $Model = $value[1];
+                                            $Model = $value[0];
                                             echo "<option value='$Model'>" . $Model . "</option>";
 
                                         }
@@ -143,6 +143,9 @@ $BranchCode = "B000";
                                                 </table>
                                             </div>
                                             <!-- /.panel-body -->
+                                            <div class="panel-footer">
+                                                <b>Total Price: <label id="sPrice">sads</label></b>
+                                            </div>
                                         </div>
                                         <div class="row">
                                             <div class="col-lg-6">
@@ -180,6 +183,15 @@ $BranchCode = "B000";
 </body>
 </html>
 <script type="text/javascript">
+    var ModelUnit = document.getElementById('model_name');
+    var Qty = document.getElementById('Quantity');
+    var Price = document.getElementById('Price');
+    var TotalPrice = document.getElementById('TotalPrice');
+    var btnAdd = document.getElementById("btnAdd");
+    var sPrice = document.getElementById("sPrice");
+    Qty.disabled = true;
+    btnAdd.disabled = true;
+
     $("#hiddendiv").hide();
     $("#CBDownPayment").click(function () {
         if ($(this).is(":checked")) {
@@ -188,14 +200,6 @@ $BranchCode = "B000";
             $("#hiddendiv").hide(300);
         }
     });
-
-    var ModelUnit = document.getElementById('model_name');
-    var Qty = document.getElementById('Quantity');
-    var Price = document.getElementById('Price');
-    var TotalPrice = document.getElementById('TotalPrice');
-    var btnAdd = document.getElementById("btnAdd");
-    Qty.disabled = true;
-    btnAdd.disabled = true;
 
     function btn() {
         $.post('functions/tables.php',
@@ -220,6 +224,16 @@ $BranchCode = "B000";
         TotalPrice.value = "";
         Qty.disabled = true;
         btnAdd.disabled = true;
+
+        var tPrice = document.getElementsByName('tTotalPrice[]');
+        var stPrice = 0;
+
+        for(i=0; i < tPrice.length; i++)  {
+            stPrice = parseFloat(stPrice) + parseFloat(tPrice[i].value.replace(/,/g, ''));
+        }
+        stPrice = accounting.formatNumber(stPrice, 2, ",", ".");
+        sPrice.textContent = stPrice;
+
     }
 
     $('#btnAdd').click(addDataRow);
@@ -236,6 +250,7 @@ $BranchCode = "B000";
                 tp = accounting.formatNumber(tp, 2, ",", ".");
                 TotalPrice.value = tp;
                 document.getElementById("Quantity").disabled = false;
+
             });
         } else {
             Qty.value = "";
