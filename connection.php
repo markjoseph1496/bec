@@ -1,159 +1,59 @@
 <?php
-/*
-$servername = "localhost";
-$username = "root";
-$password = "";
 
-$conn = new mysqli($servername, $username, $password);
+function db_connect(){
 
-if($conn->connect_error){
-    die("Connection Failed: " . $conn->connect_error);
+    //Connection as static to avoid connecting more than once
+    static $connection;
+
+    // Try and connect to the database, if a connection has not been established
+    if(!isset($connection)){
+        //load config as an array
+        $config = parse_ini_file('config.ini');
+        $connection = mysqli_connect($config['host'], $config['username'], $config['password'], $config['dbname']);
+
+    }
+
+    //If connection was not successful
+    if($connection === false){
+        return mysqli_connect_error();
+    }
+    return $connection;
 }
 
+function db_query($query){
+    // Connect to the database
+    $connection = db_connect();
 
+    //Query the database
+    $result = mysqli_query($connection, $query);
 
+    return $result;
 
-
-
-                'host' => 'mysql.hostinger.ph',
-                'user' => 'u412994236_bec',
-                'pass' => 'sX5eDJOHupKMu5nCL5',
-                'db' => 'u412994236_bec'
-*/
-
-class GSecureSQLConfig
-{
-    static function get_mysqli_config($type = NULL)
-    {
-        if (strtoupper($type) == 'localhost') {
-            return array(
-                'host' => 'localhost:3306',
-                'user' => 'root',
-                'pass' => '',
-                'db' => 'becdb'
-            );
-        } else {
-            return array(
-                'host' => 'mysql.hostinger.ph',
-                'user' => 'u412994236_bec',
-                'pass' => 'sX5eDJOHupKMu5nCL5',
-                'db' => 'u412994236_bec'
-            );
-        }
-    }
 }
 
+function db_error(){
+    $connection = db_connect();
+    return mysqli_error($connection);
+}
 
-class GSecureSQL
-{
-    private static $config;
+function db_select($query){
+    $rows = array();
+    $result = db_query($query);
 
-    private static function _get_mysqli_config()
-    {
-        self::$config = GSecureSQLConfig::get_mysqli_config();
+    //If query failed, return false
+    if($result === false){
+        return false;
     }
 
-    static function query($sql, $has_return = FALSE, $types = NULL)
-    {
-        // validation
-
-        // -----
-        self::_get_mysqli_config();
-        $cn = new mysqli(
-            self::$config['host'],
-            self::$config['user'],
-            self::$config['pass'],
-            self::$config['db']
-        );
-        $ret = NULL;
-
-        $st = $cn->prepare($sql);
-
-        if($cn->errno <> 0){
-            trigger_error('MySQL Connection Error #' . $cn->errno . ': ' . $cn->error, E_USER_ERROR);
-        }
-        if (is_null($types)) {
-            if (!$has_return) {
-                $st->execute();
-                $st->close();
-                $cn->close();
-                $ret = 'Query has been executed';
-            } else {
-                $st->execute();
-                $code_result = '$st->bind_result(';
-                $bool = false;
-                $p = array();
-                for($i = 0; $i < $st->field_count; $i++){
-                    if(!$bool){
-                        $bool = true;
-                        $code_result .= '$p[' . $i . ']';
-                    }else{
-                        $code_result .= ',$p[' . $i . ']';
-                    }
-                }
-                $code_result .= ');';
-                eval($code_result);
-
-                $ret = array();
-                $k = 0;
-                while($st->fetch()){
-                    for($i = 0; $i < count($p); $i++){
-                        $ret[$k][$i] = $p[$i];
-                    }
-                    $k++;
-                }
-
-                $st->close();
-                $cn->close();
-            }
-        } else {
-            if (!$has_return) {
-                $arg = func_get_args();
-                $code = '$st->bind_param($types';
-                for ($i = 3; $i < count($arg); $i++) {
-                    $code .= ',$arg[' . $i . ']';
-                }
-                $code .= ');';
-                eval($code);
-                $st->execute();
-                $st->close();
-                $cn->close();
-            } else {
-                $arg = func_get_args();
-                $code = '$st->bind_param($types';
-                for ($i = 3; $i < count($arg); $i++) {
-                    $code .= ',$arg[' . $i . ']';
-                }
-                $code .= ');';
-                eval($code);
-                $st->execute();
-                $code_result = '$st->bind_result(';
-                $bool = false;
-                $p = array();
-                for($i = 0; $i < $st->field_count; $i++){
-                    if(!$bool){
-                        $bool = true;
-                        $code_result .= '$p[' . $i . ']';
-                    }else{
-                        $code_result .= ',$p[' . $i . ']';
-                    }
-                }
-                $code_result .= ');';
-                eval($code_result);
-
-                $ret = array();
-                $k = 0;
-                while($st->fetch()){
-                    for($i = 0; $i < count($p); $i++){
-                        $ret[$k][$i] = $p[$i];
-                    }
-                    $k++;
-                }
-
-                $st->close();
-                $cn->close();
-            }
-        }
-        return $ret;
+    while ($row = mysqli_fetch_assoc($result)) {
+        $rows[] = $row;
     }
+    return $rows;
+
+}
+
+function db_quote($value){
+    $connection = db_connect();
+    return "'" . mysqli_real_escape_string($connection, $value) . "'";
+
 }

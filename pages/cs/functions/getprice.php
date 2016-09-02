@@ -1,14 +1,15 @@
 <?php
 include('../../../connection.php');
 
-if(isset($_POST['id'])){
-    $id = $_POST['id'];
-    $unitprice =
-        GSecureSQL::query(
-            "SELECT SRP FROM unitstbl WHERE Model = '$id'",
-            TRUE
-        );
+if (isset($_POST['id'])) {
+    $id = db_quote($_POST['id']);
 
-    $Price = $unitprice[0][0];
-    echo $Price;
+    $unitprice = db_select("SELECT `SRP` FROM `unitstbl` WHERE `Model` = " . $id);
+
+    echo $unitprice[0]['SRP'];
+
+    if ($unitprice === false) {
+        $error = db_error();
+        echo $error;
+    }
 }
