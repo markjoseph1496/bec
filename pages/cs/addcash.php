@@ -182,6 +182,7 @@ $BranchCode = "B000";
 
         var stPrice = 0;
 
+
         for (i = 0; i < tPrice.length; i++) {
             stPrice = parseFloat(stPrice) + parseFloat(tPrice[i].value.replace(/,/g, ''));
         }
