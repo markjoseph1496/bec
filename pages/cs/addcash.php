@@ -2,7 +2,7 @@
 include('../../connection.php');
 
 $Cashier = "MFC";
-$BranchCode = "B000";
+$BranchCode = "B009";
 
 ?>
 <!DOCTYPE html>
@@ -55,7 +55,6 @@ $BranchCode = "B000";
 <body>
 
 <div id="wrapper">
-
     <?php
     include('navigation.html');
     ?>
@@ -65,7 +64,7 @@ $BranchCode = "B000";
             <div class="row">
                 <div class="col-lg-12">
                     <h1 class="page-header">Add Cash Transaction</h1>
-                    <form method="POST" name="frmUnitsCash" id="frmUnitsCash" action="a.php">
+                    <form method="POST" name="frmUnitsCash" id="frmUnitsCash" action="functions/addcashtransaction.php" onkeypress="return noenter(event)">
                         <input type="hidden" value="<?php echo $Cashier ?>" name="Cashier">
                         <input type="hidden" value="<?php echo $BranchCode ?>" name="BranchCode">
                         <div class="row">
@@ -86,7 +85,18 @@ $BranchCode = "B000";
                                     <input type="hidden" class="form-control" name="Brand" id="Brand">
                                     <input type="hidden" class="form-control" name="UnitPrice" id="UnitPrice">
                                 </div>
-
+                                <div class="form-group">
+                                    <label>Sales Clerk</label>
+                                    <select class="form-control" name="SalesClerk" id="SalesClerk">
+                                        <option selected="selected" value="">Please Select One</option>
+                                        <option value="MFC">MFC</option>
+                                        <option value="RRG">RRG</option>
+                                        <option value="BDP">BDP</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <button class="btn btn-primary">Submit</button>
+                                </div>
                             </div>
                             <div class="col-lg-8 col-xs-8">
                                 <div class="row">
@@ -129,7 +139,6 @@ $BranchCode = "B000";
             <!-- /.row -->
         </div>
         <!-- /.container-fluid -->
-        <br><br><br><br>
     </div>
     <!-- /#page-wrapper -->
 </div>
@@ -158,6 +167,13 @@ $BranchCode = "B000";
         }
     }
 
+    function noenter(e) {
+        e = e || window.event;
+        var key = e.keyCode || e.charCode;
+        return key !== 13;
+
+    }
+
     function addItem() {
         var data = $('#imeisn, #ItemCode, #model_name, #Brand, #UnitPrice');
         var row = $('<tr>');
@@ -182,7 +198,6 @@ $BranchCode = "B000";
 
         var stPrice = 0;
 
-
         for (i = 0; i < tPrice.length; i++) {
             stPrice = parseFloat(stPrice) + parseFloat(tPrice[i].value.replace(/,/g, ''));
         }
@@ -190,7 +205,6 @@ $BranchCode = "B000";
         sPrice.textContent = stPrice;
         hPrice.value = stPrice;
 
-        alert('Successfully added');
     }
 
     function checkImeiSN(e) {
@@ -217,41 +231,47 @@ $BranchCode = "B000";
         }
     }
 
-    /*
-     // Bootstrap Validator
-     $(document).ready(function () {
-     var validator = $("#frmUnitsCash").bootstrapValidator({
-     feedbackIcons: {
-     valid: "glyphicon glyphicon-ok",
-     invalid: "glyphicon glyphicon-remove",
-     validating: "glyphicon glyphicon-refresh"
-     },
-     fields: {
-     CName: {
-     validators: {
-     notEmpty: {
-     message: "Customer name is required."
-     },
-     regexp: {
-     regexp: /^[a-zA-Z .]+$/,
-     message: "Invalid name."
-     }
-     }
-     },
-     ORNumber: {
-     validators: {
-     notEmpty: {
-     message: "OR number is required"
-     },
-     regexp: {
-     regexp: /^[0-9]+$/,
-     message: "Invalid OR number."
-     }
-     }
-     }
-     }
-     });
-     });
-
-     */
+/*
+    //Bootstrap Validator
+    $(document).ready(function () {
+        var validator = $("#frmUnitsCash").bootstrapValidator({
+            feedbackIcons: {
+                valid: "glyphicon glyphicon-ok",
+                invalid: "glyphicon glyphicon-remove",
+                validating: "glyphicon glyphicon-refresh"
+            },
+            fields: {
+                CName: {
+                    validators: {
+                        notEmpty: {
+                            message: "Customer name is required."
+                        },
+                        regexp: {
+                            regexp: /^[a-zA-Z .]+$/,
+                            message: "Invalid name."
+                        }
+                    }
+                },
+                ORNumber: {
+                    validators: {
+                        notEmpty: {
+                            message: "OR number is required"
+                        },
+                        regexp: {
+                            regexp: /^[0-9]+$/,
+                            message: "Invalid OR number."
+                        }
+                    }
+                },
+                SalesClerk: {
+                    validators: {
+                        notEmpty: {
+                            message: "Sales Clerk is required"
+                        }
+                    }
+                }
+            }
+        });
+    });
+*/
 </script>
