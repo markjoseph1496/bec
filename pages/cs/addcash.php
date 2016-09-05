@@ -81,7 +81,7 @@ $BranchCode = "B000";
                                 <div class="form-group">
                                     <label>IMEI / SN</label>
                                     <input type="hidden" class="form-control" name="ItemCode" id="ItemCode">
-                                    <input type="text" class="form-control" name="imeisn" id="imeisn" onkeypress="checkImeiSN()" maxlength="15">
+                                    <input type="text" class="form-control" name="imeisn" id="imeisn" onkeypress="return checkImeiSN(event)" maxlength="15">
                                     <input type="hidden" class="form-control" name="model_name" id="model_name">
                                     <input type="hidden" class="form-control" name="Brand" id="Brand">
                                     <input type="hidden" class="form-control" name="UnitPrice" id="UnitPrice">
@@ -146,15 +146,15 @@ $BranchCode = "B000";
     var hPrice = document.getElementById("hPrice"); //hidden value of total price
     var arrayImei = ["0"];
 
-    function checkimei(){
+    function checkimei() {
         var b = arrayImei.indexOf(imeisn.value);
-        if(b == -1){
+        if (b == -1) {
             arrayImei.push(imeisn.value);
             addItem();
         }
-        else{
+        else {
             imeisn.value = "";
-            alert('bawal to i add');
+            alert('Item already exists.');
         }
     }
 
@@ -190,11 +190,11 @@ $BranchCode = "B000";
         sPrice.textContent = stPrice;
         hPrice.value = stPrice;
 
+        alert('Successfully added');
     }
 
-    function checkImeiSN() {
-        var imeisnlength = imeisn.value.length;
-        if (imeisnlength == 15) {
+    function checkImeiSN(e) {
+        if (e && e.keyCode == 13) {
             $.ajax({
                 type: 'POST',
                 url: 'functions/checkimeisn.php',
@@ -202,7 +202,7 @@ $BranchCode = "B000";
                 success: function (data) {
                     var result = $.parseJSON(data);
                     if (result.Count == 0) {
-                        alert('walang item ito');
+                        alert("Item doesn't exists");
                         imeisn.value = "";
                     } else {
                         itemCode.value = result.rItemCode;

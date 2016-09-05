@@ -69,32 +69,33 @@
                             <div class="panel panel-info">
                                 <div class="panel-heading">
                                     <span class="fa fa-list-alt"> CS-MFC / August 25, 2016</span>
+                                    <span style="float:right"><b>Total: 9,998.00</b></span>
                                 </div>
                                 <div class="panel-body">
                                     <div class="table-responsive">
                                         <table class="table table-hover">
                                             <thead>
                                             <tr>
+                                                <th width="10%">Time</th>
                                                 <th width="10%">OR Number</th>
                                                 <th width="20%">Customer Name</th>
                                                 <th width="30%">Item(s)</th>
-                                                <th width="20%">Cash</th>
                                                 <th width="20%">Subtotal</th>
                                             </tr>
                                             </thead>
                                             <tbody>
                                             <tr>
+                                                <td>10:49 PM</td>
                                                 <td>29660</td>
                                                 <td>Mark Joseph Cinco</td>
                                                 <td>Flare S4 Plus</td>
                                                 <td>4,999.00</td>
-                                                <td>4,999.00</td>
                                             </tr>
                                             <tr>
+                                                <td>10:51 PM</td>
                                                 <td>29661</td>
                                                 <td>Mark Joseph Cinco</td>
                                                 <td>Flare S4 Plus, Flare S3, Flare S5</td>
-                                                <td>4,999.00</td>
                                                 <td>4,999.00</td>
                                             </tr>
                                             </tbody>

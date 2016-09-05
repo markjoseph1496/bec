@@ -2,7 +2,7 @@
 include('../../../connection.php');
 
 if (isset($_POST['imeisn'])) {
-    $ImeiSN = $_POST['imeisn'];
+    $ImeiSN = db_quote($_POST['imeisn']);
 
     $ItemDetails = db_select("SELECT * FROM `unitstbl` WHERE `IMEISN` = " . $ImeiSN);
 
