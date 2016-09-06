@@ -1,8 +1,5 @@
-<!-- Accounting.js -->
-<script src="../../../dist/js/accounting.min.js"></script>
 <?php
 include('../../../connection.php');
-
 
 if(isset($_POST['Cashier'])){
     $_Date = date("Y-m-d");
@@ -26,7 +23,6 @@ if(isset($_POST['Cashier'])){
              (". $ORNumber .",
              ". $sImeiSN .")");
 
-        echo $sImeiSN . "<br>";
         db_query("UPDATE `unitstbl` SET `isSold` = '1' WHERE `IMEISN` = " . $sImeiSN);
 
     }
