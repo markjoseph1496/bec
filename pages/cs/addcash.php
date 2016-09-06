@@ -99,7 +99,7 @@ $BranchCode = "B009";
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                    <button type="submit" class="btn btn-primary" id="btnSubmit">Submit</button>
                                 </div>
                             </div>
                             <div class="col-lg-8 col-xs-8">
@@ -135,6 +135,30 @@ $BranchCode = "B009";
                                 </div>
                             </div>
                         </div>
+                        <!--Modal-->
+                        <div class="modal fade" id="errorModal">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+
+                                        </button>
+                                        <h4 class="modal-title">Modal title</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Please enter all values in the fields.</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-primary">Save changes</button>
+                                    </div>
+                                </div>
+                                <!-- /.modal-content -->
+                            </div>
+                            <!-- /.modal-dialog -->
+                        </div>
+                        <!-- /.modal -->
+                        <!--End Modal-->
                     </form>
                 </div>
                 <!-- /.col-lg-12 -->

@@ -66,19 +66,11 @@ function checkImeiSN(e) {
                     else {
                         imeisn.value = "";
                         bootbox.dialog({
-                            message: "I am a custom dialog",
-                            title: "Custom title",
+                            message: "Item already exists. Please enter other item.",
+                            title: "Duplicate Item",
                             buttons: {
-                                success: {
-                                    label: "Success!",
-                                    className: "btn-success"
-                                },
-                                danger: {
-                                    label: "Danger!",
-                                    className: "btn-danger"
-                                },
                                 main: {
-                                    label: "Click ME!",
+                                    label: "Close!",
                                     className: "btn-primary"
                                 }
                             }

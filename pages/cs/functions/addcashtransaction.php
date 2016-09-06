@@ -27,7 +27,7 @@ if(isset($_POST['Cashier'])){
 
     }
 
-    db_query("INSERT INTO `cashtransactiontbl` (`ORNumber`,`_Date`, `BranchCode`, `CustomerName`, `SalesClerk`,`Cashier`,`Total`) VALUES
+    db_query("INSERT INTO `unitstransactiontbl` (`ORNumber`,`_Date`, `BranchCode`, `CustomerName`, `SalesClerk`,`Cashier`,`Total`) VALUES
             (". $ORNumber .",
             ". $_Date .",
             ". $BranchCode . ",
