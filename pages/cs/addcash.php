@@ -31,7 +31,6 @@ $BranchCode = "B009";
     <link href="../../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
     <!-- bootstrap validator -->
-
     <link href="../../dist/css/bootstrapValidator.min.css" rel="stylesheet" type="text/css">
 
     <!-- jQuery -->
@@ -55,8 +54,9 @@ $BranchCode = "B009";
     <!-- Function -->
     <script src="js/addcash.js"></script>
 
+
 </head>
-<body>
+<body onload="imeisn.focus();">
 
 <div id="wrapper">
     <?php
@@ -67,22 +67,14 @@ $BranchCode = "B009";
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">Add Cash Transaction</h1>
-                    <form method="POST" name="frmUnitsCash" id="frmUnitsCash" action="functions/addcashtransaction.php" onkeypress="return noenter(event)">
+                    <h1 class="page-header">Add Transaction</h1>
+                    <form method="POST" name="frmUnitsCash" id="frmUnitsCash" action="functions/addtransaction.php" onkeypress="return noenter(event)">
                         <input type="hidden" value="<?php echo $Cashier ?>" name="Cashier">
                         <input type="hidden" value="<?php echo $BranchCode ?>" name="BranchCode">
                         <div class="row">
-                            <div class="col-lg-4 col-xs-4">
+                            <div class="col-lg-4 col-xs-12">
                                 <div class="form-group">
-                                    <label>OR Number</label>
-                                    <input class="form-control" name="ORNumber" id="ORNumber" maxlength="9">
-                                </div>
-                                <div class="form-group">
-                                    <label>Customer Name</label>
-                                    <input class="form-control" name="CName" id="CName" maxlength="50" style="text-transform: capitalize">
-                                </div>
-                                <div class="form-group">
-                                    <label>IMEI / SN</label>
+                                    <label>Enter IMEI / SN:</label>
                                     <input type="hidden" class="form-control" name="ItemCode" id="ItemCode">
                                     <input type="text" class="form-control" name="imeisn" id="imeisn" onkeypress="return checkImeiSN(event)" maxlength="15">
                                     <input type="hidden" class="form-control" name="model_name" id="model_name">
@@ -90,46 +82,36 @@ $BranchCode = "B009";
                                     <input type="hidden" class="form-control" name="UnitPrice" id="UnitPrice">
                                 </div>
                                 <div class="form-group">
-                                    <label>Sales Clerk</label>
-                                    <select class="form-control" name="SalesClerk" id="SalesClerk">
-                                        <option selected="selected" value="">Please Select One</option>
-                                        <option value="MFC">MFC</option>
-                                        <option value="RRG">RRG</option>
-                                        <option value="BDP">BDP</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <button type="submit" class="btn btn-primary" id="btnSubmit">Submit</button>
+                                    <a class="btn btn-primary" onclick="ProceedToPayment();">Proceed to payment</a>
                                 </div>
                             </div>
-                            <div class="col-lg-8 col-xs-8">
-                                <div class="row">
-                                    <div class="col-lg-12 col-xs-12">
-                                        <div class="panel panel-info">
-                                            <div class="panel-heading">
-                                                <i class="fa fa-table fa-fw"></i> Items
-                                            </div>
-                                            <!-- /.panel-heading -->
-                                            <div class="panel-body" style="height: 400px; overflow-y: scroll;">
-                                                <table class="table table-hover" id="Items">
-                                                    <thead>
-                                                    <tr>
-                                                        <th width="15%">Item Code</th>
-                                                        <th width="20%">IMEI / SN</th>
-                                                        <th width="20%">Model / Unit</th>
-                                                        <th width="20%">Brand</th>
-                                                        <th width="20%">Unit Price</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            <!-- /.panel-body -->
-                                            <div class="panel-footer">
-                                                <b>Total Price: <label id="sPrice">0.00</label></b>
-                                                <input type="hidden" id="hPrice" name="hPrice" value="0">
-                                            </div>
+                            <div class="row">
+                                <div class="col-lg-12 col-xs-12">
+                                    <div class="panel panel-info">
+                                        <div class="panel-heading">
+                                            <i class="fa fa-table fa-fw"></i> Items
+                                        </div>
+                                        <!-- /.panel-heading -->
+                                        <div class="panel-body" style="height: 300px; overflow-y: scroll;" id="testssss">
+                                            <table class="table table-hover" id="Items">
+                                                <thead>
+                                                <tr>
+                                                    <th width="15%">Item Code</th>
+                                                    <th width="20%">IMEI / SN</th>
+                                                    <th width="15%">Model / Unit</th>
+                                                    <th width="15%">Brand</th>
+                                                    <th width="15%">Unit Price</th>
+                                                    <th width="20%">Action</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <!-- /.panel-body -->
+                                        <div class="panel-footer">
+                                            <b>Total Price: <label id="sPrice">0.00</label></b>
+                                            <input type="hidden" id="hPrice" name="hPrice" value="0">
                                         </div>
                                     </div>
                                 </div>
@@ -140,9 +122,7 @@ $BranchCode = "B009";
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
-
-                                        </button>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                                         <h4 class="modal-title">Modal title</h4>
                                     </div>
                                     <div class="modal-body">
@@ -180,49 +160,30 @@ $BranchCode = "B009";
     var UnitPrice = document.getElementById('UnitPrice'); //textfield
     var sPrice = document.getElementById("sPrice"); //label of total price
     var hPrice = document.getElementById("hPrice"); //hidden value of total price
+    var DeleteRow = document.getElementById("Items"); // table name
     var arrayImei = ["0"];
 
-
-    //Bootstrap Validator
+/*
     $(document).ready(function () {
-        var validator = $("#frmUnitsCash").bootstrapValidator({
+        $('#frmUnitsCash').bootstrapValidator({
+//        live: 'disabled',
+            message: 'This value is not valid',
             feedbackIcons: {
-                valid: "glyphicon glyphicon-ok",
-                invalid: "glyphicon glyphicon-remove",
-                validating: "glyphicon glyphicon-refresh"
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
             },
             fields: {
-                CName: {
+                imeisn: {
+                    group: '.form-group',
                     validators: {
                         notEmpty: {
-                            message: "Customer name is required."
-                        },
-                        regexp: {
-                            regexp: /^[a-zA-Z .]+$/,
-                            message: "Invalid name."
-                        }
-                    }
-                },
-                ORNumber: {
-                    validators: {
-                        notEmpty: {
-                            message: "OR number is required"
-                        },
-                        regexp: {
-                            regexp: /^[0-9]+$/,
-                            message: "Invalid OR number."
-                        }
-                    }
-                },
-                SalesClerk: {
-                    validators: {
-                        notEmpty: {
-                            message: "Sales Clerk is required"
+                            message: 'The last name is required and cannot be empty'
                         }
                     }
                 }
             }
         });
     });
-
+    */
 </script>

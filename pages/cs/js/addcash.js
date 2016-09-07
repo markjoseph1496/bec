@@ -11,9 +11,13 @@ function noenter(e) {
 function addItem() {
     var data = $('#imeisn, #ItemCode, #model_name, #Brand, #UnitPrice');
     var row = $('<tr>');
-    for (var i = 0; i < data.length; i++) {
-        $('<td>').text(data[i].value).appendTo(row);
-    }
+
+    $('<td width="15%">').text(data[0].value).appendTo(row);
+    $('<td width="20%">').text(data[1].value).appendTo(row);
+    $('<td width="15%">').text(data[2].value).appendTo(row);
+    $('<td width="15%">').text(data[3].value).appendTo(row);
+    $('<td width="15%">').text(data[4].value).appendTo(row);
+    $('<td width="20%"><a class="btn btn-default"><i class="fa fa-pencil-square-o"></i></a> <a onclick="deleteItem(this);" class="btn btn-danger"><i class="fa fa-trash fa-1x"></i></a></td>').appendTo(row);
 
     $('<input type="hidden" name="tItemCode[]">').val(data[0].value).appendTo(row);
     $('<input type="hidden" name="timeisn[]">').val(data[1].value).appendTo(row);
@@ -23,7 +27,6 @@ function addItem() {
     row.appendTo('#Items');
 
     var tPrice = document.getElementsByName('tUnitPrice[]'); //value of unit price on table
-
     itemCode.value = "";
     imeisn.value = "";
     ModelUnit.value = "";
@@ -39,6 +42,20 @@ function addItem() {
     sPrice.textContent = stPrice;
     hPrice.value = stPrice;
 
+}
+
+function deleteItem(r){
+    var i = r.parentNode.parentNode.rowIndex;
+    var timeisn = document.getElementsByName('timeisn[]');
+    var tItemCode = document.getElementsByName('tItemCode[]');
+    var tmodel_name = document.getElementsByName('tmodel_name[]');
+    var tBrand = document.getElementsByName('tBrand[]');
+    var tUnitPrice = document.getElementsByName('tUnitPrice[]');
+
+    $("input").remove(timeisn[i-1], tItemCode[i-1], tmodel_name[i-1], tBrand[i-1], tUnitPrice[i-1]);
+
+    arrayImei.splice(i,1);
+    DeleteRow.deleteRow(i);
 }
 
 function checkImeiSN(e) {
@@ -70,15 +87,34 @@ function checkImeiSN(e) {
                             title: "Duplicate Item",
                             buttons: {
                                 main: {
-                                    label: "Close!",
+                                    label: "Close",
                                     className: "btn-primary"
                                 }
                             }
                         });
+                        imeisn.focus();
                     }
 
                 }
             }
         })
+    }
+}
+
+function ProceedToPayment(){
+    if(arrayImei == 0){
+        bootbox.dialog({
+            message: "Please add item first",
+            title: "No item added",
+            buttons: {
+                main: {
+                    label: "Close",
+                    className: "btn-primary"
+                }
+            }
+        });
+    }
+    else{
+        $('#frmUnitsCash').submit();
     }
 }
