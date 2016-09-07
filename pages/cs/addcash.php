@@ -121,16 +121,15 @@ $BranchCode = "B009";
                         <div class="modal fade" id="errorModal">
                             <div class="modal-dialog">
                                 <div class="modal-content">
-                                    <div class="modal-header">
+                                    <div class="modal-header modal-header-danger">
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                        <h4 class="modal-title">Modal title</h4>
+                                        <h4 class="modal-title">No item(s) added.</h4>
                                     </div>
                                     <div class="modal-body">
-                                        <p>Please enter all values in the fields.</p>
+                                        <p>Please add item(s) before you can proceed to payment.</p>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                        <button type="button" class="btn btn-primary">Save changes</button>
+                                        <button class="btn btn-default" data-dismiss="modal">Close</button>
                                     </div>
                                 </div>
                                 <!-- /.modal-content -->

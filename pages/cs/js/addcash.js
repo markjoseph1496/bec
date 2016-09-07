@@ -92,9 +92,7 @@ function checkImeiSN(e) {
                                 }
                             }
                         });
-                        imeisn.focus();
                     }
-
                 }
             }
         })
@@ -103,16 +101,10 @@ function checkImeiSN(e) {
 
 function ProceedToPayment(){
     if(arrayImei == 0){
-        bootbox.dialog({
-            message: "Please add item first",
-            title: "No item added",
-            buttons: {
-                main: {
-                    label: "Close",
-                    className: "btn-primary"
-                }
-            }
-        });
+       $('#errorModal').modal('show');
+        $('#errorModal').on('hidden.bs.modal', function () {
+            imeisn.focus();
+        })
     }
     else{
         $('#frmUnitsCash').submit();
