@@ -1,4 +1,4 @@
-$.getScript("../../dist/js/bootbox.min.js", function(){
+$.getScript("../../dist/js/bootbox.min.js", function () {
 
 });
 
@@ -11,6 +11,7 @@ function noenter(e) {
 function addItem() {
     var data = $('#imeisn, #ItemCode, #model_name, #Brand, #UnitPrice');
     var row = $('<tr>');
+    var modalrow = $('<tr>');
 
     $('<td width="15%">').text(data[0].value).appendTo(row);
     $('<td width="20%">').text(data[1].value).appendTo(row);
@@ -25,6 +26,13 @@ function addItem() {
     $('<input type="hidden" name="tBrand[]">').val(data[3].value).appendTo(row);
     $('<input type="hidden" name="tUnitPrice[]">').val(data[4].value).appendTo(row);
     row.appendTo('#Items');
+
+    $('<td width="15%">').text(data[0].value).appendTo(modalrow);
+    $('<td width="20%">').text(data[1].value).appendTo(modalrow);
+    $('<td width="20%">').text(data[2].value).appendTo(modalrow);
+    $('<td width="15%">').text(data[3].value).appendTo(modalrow);
+    $('<td width="15%">').text(data[4].value).appendTo(modalrow);
+    modalrow.appendTo('#ModalItems');
 
     var tPrice = document.getElementsByName('tUnitPrice[]'); //value of unit price on table
     itemCode.value = "";
@@ -41,10 +49,11 @@ function addItem() {
     stPrice = accounting.formatNumber(stPrice, 2, ",", ".");
     sPrice.textContent = stPrice;
     hPrice.value = stPrice;
+    mPrice.textContent = stPrice;
 
 }
 
-function deleteItem(r){
+function deleteItem(r) {
     var i = r.parentNode.parentNode.rowIndex;
     var timeisn = document.getElementsByName('timeisn[]');
     var tItemCode = document.getElementsByName('tItemCode[]');
@@ -52,9 +61,9 @@ function deleteItem(r){
     var tBrand = document.getElementsByName('tBrand[]');
     var tUnitPrice = document.getElementsByName('tUnitPrice[]');
 
-    $("input").remove(timeisn[i-1], tItemCode[i-1], tmodel_name[i-1], tBrand[i-1], tUnitPrice[i-1]);
+    $("input").remove(timeisn[i - 1], tItemCode[i - 1], tmodel_name[i - 1], tBrand[i - 1], tUnitPrice[i - 1]);
 
-    arrayImei.splice(i,1);
+    arrayImei.splice(i, 1);
     DeleteRow.deleteRow(i);
 }
 
@@ -68,8 +77,11 @@ function checkImeiSN(e) {
             success: function (data) {
                 var result = $.parseJSON(data);
                 if (result.Count == 0) {
-                    alert("Item doesn't exists");
                     imeisn.value = "";
+                    $('#noItemFromDB').modal('show');
+                    $('#noItemFromDB').on('hidden.bs.modal', function () {
+                        imeisn.focus();
+                    });
                 } else {
                     itemCode.value = result.rItemCode;
                     ModelUnit.value = result.rModelName;
@@ -82,15 +94,9 @@ function checkImeiSN(e) {
                     }
                     else {
                         imeisn.value = "";
-                        bootbox.dialog({
-                            message: "Item already exists. Please enter other item.",
-                            title: "Duplicate Item",
-                            buttons: {
-                                main: {
-                                    label: "Close",
-                                    className: "btn-primary"
-                                }
-                            }
+                        $('#itemExists').modal('show');
+                        $('#itemExists').on('hidden.bs.modal', function () {
+                            imeisn.focus();
                         });
                     }
                 }
@@ -99,14 +105,15 @@ function checkImeiSN(e) {
     }
 }
 
-function ProceedToPayment(){
-    if(arrayImei == 0){
-       $('#errorModal').modal('show');
-        $('#errorModal').on('hidden.bs.modal', function () {
+function ProceedToPayment() {
+    if (arrayImei == 0) {
+        $('#PaymentDetails').modal('show');
+        // $('#noItemModal').modal('show');
+        $('#noItemModal').on('hidden.bs.modal', function () {
             imeisn.focus();
         })
     }
-    else{
-        $('#frmUnitsCash').submit();
+    else {
+        $('#PaymentDetails').modal('show');
     }
 }

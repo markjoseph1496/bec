@@ -117,16 +117,68 @@ $BranchCode = "B009";
                                 </div>
                             </div>
                         </div>
-                        <!--Modal-->
-                        <div class="modal fade" id="errorModal">
-                            <div class="modal-dialog">
+
+                        <!-- ProceedToPaymentModal -->
+                        <div class="modal fade" id="PaymentDetails">
+                            <div class="modal-dialog modal-lg">
                                 <div class="modal-content">
-                                    <div class="modal-header modal-header-danger">
+                                    <div class="modal-header modal-header-success">
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                        <h4 class="modal-title">No item(s) added.</h4>
+                                        <h4 class="modal-title">Payment Details</h4>
                                     </div>
                                     <div class="modal-body">
-                                        <p>Please add item(s) before you can proceed to payment.</p>
+                                        <div class="row">
+                                            <div class="col-lg-4">
+                                                <label>Transaction No: </label>
+                                                <div class="form-group">
+                                                    <label>Mode of Payment</label>
+                                                    <select class="form-control" name="ModeOfPayment" id="ModeOfPayment">
+                                                        <option value="" selected="selected">Please Select One</option>
+                                                        <option value="Cash">Cash</option>
+                                                        <option value="CreditCard">Credit Card</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Amount to pay</label>
+                                                    <input type="text" class="form-control" readonly name="AmountToPay" id="AmountToPay">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Cash Received</label>
+                                                    <input type="text" class="form-control" name="CashReceived" id="CashReceived">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Balance</label>
+                                                    <input type="text" class="form-control" readonly name="Balance" id="Balance">
+                                                </div>
+                                            </div>
+                                            <div class=col-lg-8>
+                                                <div class="panel panel-info">
+                                                    <div class="panel-heading">
+                                                        <i class="fa fa-table fa-fw"></i> Items
+                                                    </div>
+                                                    <!-- /.panel-heading -->
+                                                    <div class="panel-body" style="height: 300px; overflow-y: scroll;">
+                                                        <table class="table table-hover" id="ModalItems">
+                                                            <thead>
+                                                            <tr>
+                                                                <th width="15%">Item Code</th>
+                                                                <th width="20%">IMEI / SN</th>
+                                                                <th width="20%">Model / Unit</th>
+                                                                <th width="15%">Brand</th>
+                                                                <th width="15%">Unit Price</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <!-- /.panel-body -->
+                                                    <div class="panel-footer">
+                                                        <b>Total Price: <label id="mPrice">0.00</label></b>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="modal-footer">
                                         <button class="btn btn-default" data-dismiss="modal">Close</button>
@@ -137,8 +189,74 @@ $BranchCode = "B009";
                             <!-- /.modal-dialog -->
                         </div>
                         <!-- /.modal -->
-                        <!--End Modal-->
+
                     </form>
+                    <!--Modal-->
+                    <!-- No Item Modal -->
+                    <div class="modal fade" id="noItemModal">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header modal-header-danger">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title">No items added.</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Please add item(s) before you can proceed to payment.</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-default" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                            <!-- /.modal-content -->
+                        </div>
+                        <!-- /.modal-dialog -->
+                    </div>
+                    <!-- /.modal -->
+
+                    <!-- Item Exists Modal -->
+                    <div class="modal fade" id="itemExists">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header modal-header-danger">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title">Item Already exists</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Please enter other item.</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-default" data-dismiss="modal" id="btnClose">Close</button>
+                                </div>
+                            </div>
+                            <!-- /.modal-content -->
+                        </div>
+                        <!-- /.modal-dialog -->
+                    </div>
+                    <!-- /.modal -->
+
+
+                    <!-- No Item From Modal -->
+                    <div class="modal fade" id="noItemFromDB">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header modal-header-danger">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title">Item Doesn't exists</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Please enter other item.</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-default" data-dismiss="modal" id="btnClose">Close</button>
+                                </div>
+                            </div>
+                            <!-- /.modal-content -->
+                        </div>
+                        <!-- /.modal-dialog -->
+                    </div>
+                    <!-- /.modal -->
+
+                    <!--End Modal-->
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -159,30 +277,32 @@ $BranchCode = "B009";
     var UnitPrice = document.getElementById('UnitPrice'); //textfield
     var sPrice = document.getElementById("sPrice"); //label of total price
     var hPrice = document.getElementById("hPrice"); //hidden value of total price
+    var mPrice = document.getElementById("mPrice"); //label of total price for modal
     var DeleteRow = document.getElementById("Items"); // table name
+    var btnClose = document.getElementById('btnClose');
     var arrayImei = ["0"];
 
-/*
-    $(document).ready(function () {
-        $('#frmUnitsCash').bootstrapValidator({
-//        live: 'disabled',
-            message: 'This value is not valid',
-            feedbackIcons: {
-                valid: 'glyphicon glyphicon-ok',
-                invalid: 'glyphicon glyphicon-remove',
-                validating: 'glyphicon glyphicon-refresh'
-            },
-            fields: {
-                imeisn: {
-                    group: '.form-group',
-                    validators: {
-                        notEmpty: {
-                            message: 'The last name is required and cannot be empty'
-                        }
-                    }
-                }
-            }
-        });
-    });
-    */
+    /*
+     $(document).ready(function () {
+     $('#frmUnitsCash').bootstrapValidator({
+     //        live: 'disabled',
+     message: 'This value is not valid',
+     feedbackIcons: {
+     valid: 'glyphicon glyphicon-ok',
+     invalid: 'glyphicon glyphicon-remove',
+     validating: 'glyphicon glyphicon-refresh'
+     },
+     fields: {
+     imeisn: {
+     group: '.form-group',
+     validators: {
+     notEmpty: {
+     message: 'The last name is required and cannot be empty'
+     }
+     }
+     }
+     }
+     });
+     });
+     */
 </script>
