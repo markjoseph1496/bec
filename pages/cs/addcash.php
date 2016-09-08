@@ -127,14 +127,14 @@ $BranchCode = "B009";
                                         <h4 class="modal-title">Payment Details</h4>
                                     </div>
                                     <div class="modal-body">
+                                        <i><h4 style="color:red">Note: Please check all data before save. This cannot be undone.</h4></i>
                                         <div class="row">
                                             <div class="col-lg-4">
-                                                <label>Transaction No: </label>
+                                                <label>Transaction No: 5654987366</label>
                                                 <div class="form-group">
                                                     <label>Mode of Payment</label>
                                                     <select class="form-control" name="ModeOfPayment" id="ModeOfPayment">
-                                                        <option value="" selected="selected">Please Select One</option>
-                                                        <option value="Cash">Cash</option>
+                                                        <option value="Cash" selected="selected">Cash</option>
                                                         <option value="CreditCard">Credit Card</option>
                                                     </select>
                                                 </div>
@@ -144,7 +144,7 @@ $BranchCode = "B009";
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Cash Received</label>
-                                                    <input type="text" class="form-control" name="CashReceived" id="CashReceived">
+                                                    <input type="text" class="form-control" name="CashReceived" id="CashReceived" onkeyup="updateBalance();" maxlength="7">
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Balance</label>
@@ -164,7 +164,7 @@ $BranchCode = "B009";
                                                                 <th width="15%">Item Code</th>
                                                                 <th width="20%">IMEI / SN</th>
                                                                 <th width="20%">Model / Unit</th>
-                                                                <th width="15%">Brand</th>
+                                                                <th width="20%">Brand</th>
                                                                 <th width="15%">Unit Price</th>
                                                             </tr>
                                                             </thead>
@@ -181,7 +181,7 @@ $BranchCode = "B009";
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <button class="btn btn-default" data-dismiss="modal">Close</button>
+                                        <button class="btn btn-primary">Save</button>
                                     </div>
                                 </div>
                                 <!-- /.modal-content -->
@@ -225,7 +225,7 @@ $BranchCode = "B009";
                                     <p>Please enter other item.</p>
                                 </div>
                                 <div class="modal-footer">
-                                    <button class="btn btn-default" data-dismiss="modal" id="btnClose">Close</button>
+                                    <button class="btn btn-default" data-dismiss="modal">Close</button>
                                 </div>
                             </div>
                             <!-- /.modal-content -->
@@ -279,30 +279,36 @@ $BranchCode = "B009";
     var hPrice = document.getElementById("hPrice"); //hidden value of total price
     var mPrice = document.getElementById("mPrice"); //label of total price for modal
     var DeleteRow = document.getElementById("Items"); // table name
-    var btnClose = document.getElementById('btnClose');
+    var ModalItems = document.getElementById("ModalItems"); // Modal Table
+    var AmountToPay = document.getElementById("AmountToPay"); // Amount to pay textfield
+    var CashReceived = document.getElementById("CashReceived");
+    var Balance = document.getElementById("Balance");
     var arrayImei = ["0"];
+    var stPrice = 0;
 
-    /*
-     $(document).ready(function () {
-     $('#frmUnitsCash').bootstrapValidator({
-     //        live: 'disabled',
-     message: 'This value is not valid',
-     feedbackIcons: {
-     valid: 'glyphicon glyphicon-ok',
-     invalid: 'glyphicon glyphicon-remove',
-     validating: 'glyphicon glyphicon-refresh'
-     },
-     fields: {
-     imeisn: {
-     group: '.form-group',
-     validators: {
-     notEmpty: {
-     message: 'The last name is required and cannot be empty'
-     }
-     }
-     }
-     }
-     });
-     });
-     */
+
+    $(document).ready(function () {
+        $('#frmUnitsCash').bootstrapValidator({
+            //        live: 'disabled',
+            message: 'This value is not valid',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                CashReceived: {
+                    validators: {
+                        notEmpty: {
+                            message: 'This field cannot be empty'
+                        },
+                        regexp: {
+                            regexp: /^[0-9]+$/,
+                            message: 'Invalid Input. Only numerical values are allowed.'
+                        }
+                    }
+                }
+            }
+        });
+    });
 </script>
