@@ -27,11 +27,11 @@ function addItem() {
     $('<input type="hidden" name="tUnitPrice[]">').val(data[4].value).appendTo(row);
     row.appendTo('#Items');
 
-    $('<td width="15%">').text(data[0].value).appendTo(modalrow);
+    $('<td width="20%">').text(data[0].value).appendTo(modalrow);
     $('<td width="20%">').text(data[1].value).appendTo(modalrow);
     $('<td width="20%">').text(data[2].value).appendTo(modalrow);
     $('<td width="20%">').text(data[3].value).appendTo(modalrow);
-    $('<td width="15%">').text(data[4].value).appendTo(modalrow);
+    $('<td width="20%">').text(data[4].value).appendTo(modalrow);
     modalrow.appendTo('#ModalItems');
 
     itemCode.value = "";
@@ -58,16 +58,31 @@ function updateTotalPrice(){
 }
 
 function updateBalance(){
-    var ATP = parseFloat(AmountToPay.value.replace(/,/g, ""));
-    var CR = parseFloat(CashReceived.value);
-    if(CashReceived.value.length == 0){
-        Balance.value = "-" + AmountToPay.value;
-    }else{
-        var b = CR - ATP || "0.00";
-        b = accounting.formatNumber(b, 2, ",", ".");
-        Balance.value = b;
-    }
+    var TotalAmountTendered = parseFloat(Cash.value.replace(/,/g, "")) + parseFloat(Credit.value.replace(/,/g, "")) + parseFloat(HomeCredit.value.replace(/,/g, ""));
+    TotalAmountTendered = accounting.formatNumber(TotalAmountTendered, 2, ",", ".");
+    AmountTendered.value = TotalAmountTendered;
+    Balance.value = accounting.formatNumber(parseFloat(TotalAmountTendered.replace(/,/g, "")) - parseFloat(AmountToPay.value.replace(/,/g, "")), 2, ",", ".");
+
 }
+
+function ConvertToMoney(){
+    if(Cash.value.length == 0){
+        Cash.value = "0.00";
+    }
+    if(Credit.value.length == 0){
+        Credit.value = "0.00";
+    }
+    if(HomeCredit.value.length == 0){
+        HomeCredit.value = "0.00";
+    }
+
+    Cash.value = accounting.formatNumber(Cash.value, 2, ",", ".");
+    Credit.value = accounting.formatNumber(Credit.value, 2, ",", ".");
+    HomeCredit.value = accounting.formatNumber(HomeCredit.value, 2, ",", ".");
+
+    TransactionFields();
+}
+
 
 function deleteItem(r) {
     var i = r.parentNode.parentNode.rowIndex;
@@ -130,5 +145,21 @@ function ProceedToPayment() {
     }
     else {
         $('#PaymentDetails').modal('show');
+    }
+}
+
+function TransactionFields() {
+    if ($(Credit).val() != "0.00") {
+        $('#divCreditCard').show();
+    }else{
+        $('#divCreditCard').hide();
+    }
+
+
+    if($(HomeCredit).val() != "0.00"){
+        $('#divHomeCredit').show();
+    }
+    else{
+        $('#divHomeCredit').hide();
     }
 }

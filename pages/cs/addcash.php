@@ -56,7 +56,7 @@ $BranchCode = "B009";
 
 
 </head>
-<body onload="imeisn.focus();">
+<body onload="ConvertToMoney(); imeisn.focus();">
 
 <div id="wrapper">
     <?php
@@ -98,7 +98,7 @@ $BranchCode = "B009";
                                                 <tr>
                                                     <th width="15%">Item Code</th>
                                                     <th width="20%">IMEI / SN</th>
-                                                    <th width="15%">Model / Unit</th>
+                                                    <th width="15%">Item</th>
                                                     <th width="15%">Brand</th>
                                                     <th width="15%">Unit Price</th>
                                                     <th width="20%">Action</th>
@@ -127,31 +127,130 @@ $BranchCode = "B009";
                                         <h4 class="modal-title">Payment Details</h4>
                                     </div>
                                     <div class="modal-body">
-                                        <i><h4 style="color:red">Note: Please check all data before save. This cannot be undone.</h4></i>
+                                        <h4 style="color:red"><i>NOTE: Please check all data before save. This cannot be undone.</i></h4>
+                                        <label>Transaction No: 5654987366</label>
                                         <div class="row">
-                                            <div class="col-lg-4">
-                                                <label>Transaction No: 5654987366</label>
+                                            <div class="col-lg-3">
                                                 <div class="form-group">
-                                                    <label>Mode of Payment</label>
-                                                    <select class="form-control" name="ModeOfPayment" id="ModeOfPayment">
-                                                        <option value="Cash" selected="selected">Cash</option>
-                                                        <option value="CreditCard">Credit Card</option>
+                                                    <label>OR / SI / CI</label>
+                                                    <input type="text" class="form-control" name="ORNumber" id="ORNumber" maxlength="9">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Customer Name</label>
+                                                    <input type="text" class="form-control" name="CName" id="CName" maxlength="50">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Sales Clerk</label>
+                                                    <select class="form-control" name="SalesClerk" id="SalesClerk">
+                                                        <option value="" selected="selected">Select One</option>
+                                                        <option value="MFC">MFC</option>
+                                                        <option value="RRG">RRG</option>
+                                                        <option value="BDP">BDP</option>
                                                     </select>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Amount to pay</label>
-                                                    <input type="text" class="form-control" readonly name="AmountToPay" id="AmountToPay">
+                                                    <label>Cash</label>
+                                                    <input type="text" class="form-control" name="Cash" id="Cash" onkeyup="updateBalance();" onfocusout="ConvertToMoney()"
+                                                           onClick="this.setSelectionRange(0, this.value.length)">
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Cash Received</label>
-                                                    <input type="text" class="form-control" name="CashReceived" id="CashReceived" onkeyup="updateBalance();" maxlength="7">
-                                                </div>
-                                                <div class="form-group">
-                                                    <label>Balance</label>
-                                                    <input type="text" class="form-control" readonly name="Balance" id="Balance">
+                                                    <label>Credit Card</label>
+                                                    <input type="text" class="form-control" name="CreditCard" id="CreditCard" onkeyup="updateBalance();" onfocusout="ConvertToMoney()"
+                                                           onClick="this.setSelectionRange(0, this.value.length)">
                                                 </div>
                                             </div>
-                                            <div class=col-lg-8>
+                                            <div class="col-lg-6" id="divCreditCard" style="display: none;">
+                                                <div class="panel panel-info">
+                                                    <div class="panel-heading">
+                                                        <i class="fa fa-credit-card"></i> For Credit Card
+                                                    </div>
+                                                    <!-- /.panel-heading -->
+                                                    <div class="panel-body" style="height: 310px;">
+                                                        <div class="col-lg-6">
+                                                            <div class="form-group">
+                                                                <label>Cardholder Name</label>
+                                                                <input type="text" class="form-control" name="CardHolder" id="CardHolder">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label>Card Number</label>
+                                                                <input type="text" class="form-control" name="CardNumber" id="CardNumber">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label>Merchant ID</label>
+                                                                <input type="text" class="form-control" name="MID" id="MID">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label>Batch Number</label>
+                                                                <input type="text" class="form-control" name="BatchNum" id="BatchNum">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-6">
+                                                            <div class="form-group">
+                                                                <label>Approval Code</label>
+                                                                <input type="text" class="form-control" name="ApprCode" id="ApprCode">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label>Terms</label>
+                                                                <select class="form-control" name="Terms" id="Terms">
+                                                                    <option value="Debit">Debit</option>
+                                                                    <option value="Straight">Straight</option>
+                                                                    <option value="3Months">3 Months</option>
+                                                                    <option value="6Months">6 Months</option>
+                                                                    <option value="12Months">12 Months</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label>ID Presented</label>
+                                                                <input type="text" class="form-control" name="IDPresented" id="IDPresented">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3" id="divHomeCredit" style="display: none;">
+                                                <div class="panel panel-info">
+                                                    <div class="panel-heading">
+                                                        <i class="fa fa-credit-card"></i> For Home Credit
+                                                    </div>
+                                                    <!-- /.panel-heading -->
+                                                    <div class="panel-body" style="height: 310px;">
+                                                        <div class="form-group">
+                                                            <label>Reference Number</label>
+                                                            <input type="text" class="form-control" name="RefNum" id="RefNum">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-3">
+                                                <div class="form-group">
+                                                    <label>Home Credit</label>
+                                                    <input type="text" class="form-control" name="HomeCredit" id="HomeCredit" onkeyup="updateBalance();" onfocusout="ConvertToMoney();"
+                                                           onClick="this.setSelectionRange(0, this.value.length)">
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3">
+                                                <div class="form-group">
+                                                    <label>Total Amount Tendered</label>
+                                                    <input type="text" class="form-control" name="TotalAmountTendered" id="TotalAmountTendered" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3">
+                                                <div class="form-group">
+                                                    <label>Total Amount to pay</label>
+                                                    <input type="text" class="form-control" name="TotalAmountToPay" id="TotalAmountToPay" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3">
+                                                <div class="form-group">
+                                                    <label>Balance</label>
+                                                    <input type="text" class="form-control" name="Balance" id="Balance" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class=col-lg-12>
                                                 <div class="panel panel-info">
                                                     <div class="panel-heading">
                                                         <i class="fa fa-table fa-fw"></i> Items
@@ -161,11 +260,11 @@ $BranchCode = "B009";
                                                         <table class="table table-hover" id="ModalItems">
                                                             <thead>
                                                             <tr>
-                                                                <th width="15%">Item Code</th>
+                                                                <th width="20%">Item Code</th>
                                                                 <th width="20%">IMEI / SN</th>
-                                                                <th width="20%">Model / Unit</th>
+                                                                <th width="20%">Item</th>
                                                                 <th width="20%">Brand</th>
-                                                                <th width="15%">Unit Price</th>
+                                                                <th width="20%">Unit Price</th>
                                                             </tr>
                                                             </thead>
                                                             <tbody>
@@ -179,17 +278,16 @@ $BranchCode = "B009";
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-primary">Save</button>
+                                        </div>
+                                        <!-- /.modal-content -->
                                     </div>
-                                    <div class="modal-footer">
-                                        <button class="btn btn-primary">Save</button>
-                                    </div>
+                                    <!-- /.modal-dialog -->
                                 </div>
-                                <!-- /.modal-content -->
+                                <!-- /.modal -->
                             </div>
-                            <!-- /.modal-dialog -->
                         </div>
-                        <!-- /.modal -->
-
                     </form>
                     <!--Modal-->
                     <!-- No Item Modal -->
@@ -234,7 +332,6 @@ $BranchCode = "B009";
                     </div>
                     <!-- /.modal -->
 
-
                     <!-- No Item From Modal -->
                     <div class="modal fade" id="noItemFromDB">
                         <div class="modal-dialog">
@@ -255,7 +352,6 @@ $BranchCode = "B009";
                         <!-- /.modal-dialog -->
                     </div>
                     <!-- /.modal -->
-
                     <!--End Modal-->
                 </div>
                 <!-- /.col-lg-12 -->
@@ -280,35 +376,53 @@ $BranchCode = "B009";
     var mPrice = document.getElementById("mPrice"); //label of total price for modal
     var DeleteRow = document.getElementById("Items"); // table name
     var ModalItems = document.getElementById("ModalItems"); // Modal Table
-    var AmountToPay = document.getElementById("AmountToPay"); // Amount to pay textfield
-    var CashReceived = document.getElementById("CashReceived");
+    var AmountToPay = document.getElementById("TotalAmountToPay"); // Amount to pay by customer
+    var AmountTendered = document.getElementById("TotalAmountTendered"); //Amount Tendered by customer
     var Balance = document.getElementById("Balance");
+    var Cash = document.getElementById("Cash"); //Cash paid by customer
+    var Credit = document.getElementById("CreditCard"); //Credit paid by customer
+    var HomeCredit = document.getElementById("HomeCredit");  //Home Credit paid by customer
     var arrayImei = ["0"];
     var stPrice = 0;
 
 
-    $(document).ready(function () {
-        $('#frmUnitsCash').bootstrapValidator({
-            //        live: 'disabled',
-            message: 'This value is not valid',
-            feedbackIcons: {
-                valid: 'glyphicon glyphicon-ok',
-                invalid: 'glyphicon glyphicon-remove',
-                validating: 'glyphicon glyphicon-refresh'
-            },
-            fields: {
-                CashReceived: {
-                    validators: {
-                        notEmpty: {
-                            message: 'This field cannot be empty'
-                        },
-                        regexp: {
-                            regexp: /^[0-9]+$/,
-                            message: 'Invalid Input. Only numerical values are allowed.'
-                        }
-                    }
-                }
-            }
-        });
-    });
+    /*
+     $(document).ready(function () {
+     $('#frmUnitsCash').bootstrapValidator({
+     //        live: 'disabled',
+     message: 'This value is not valid',
+     feedbackIcons: {
+     valid: 'glyphicon glyphicon-ok',
+     invalid: 'glyphicon glyphicon-remove',
+     validating: 'glyphicon glyphicon-refresh'
+     },
+     fields: {
+     group: 'form-group',
+     CashReceived: {
+     validators: {
+     notEmpty: {
+     message: 'This field cannot be empty'
+     },
+     regexp: {
+     regexp: /^[0-9]+$/,
+     message: 'Invalid Input. Only numerical values are allowed.'
+     }
+     }
+     },
+     ORNumber: {
+     validators: {
+     notEmpty: {
+     message: 'This field cannot be empty'
+     },
+     regexp: {
+     regexp: /^[0-9]+$/,
+     message: 'Invalid Input. Only numerical values are allowed.'
+     }
+     }
+     }
+
+     }
+     });
+     });
+     */
 </script>
