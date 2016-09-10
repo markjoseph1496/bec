@@ -67,11 +67,21 @@ $BranchCode = "B009";
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">Add Transaction</h1>
+                    <h1 class="page-header">Add Transaction <?php echo date("h:i A");?></h1>
                     <form method="POST" name="frmUnitsCash" id="frmUnitsCash" action="functions/addtransaction.php" onkeypress="return noenter(event)">
                         <input type="hidden" value="<?php echo $Cashier ?>" name="Cashier">
                         <input type="hidden" value="<?php echo $BranchCode ?>" name="BranchCode">
                         <div class="row">
+                            <?php
+                            if (isset($_GET['saved'])) {
+                                echo '
+                                    <div class="alert alert-success fade in" id="success-alert">
+                                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                     <strong><span class="fa fa-info-circle"></span> Transaction successfully added.</strong>
+                                    </div>
+                                    ';
+                            }
+                            ?>
                             <div class="col-lg-4 col-xs-12">
                                 <div class="form-group">
                                     <label>Enter IMEI / SN:</label>
@@ -127,21 +137,22 @@ $BranchCode = "B009";
                                         <h4 class="modal-title">Payment Details</h4>
                                     </div>
                                     <div class="modal-body">
-                                        <h4 style="color:red"><i>NOTE: Please check all data before save. This cannot be undone.</i></h4>
+                                        <h4 class="red"><i>NOTE: Please check all data before you save. This cannot be edited after saving.</i></h4>
+                                        <h5 class="red"><i>Asterisk Fields (*) are required to filled up.</i></h5>
                                         <label>Transaction No: 5654987366</label>
                                         <div class="row">
                                             <div class="col-lg-3">
                                                 <div class="form-group">
-                                                    <label>OR / SI / CI</label>
-                                                    <input type="text" class="form-control" name="ORNumber" id="ORNumber" maxlength="9">
+                                                    <label>OR / SI / CI <span class="red">(*)</span></label>
+                                                    <input type="text" class="form-control" name="ORNumber" id="ORNumber" maxlength="9" tabindex="1">
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Customer Name</label>
-                                                    <input type="text" class="form-control" name="CName" id="CName" maxlength="50">
+                                                    <label>Customer Name <span class="red">(*)</span></label>
+                                                    <input type="text" class="form-control text-capitalize" name="CName" id="CName" maxlength="50" tabindex="2">
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Sales Clerk</label>
-                                                    <select class="form-control" name="SalesClerk" id="SalesClerk">
+                                                    <label>Sales Clerk <span class="red">(*)</span></label>
+                                                    <select class="form-control" name="SalesClerk" id="SalesClerk" tabindex="3">
                                                         <option value="" selected="selected">Select One</option>
                                                         <option value="MFC">MFC</option>
                                                         <option value="RRG">RRG</option>
@@ -151,12 +162,12 @@ $BranchCode = "B009";
                                                 <div class="form-group">
                                                     <label>Cash</label>
                                                     <input type="text" class="form-control" name="Cash" id="Cash" onkeyup="updateBalance();" onfocusout="ConvertToMoney()"
-                                                           onClick="this.setSelectionRange(0, this.value.length)">
+                                                           onClick="this.setSelectionRange(0, this.value.length)" tabindex="4">
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Credit Card</label>
                                                     <input type="text" class="form-control" name="CreditCard" id="CreditCard" onkeyup="updateBalance();" onfocusout="ConvertToMoney()"
-                                                           onClick="this.setSelectionRange(0, this.value.length)">
+                                                           onClick="this.setSelectionRange(0, this.value.length)" tabindex="5">
                                                 </div>
                                             </div>
                                             <div class="col-lg-6" id="divCreditCard" style="display: none;">
@@ -168,30 +179,30 @@ $BranchCode = "B009";
                                                     <div class="panel-body" style="height: 310px;">
                                                         <div class="col-lg-6">
                                                             <div class="form-group">
-                                                                <label>Cardholder Name</label>
-                                                                <input type="text" class="form-control" name="CardHolder" id="CardHolder">
+                                                                <label>Cardholder Name <span class="red">(*)</span></label>
+                                                                <input type="text" class="form-control text-capitalize" name="CardHolder" id="CardHolder" tabindex="7">
                                                             </div>
                                                             <div class="form-group">
-                                                                <label>Card Number</label>
-                                                                <input type="text" class="form-control" name="CardNumber" id="CardNumber">
+                                                                <label>Card Number <span class="red">(*)</span></label>
+                                                                <input type="text" class="form-control" name="CardNumber" id="CardNumber" tabindex="8">
                                                             </div>
                                                             <div class="form-group">
-                                                                <label>Merchant ID</label>
-                                                                <input type="text" class="form-control" name="MID" id="MID">
+                                                                <label>Merchant ID <span class="red">(*)</span></label>
+                                                                <input type="text" class="form-control" name="MID" id="MID" tabindex="9">
                                                             </div>
                                                             <div class="form-group">
-                                                                <label>Batch Number</label>
-                                                                <input type="text" class="form-control" name="BatchNum" id="BatchNum">
+                                                                <label>Batch Number <span class="red">(*)</span></label>
+                                                                <input type="text" class="form-control" name="BatchNum" id="BatchNum" tabindex="10">
                                                             </div>
                                                         </div>
                                                         <div class="col-lg-6">
                                                             <div class="form-group">
-                                                                <label>Approval Code</label>
-                                                                <input type="text" class="form-control" name="ApprCode" id="ApprCode">
+                                                                <label>Approval Code <span class="red">(*)</span></label>
+                                                                <input type="text" class="form-control text-uppercase" name="ApprCode" id="ApprCode" tabindex="11">
                                                             </div>
                                                             <div class="form-group">
-                                                                <label>Terms</label>
-                                                                <select class="form-control" name="Terms" id="Terms">
+                                                                <label>Terms <span class="red">(*)</span></label>
+                                                                <select class="form-control" name="Terms" id="Terms" tabindex="12">
                                                                     <option value="Debit">Debit</option>
                                                                     <option value="Straight">Straight</option>
                                                                     <option value="3Months">3 Months</option>
@@ -201,7 +212,7 @@ $BranchCode = "B009";
                                                             </div>
                                                             <div class="form-group">
                                                                 <label>ID Presented</label>
-                                                                <input type="text" class="form-control" name="IDPresented" id="IDPresented">
+                                                                <input type="text" class="form-control" name="IDPresented" id="IDPresented" tabindex="13">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -215,8 +226,8 @@ $BranchCode = "B009";
                                                     <!-- /.panel-heading -->
                                                     <div class="panel-body" style="height: 310px;">
                                                         <div class="form-group">
-                                                            <label>Reference Number</label>
-                                                            <input type="text" class="form-control" name="RefNum" id="RefNum">
+                                                            <label>Reference Number <span class="red">(*)</span></label>
+                                                            <input type="text" class="form-control" name="RefNum" id="RefNum" tabindex="14">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -227,7 +238,7 @@ $BranchCode = "B009";
                                                 <div class="form-group">
                                                     <label>Home Credit</label>
                                                     <input type="text" class="form-control" name="HomeCredit" id="HomeCredit" onkeyup="updateBalance();" onfocusout="ConvertToMoney();"
-                                                           onClick="this.setSelectionRange(0, this.value.length)">
+                                                           onClick="this.setSelectionRange(0, this.value.length)" tabindex="6">
                                                 </div>
                                             </div>
                                             <div class="col-lg-3">
@@ -244,7 +255,7 @@ $BranchCode = "B009";
                                             </div>
                                             <div class="col-lg-3">
                                                 <div class="form-group">
-                                                    <label>Balance</label>
+                                                    <label>Change</label>
                                                     <input type="text" class="form-control" name="Balance" id="Balance" readonly>
                                                 </div>
                                             </div>
@@ -367,6 +378,7 @@ $BranchCode = "B009";
 </html>
 <script type="text/javascript">
     var itemCode = document.getElementById('ItemCode'); //textfield
+    var ORNumber = document.getElementById('ORNumber');
     var imeisn = document.getElementById('imeisn'); //textfield
     var ModelUnit = document.getElementById('model_name'); //textfield
     var brand = document.getElementById('Brand'); //textfield
@@ -385,44 +397,104 @@ $BranchCode = "B009";
     var arrayImei = ["0"];
     var stPrice = 0;
 
+    $("#success-alert").fadeTo(5000, 500).slideUp(500, function () {
+        $("#success-alert").alert('close');
+    });
 
-    /*
-     $(document).ready(function () {
-     $('#frmUnitsCash').bootstrapValidator({
-     //        live: 'disabled',
-     message: 'This value is not valid',
-     feedbackIcons: {
-     valid: 'glyphicon glyphicon-ok',
-     invalid: 'glyphicon glyphicon-remove',
-     validating: 'glyphicon glyphicon-refresh'
-     },
-     fields: {
-     group: 'form-group',
-     CashReceived: {
-     validators: {
-     notEmpty: {
-     message: 'This field cannot be empty'
-     },
-     regexp: {
-     regexp: /^[0-9]+$/,
-     message: 'Invalid Input. Only numerical values are allowed.'
-     }
-     }
-     },
-     ORNumber: {
-     validators: {
-     notEmpty: {
-     message: 'This field cannot be empty'
-     },
-     regexp: {
-     regexp: /^[0-9]+$/,
-     message: 'Invalid Input. Only numerical values are allowed.'
-     }
-     }
-     }
-
-     }
-     });
-     });
-     */
+    $(document).ready(function () {
+        $('#frmUnitsCash').bootstrapValidator({
+            //        live: 'disabled',
+            message: 'This value is not valid',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                group: 'form-group',
+                ORNumber: {
+                    validators: {
+                        notEmpty: {
+                            message: 'This field cannot be empty.'
+                        },
+                        regexp: {
+                            regexp: /^[0-9]+$/,
+                            message: 'Invalid Input. Only numerical values are allowed.'
+                        }
+                    }
+                },
+                CName: {
+                    validators: {
+                        notEmpty: {
+                            message: 'This field cannot be empty.'
+                        },
+                        regexp: {
+                            regexp: /^[A-Za-z. ]+$/,
+                            message: 'Name cannot contain invalid characters.'
+                        }
+                    }
+                },
+                SalesClerk: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Please select one.'
+                        }
+                    }
+                },
+                CardHolder: {
+                    validators: {
+                        notEmpty: {
+                            message: 'This field cannot be empty.'
+                        },
+                        identical: {
+                            field: 'CName',
+                            message: "Cardholder name must be same with Customer name."
+                        },
+                        regexp: {
+                            regexp: /^[A-Za-z. ]+$/,
+                            message: 'Name cannot contain invalid characters.'
+                        }
+                    }
+                },
+                CardNumber: {
+                    validators: {
+                        notEmpty: {
+                            message: 'This field cannot be empty.'
+                        },
+                        creditCard: {
+                            message: 'Invalid credit card number.'
+                        }
+                    }
+                },
+                MID: {
+                    validators: {
+                        notEmpty: {
+                            message: 'This field cannot be empty.'
+                        }
+                    }
+                },
+                BatchNum: {
+                    validators: {
+                        notEmpty: {
+                            message: 'This field cannot be empty.'
+                        }
+                    }
+                },
+                ApprCode: {
+                    validators: {
+                        notEmpty: {
+                            message: 'This field cannot be empty.'
+                        }
+                    }
+                },
+                RefNum: {
+                    validators: {
+                        notEmpty: {
+                            message: 'This field cannot be empty.'
+                        }
+                    }
+                }
+            }
+        });
+    });
 </script>

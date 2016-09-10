@@ -58,7 +58,7 @@ function updateTotalPrice(){
 }
 
 function updateBalance(){
-    var TotalAmountTendered = parseFloat(Cash.value.replace(/,/g, "")) + parseFloat(Credit.value.replace(/,/g, "")) + parseFloat(HomeCredit.value.replace(/,/g, ""));
+    var TotalAmountTendered = parseFloat(Cash.value.replace(/,/g, "") || 0) + parseFloat(Credit.value.replace(/,/g, "") || 0) + parseFloat(HomeCredit.value.replace(/,/g, "") || 0);
     TotalAmountTendered = accounting.formatNumber(TotalAmountTendered, 2, ",", ".");
     AmountTendered.value = TotalAmountTendered;
     Balance.value = accounting.formatNumber(parseFloat(TotalAmountTendered.replace(/,/g, "")) - parseFloat(AmountToPay.value.replace(/,/g, "")), 2, ",", ".");
@@ -81,6 +81,7 @@ function ConvertToMoney(){
     HomeCredit.value = accounting.formatNumber(HomeCredit.value, 2, ",", ".");
 
     TransactionFields();
+    updateBalance();
 }
 
 
@@ -138,13 +139,17 @@ function checkImeiSN(e) {
 
 function ProceedToPayment() {
     if (arrayImei == 0) {
-        $('#noItemModal').modal('show');
+        $('#PaymentDetails').modal('show');
+        //$('#noItemModal').modal('show');
         $('#noItemModal').on('hidden.bs.modal', function () {
             imeisn.focus();
-        })
+        });
     }
     else {
         $('#PaymentDetails').modal('show');
+        $('#PaymentDetails').on('shown.bs.modal', function () {
+            ORNumber.focus();
+        });
     }
 }
 
