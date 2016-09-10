@@ -67,9 +67,7 @@ $BranchCode = "B009";
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">Add Transaction <?php
-                        date_default_timezone_set('Asia/Manila');
-                        echo date("h:i A");?></h1>
+                    <h1 class="page-header">Add Transaction</h1>
                     <form method="POST" name="frmUnitsCash" id="frmUnitsCash" action="functions/addtransaction.php" onkeypress="return noenter(event)">
                         <input type="hidden" value="<?php echo $Cashier ?>" name="Cashier">
                         <input type="hidden" value="<?php echo $BranchCode ?>" name="BranchCode">

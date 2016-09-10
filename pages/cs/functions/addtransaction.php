@@ -1,10 +1,12 @@
 <?php
 include('../../../connection.php');
+date_default_timezone_set('Asia/Manila');
 
 if (isset($_POST['Cashier'])) {
 
     //Data from addcash.php
     $_Date = db_quote(date("Y-m-d"));
+    $_Time = date("h:i A");
     $Cashier = db_quote($_POST['Cashier']);
     $BranchCode = db_quote($_POST['BranchCode']);
     $ORNumber = db_quote($_POST['ORNumber']);
@@ -25,21 +27,19 @@ if (isset($_POST['Cashier'])) {
     $ReferenceNumber = db_quote($_POST['RefNum']);
     $Balance = db_quote($_POST['Balance']);
 
-    echo $CardNumber . "<br>";
-    echo $Cash;
-    die();
+
     //start of Check payment mode
     $isCash = db_quote("No");
     $isCredit = db_quote("No");
     $isHomeCredit = db_quote("No");
 
-    if ($Cash != "0.00") {
+    if ($Cash != db_quote("0.00")) {
         $isCash = db_quote("Yes");
     }
-    if ($CreditCard != "0.00") {
+    if ($CreditCard != db_quote("0.00")) {
         $isCredit = db_quote("Yes");
     }
-    if ($HomeCredit != "0.00") {
+    if ($HomeCredit != db_quote("0.00")) {
         $isHomeCredit = db_quote("Yes");
     }
     //end of check payment mode
@@ -59,9 +59,9 @@ if (isset($_POST['Cashier'])) {
 
     //Create a transaction
     $AddTransaction = db_query("INSERT INTO `unitsalestransactiontbl` 
-          (`ORNumber`,`_Date`, `BranchCode`, `CustomerName`, `SalesClerk`,`Cashier`,`isCash`,`isCredit`,`isHomeCredit`,`Total`) 
+          (`ORNumber`,`_Date`,`_Time`, `BranchCode`, `CustomerName`, `SalesClerk`,`Cashier`,`isCash`,`isCredit`,`isHomeCredit`,`Total`) 
           VALUES
-          (" . $ORNumber . ", " . $_Date . ", " . $BranchCode . ", " . $CustomerName . ", " . $SalesClerk . ", " . $Cashier . ", " . $isCash . ", " . $isCredit . ", " . $isHomeCredit . ", " . $Total . ")");
+          (" . $ORNumber . ", " . $_Date . "," . $_Time . ", " . $BranchCode . ", " . $CustomerName . ", " . $SalesClerk . ", " . $Cashier . ", " . $isCash . ", " . $isCredit . ", " . $isHomeCredit . ", " . $Total . ")");
 
     if ($AddTransaction === false) {
         echo db_error();
@@ -83,15 +83,15 @@ if (isset($_POST['Cashier'])) {
         $AddCredit = db_query("INSERT INTO `creditcardtransactiontbl` (`ORNumber`, `CreditCardNumber`, `CardHolderName`, `MID`, `BatchNum`, `ApprCode`, `Term`, `IDPresented`, `Amount`)
                               VALUES
                                (" . $ORNumber . ", " . $CardNumber . ", " . $CardHolder . ", " . $MID . ", " . $BatchNum . ", " . $ApprCode . ", " . $Term . ", " . $IDPresented . ", " . $CreditCard . ")");
-        if($AddCredit === false){
+        if ($AddCredit === false) {
             echo db_error();
         }
     }
 
     //Add Home Credit Transaction if have
-    if($isHomeCredit == db_quote("Yes")){
-        $AddHomeCredit = db_query("INSERT INTO `homecredittransactiontbl` (`ORNumber`, `ReferenceNumber`, `Amount`) VALUES (". $ORNumber .", ". $ReferenceNumber .", " . $HomeCredit . ") ");
-        if($AddHomeCredit === false){
+    if ($isHomeCredit == db_quote("Yes")) {
+        $AddHomeCredit = db_query("INSERT INTO `homecredittransactiontbl` (`ORNumber`, `ReferenceNumber`, `Amount`) VALUES (" . $ORNumber . ", " . $ReferenceNumber . ", " . $HomeCredit . ") ");
+        if ($AddHomeCredit === false) {
             echo db_error();
         }
     }
