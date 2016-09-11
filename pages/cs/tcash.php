@@ -54,7 +54,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">Unit Sales Transaction (Cash)</h1>
+                    <h1 class="page-header">Unit Sales Transaction</h1>
                     <div class="row">
                         <div class="col-lg-12 col-md-12">
                             <div class="row">
@@ -68,40 +68,72 @@
                             <br>
                             <div class="panel panel-info">
                                 <div class="panel-heading">
-                                    <span class="fa fa-list-alt"> CS-MFC / August 25, 2016</span>
-                                    <span style="float:right"><b>Total: 9,998.00</b></span>
+                                    <span class="fa fa-list-alt"> <?php echo date("F j, Y"); ?></span>
+                                    <span style="float:right"><b>Grand Total: 9,998.00</b></span>
                                 </div>
                                 <div class="panel-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover">
-                                            <thead>
-                                            <tr>
-                                                <th width="10%">Time</th>
-                                                <th width="10%">OR Number</th>
-                                                <th width="20%">Customer Name</th>
-                                                <th width="30%">Item(s)</th>
-                                                <th width="20%">Subtotal</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr>
-                                                <td>10:49 PM</td>
-                                                <td>29660</td>
-                                                <td>Mark Joseph Cinco</td>
-                                                <td>Flare S4 Plus</td>
-                                                <td>4,999.00</td>
-                                            </tr>
-                                            <tr>
-                                                <td>10:51 PM</td>
-                                                <td>29661</td>
-                                                <td>Mark Joseph Cinco</td>
-                                                <td>Flare S4 Plus, Flare S3, Flare S5</td>
-                                                <td>4,999.00</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
+                                    <!-- Nav tabs -->
+                                    <ul class="nav nav-tabs">
+                                        <li class="active"><a href="#home" data-toggle="tab">Cash</a>
+                                        </li>
+                                        <li><a href="#profile" data-toggle="tab">Credit Card</a>
+                                        </li>
+                                        <li><a href="#messages" data-toggle="tab">Home Credit</a>
+                                        </li>
+                                    </ul>
+
+                                    <!-- Tab panes -->
+                                    <div class="tab-content">
+                                        <div class="tab-pane fade in active" id="home">
+                                            <h4>Cash Transactions</h4>
+                                            <div class="table-responsive">
+                                                <table class="table tab width="15%"le-hover">
+                                                    <thead>
+                                                    <tr>
+                                                        <th width="15%">Transaction ID</th>
+                                                        <th width="10%">Time</th>
+                                                        <th width="10%">OR Number</th>
+                                                        <th width="20%">Customer Name</th>
+                                                        <th width="25%">Item(s)</th>
+                                                        <th width="15%">Amount Tendered</th>
+                                                        <th width="10%">Subtotal</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <tr>
+                                                        <td width="15%">B000-201609110001</td>
+                                                        <td width="10%">10:49 AM</td>
+                                                        <td width="10%">29660</td>
+                                                        <td width="20%">Mark Joseph Cinco</td>
+                                                        <td width="25%">Flare S4 Plus</td>
+                                                        <td width="15%">3,999.00</td>
+                                                        <td width="10%">4,999.00</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td width="15%">B000-201609110002</td>
+                                                        <td width="10%">10:51 AM</td>
+                                                        <td width="10%">29661</td>
+                                                        <td width="20%">Mark Joseph Cinco</td>
+                                                        <td width="25%">Flare S4 Plus, Flare S3</td>
+                                                        <td width="15%">4,999.00</td>
+                                                        <td width="10%">4,999.00</td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <!-- /.table-responsive -->
+                                        </div>
+                                        <div class="tab-pane fade" id="profile">
+                                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                                                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+                                                dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                                        </div>
+                                        <div class="tab-pane fade" id="messages">
+                                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                                                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+                                                dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                                        </div>
                                     </div>
-                                    <!-- /.table-responsive -->
                                 </div>
                             </div>
                         </div>
