@@ -1,5 +1,7 @@
 <?php
 
+date_default_timezone_set('Asia/Manila');
+
 function db_connect(){
 
     //Connection as static to avoid connecting more than once
