@@ -6,11 +6,11 @@ if (isset($_POST['Cashier'])) {
 
     //Data from addcash.php
     $_Date = db_quote(date("Y-m-d"));
-    $_Time = date("h:i A");
+    $_Time = db_quote(date("h:i A"));
     $Cashier = db_quote($_POST['Cashier']);
     $BranchCode = db_quote($_POST['BranchCode']);
     $ORNumber = db_quote($_POST['ORNumber']);
-    $CustomerName = db_quote($_POST['CName']);
+    $CustomerName = db_quote(ucwords($_POST['CName']));
     $SalesClerk = db_quote($_POST['SalesClerk']);
     $ImeiSN = $_POST['timeisn'];
     $Total = db_quote($_POST['hPrice']);
@@ -65,6 +65,7 @@ if (isset($_POST['Cashier'])) {
 
     if ($AddTransaction === false) {
         echo db_error();
+        die();
     }
     //End of transaction
 

@@ -1,3 +1,9 @@
+<?php
+include('../../connection.php');
+
+$BranchCode = "'B009'";
+$Cashier = "'MFC'";
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -87,37 +93,71 @@
                                         <div class="tab-pane fade in active" id="home">
                                             <h4>Cash Transactions</h4>
                                             <div class="table-responsive">
-                                                <table class="table tab width="15%"le-hover">
+                                                <table class="table table-hover">
                                                     <thead>
                                                     <tr>
                                                         <th width="15%">Transaction ID</th>
                                                         <th width="10%">Time</th>
                                                         <th width="10%">OR Number</th>
-                                                        <th width="20%">Customer Name</th>
-                                                        <th width="25%">Item(s)</th>
+                                                        <th width="25%">Customer Name</th>
+                                                        <th width="15%">Item(s)</th>
                                                         <th width="15%">Amount Tendered</th>
                                                         <th width="10%">Subtotal</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    <tr>
-                                                        <td width="15%">B000-201609110001</td>
-                                                        <td width="10%">10:49 AM</td>
-                                                        <td width="10%">29660</td>
-                                                        <td width="20%">Mark Joseph Cinco</td>
-                                                        <td width="25%">Flare S4 Plus</td>
-                                                        <td width="15%">3,999.00</td>
-                                                        <td width="10%">4,999.00</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td width="15%">B000-201609110002</td>
-                                                        <td width="10%">10:51 AM</td>
-                                                        <td width="10%">29661</td>
-                                                        <td width="20%">Mark Joseph Cinco</td>
-                                                        <td width="25%">Flare S4 Plus, Flare S3</td>
-                                                        <td width="15%">4,999.00</td>
-                                                        <td width="10%">4,999.00</td>
-                                                    </tr>
+                                                    <?php
+                                                    $tblTransaction = db_select("
+                                                    SELECT 
+                                                    unitsalestransactiontbl.TransactionID,
+                                                    unitsalestransactiontbl._Time,
+                                                    unitsalestransactiontbl.ORNumber,
+                                                    unitsalestransactiontbl.CustomerName,
+                                                    unitsalestransactiontbl.Total,
+                                                    cashtransactiontbl.Amount
+                                                    FROM unitsalestransactiontbl
+                                                    INNER JOIN cashtransactiontbl ON unitsalestransactiontbl.ORNumber = cashtransactiontbl.ORNumber
+                                                    WHERE unitsalestransactiontbl._Date = " . db_quote(date("Y-m-d")) . " 
+                                                    AND unitsalestransactiontbl.BranchCode = " . $BranchCode . " 
+                                                    AND unitsalestransactiontbl.Cashier = " . $Cashier . "
+                                                    ORDER BY unitsalestransactiontbl.ORNumber ASC");
+
+
+                                                    foreach ($tblTransaction as $transaction) {
+                                                        $TransactionID = $transaction['TransactionID'];
+                                                        $_Time = $transaction['_Time'];
+                                                        $ORNumber = $transaction['ORNumber'];
+                                                        $CustomerName = $transaction['CustomerName'];
+                                                        $AmountTendered = $transaction['Amount'];
+                                                        $Total = $transaction['Total'];
+
+                                                        $SoldUnitstbl = db_select("
+                                                        SELECT
+                                                        unitstbl.Model
+                                                        FROM soldunits
+                                                        INNER JOIN unitstbl ON soldunits.IMEISN = unitstbl.IMEISN
+                                                        WHERE soldunits.ORNumber = " . $ORNumber);
+
+                                                        ?>
+                                                        <tr>
+                                                            <td width="15%" align="center"><?php echo $TransactionID ?></td>
+                                                            <td width="10%" align="left"><?php echo $_Time ?></td>
+                                                            <td width="10%" align="left"><?php echo $ORNumber ?></td>
+                                                            <td width="25%" align="left"><?php echo $CustomerName ?></td>
+                                                            <td width="15%" align="left">
+                                                                <?php
+                                                                foreach ($SoldUnitstbl as $soldunits) {
+                                                                    $Model = $soldunits['Model'];
+                                                                    echo $Model . "<br>";
+                                                                }
+                                                                ?>
+                                                            </td>
+                                                            <td width="15%" align="center"><?php echo $AmountTendered ?></td>
+                                                            <td width="10%" align="center"><?php echo $Total ?></td>
+                                                        </tr>
+                                                        <?php
+                                                    }
+                                                    ?>
                                                     </tbody>
                                                 </table>
                                             </div>
