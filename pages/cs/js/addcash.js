@@ -139,8 +139,7 @@ function checkImeiSN(e) {
 
 function ProceedToPayment() {
     if (arrayImei == 0) {
-        $('#PaymentDetails').modal('show');
-        //$('#noItemModal').modal('show');
+        $('#noItemModal').modal('show');
         $('#noItemModal').on('hidden.bs.modal', function () {
             imeisn.focus();
         });

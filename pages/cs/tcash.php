@@ -297,7 +297,7 @@ $GrandTotal = number_format($GrandTotal, 2, '.', ',');
                                                     </thead>
                                                     <tbody>
                                                     <?php
-                                                    $tblCashTransaction = db_select("
+                                                    $tblHomeCreditTransaction = db_select("
                                                     SELECT 
                                                     unitsalestransactiontbl.TransactionID,
                                                     unitsalestransactiontbl._Time,
@@ -305,16 +305,20 @@ $GrandTotal = number_format($GrandTotal, 2, '.', ',');
                                                     unitsalestransactiontbl.CustomerName,
                                                     unitsalestransactiontbl.Total,
                                                     unitsalestransactiontbl.SalesClerk,
-                                                    cashtransactiontbl.Amount
+                                                    homecredittransactiontbl.Amount
                                                     FROM unitsalestransactiontbl
-                                                    INNER JOIN cashtransactiontbl ON unitsalestransactiontbl.ORNumber = cashtransactiontbl.ORNumber
+                                                    INNER JOIN homecredittransactiontbl ON unitsalestransactiontbl.ORNumber = homecredittransactiontbl.ORNumber
                                                     WHERE unitsalestransactiontbl._Date = " . $_Date . " 
                                                     AND unitsalestransactiontbl.BranchCode = " . $BranchCode . " 
                                                     AND unitsalestransactiontbl.Cashier = " . $Cashier . "
                                                     ORDER BY unitsalestransactiontbl.ORNumber ASC");
 
+                                                    if($tblHomeCreditTransaction === false) {
+                                                        echo db_error();
+                                                    }
 
-                                                    foreach ($tblCashTransaction as $transaction) {
+
+                                                    foreach ($tblHomeCreditTransaction as $transaction) {
                                                         $TransactionID = $transaction['TransactionID'];
                                                         $_Time = $transaction['_Time'];
                                                         $ORNumber = $transaction['ORNumber'];
@@ -370,9 +374,7 @@ $GrandTotal = number_format($GrandTotal, 2, '.', ',');
                                                         <th>Cash</th>
                                                         <th>Credit Card</th>
                                                         <th>Home Credit</th>
-                                                        <th>Total Amount Tendered</th>
-                                                        <th>Total Amount to Pay</th>
-                                                        <th>Balance</th>
+                                                        <th>Total Amount Paid</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -387,8 +389,9 @@ $GrandTotal = number_format($GrandTotal, 2, '.', ',');
                                                     homecredittransactiontbl.Amount as HCAmount
                                                     FROM unitsalestransactiontbl
                                                     LEFT JOIN cashtransactiontbl ON unitsalestransactiontbl.ORNumber = cashtransactiontbl.ORNumber
-                                                    LEFT JOIN creditcardtransactiontbl ON unitsalestransactiontbl.ORNumber = creditcardtransactiontbl.ORNumber
                                                     LEFT JOIN homecredittransactiontbl ON unitsalestransactiontbl.ORNumber = homecredittransactiontbl.ORNumber
+                                                    LEFT JOIN creditcardtransactiontbl ON unitsalestransactiontbl.ORNumber = creditcardtransactiontbl.ORNumber
+                                                    
                                                     WHERE unitsalestransactiontbl._Date = ". $_Date ."
                                                     AND unitsalestransactiontbl.Cashier = ". $Cashier ."
                                                     AND unitsalestransactiontbl.BranchCode = " . $BranchCode
@@ -411,10 +414,6 @@ $GrandTotal = number_format($GrandTotal, 2, '.', ',');
                                                         $HomeCredit = str_replace(',', '', $HomeCredit);
                                                         $Total = str_replace(',', '', $Total);
 
-                                                        $TotalAmountTendered = $Cash + $CreditCard + $HomeCredit;
-                                                        $Balance = $TotalAmountTendered - $Total;
-
-
                                                         $Cash = (float)$Cash;
                                                         $CreditCard = (float)$CreditCard;
                                                         $HomeCredit = (float)$HomeCredit;
@@ -423,8 +422,6 @@ $GrandTotal = number_format($GrandTotal, 2, '.', ',');
                                                         $CreditCard = number_format($CreditCard,2,'.',',');
                                                         $HomeCredit = number_format($HomeCredit,2,'.',',');
 
-                                                        $TotalAmountTendered = number_format($TotalAmountTendered,2,'.',',');
-                                                        $Balance = number_format($Balance,2,'.',',');
                                                         $Total = number_format($Total,2,'.',',');
 
 
@@ -447,9 +444,7 @@ $GrandTotal = number_format($GrandTotal, 2, '.', ',');
                                                             <td><?php echo $Cash; ?></td>
                                                             <td><?php echo $CreditCard; ?></td>
                                                             <td><?php echo $HomeCredit; ?></td>
-                                                            <td><?php echo $TotalAmountTendered; ?></td>
                                                             <td><?php echo $Total; ?></td>
-                                                            <td><?php echo $Balance; ?></td>
                                                         </tr>
                                                     <?php
                                                     }
