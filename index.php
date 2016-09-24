@@ -1,82 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
 
     <title>Berlein Electronics Corp.</title>
 
-    <!-- Bootstrap Core CSS -->
-    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- MetisMenu CSS -->
-    <link href="vendor/metisMenu/metisMenu.min.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
-    <link href="dist/css/sb-admin-2.css" rel="stylesheet">
-
-    <!-- Custom Fonts -->
-    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-
+    <!-- Bootstrap -->
+    <link href="src/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="src/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="src/nprogress/nprogress.css" rel="stylesheet">
+    <!-- Animate.css -->
+    <link href="src/animate.css/animate.min.css" rel="stylesheet">
+    <!-- Bootstrap Validator -->
+    <link href="src/validator/bootstrapValidator.min.css">
+    <!-- Custom Theme Style -->
+    <link href="build/css/custom.min.css" rel="stylesheet">
 </head>
 
-<body>
+<body class="login">
+<div>
+    <div class="login_wrapper">
+        <div class="animate form login_form">
+            <section class="login_content">
+                <form id="LoginForm" method="post" autocomplete="off">
+                    <h1>Login</h1>
+                    <div id="LoginError" class="alert alert-danger alert-dismissible fade in" role="alert" style="display: none">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                        </button>
+                        Account doesn't exists. Please Try again.
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="Username" id="Username" class="form-control" placeholder="Username"/>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" name="Password" id="Password" class="form-control" placeholder="Password"/>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-default" href="">Log in</button>
+                    </div>
 
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4 col-md-offset-4">
-                <div class="login-panel panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Please Sign In</h3>
+                    <div class="clearfix"></div>
+
+                    <div class="separator">
+                        <div>
+                            <h1>Berlein Electronics Corp.</h1>
+                            <p>©2016 All Rights Reserved.</p>
+                        </div>
                     </div>
-                    <div class="panel-body">
-                        <form role="form">
-                            <fieldset>
-                                <div class="form-group">
-                                    <input class="form-control" placeholder="E-mail" name="email" type="email" autofocus>
-                                </div>
-                                <div class="form-group">
-                                    <input class="form-control" placeholder="Password" name="password" type="password" value="">
-                                </div>
-                                <div class="checkbox">
-                                    <label>
-                                        <input name="remember" type="checkbox" value="Remember Me">Remember Me
-                                    </label>
-                                </div>
-                                <!-- Change this to a button or input when using this as a form -->
-                                <a href="pages/cs/csdb.php" class="btn btn-lg btn-success btn-block">Login</a>
-                            </fieldset>
-                        </form>
-                    </div>
-                </div>
-            </div>
+                </form>
+            </section>
         </div>
     </div>
+</div>
+<!-- jQuery -->
+<script src="src/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap -->
+<script src="src/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- FastClick -->
+<script src="src/fastclick/lib/fastclick.js"></script>
+<!-- NProgress -->
+<script src="src/nprogress/nprogress.js"></script>
+<!-- validator -->
+<script src="src/validator/bootstrapValidator.min.js"></script>
 
-    <!-- jQuery -->
-    <script src="vendor/jquery/jquery.min.js"></script>
+<!-- Custom Theme Scripts -->
+<script src="build/js/custom.min.js"></script>
 
-    <!-- Bootstrap Core JavaScript -->
-    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+<!-- validator -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#LoginForm').bootstrapValidator({
+            message: 'This value is not valid',
+            feedbackIcons: {
+                invalid: 'glyphicon glyphicon-remove'
+            },
+            fields: {
+                group: 'form-group',
+                Username: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Please enter your username.'
+                        }
+                    }
+                },
+                Password: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Please enter your password.'
+                        }
+                    }
+                }
+            }
+        }).on('success.form.bv', function (e) {
+            // Prevent form submission
+            e.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: 'functions/login.php',
+                data: $('#LoginForm').serialize(),
+                success: function (data) {
+                    var result = $.parseJSON(data);
+                    if(result.Count == 0){
+                        $('#Username').val("");
+                        $('#Password').val("");
+                        $('#LoginError').show();
+                        $("#LoginError").fadeTo(5000, 500).slideUp(500, function () {
 
-    <!-- Metis Menu Plugin JavaScript -->
-    <script src="vendor/metisMenu/metisMenu.min.js"></script>
-
-    <!-- Custom Theme JavaScript -->
-    <script src="dist/js/sb-admin-2.js"></script>
-
+                        });
+                    }
+                    else{
+                        if(result.AccountType == "Admin"){
+                            alert("Login Success!");
+                            window.location.href = "pages/ad/admin.php";
+                        }
+                        else if(result.AccountType == "Cashier"){
+                            alert("Login Success!");
+                            window.location.href = "pages/cs/plain_page.php";
+                        }
+                        else if(result.AccountType == "Area Manager"){
+                            alert("Login Success!");
+                            window.location.href = "pages/am/plain_page.php";
+                        }
+                    }
+                }
+            })
+        });
+    });
+</script>
 </body>
-
 </html>
