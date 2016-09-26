@@ -389,6 +389,8 @@
 <script src="../../src/pdfmake/build/vfs_fonts.js"></script>
 <!-- Custom Theme Scripts -->
 <script src="../../build/js/custom.min.js"></script>
+<!-- Function JS -->
+<script src="js/function.js"></script>
 
 <!-- Datatables -->
 <script>

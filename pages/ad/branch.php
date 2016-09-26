@@ -43,7 +43,7 @@
             <div class="">
                 <div class="page-title">
                     <div class="title_left">
-                        <h3>Branch Page</h3>
+                        <h3>Branches</h3>
                     </div>
                 </div>
 
@@ -87,8 +87,8 @@
                                                     <td><?php echo $BranchArea ?></td>
                                                     <td><?php echo $BranchType ?></td>
                                                     <td>
-                                                        <button class="btn btn-dark" data-toggle="modal" data-target="#PODetails"><i class="fa fa-eye"></i></button>
-                                                        <button class="btn btn-danger" data-toggle="modal" data-target="#PODetails"><i class="fa fa-trash"></i></button>
+                                                        <button class="btn btn-dark" onclick="BranchDetails('<?php echo $BranchCode ?>');"><i class="fa fa-eye"></i></button>
+                                                        <button class="btn btn-danger" data-toggle="modal" data-target="#CheckDelete" onclick="DeleteBranch('<?php echo $BranchCode ?>');"><i class="fa fa-trash"></i></button>
                                                     </td>
                                                 </tr>
                                                 <?php
@@ -96,7 +96,7 @@
                                             ?>
                                             </tbody>
                                         </table>
-                                        <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#myModal">Add Branch</button>
+                                        <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#AddBranchModal">Add Branch</button>
                                     </div>
                                 </div>
                             </div>
@@ -106,7 +106,7 @@
 
                 <form id="AddBranch" method="POST" autocomplete="off">
                     <!-- Modal add branch-->
-                    <div class="modal fade" id="myModal" role="dialog">
+                    <div class="modal fade" id="AddBranchModal" role="dialog">
                         <div class="modal-dialog">
                             <!-- Modal content-->
                             <div class="modal-content">
@@ -123,7 +123,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <label>Branch Name <span class="red">(*)</span></label>
-                                                <input type="text" class="form-control" id="BranchName" name="BranchName">
+                                                <input type="text" class="form-control" style="text-transform: uppercase" id="BranchName" name="BranchName">
                                             </div>
                                             <div class="form-group">
                                                 <label>Brand <span class="red">(*)</span></label>
@@ -170,6 +170,34 @@
                     </div>
                     <!-- End Modal addbranch-->
                 </form>
+
+                <!-- EditBranch Modal -->
+                <div class="modal fade" id="EditBranchModal" role="dialog">
+
+                </div>
+                <!-- End EditBranch Modal-->
+
+                <!-- Delete Branch Modal -->
+                <div class="modal fade" id="CheckDelete">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header modal-header-danger">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Delete Branch?</h4>
+                            </div>
+                            <div class="modal-body">
+                                <strong><p>Are you sure you want to delete this branch?</p></strong>
+                            </div>
+                            <div class="modal-footer">
+                                <button id="Yes" class="btn btn-danger">Yes</button>
+                                <button class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                        <!-- /.modal-content -->
+                    </div>
+                    <!-- /.modal-dialog -->
+                </div>
+                <!-- /.modal -->
             </div>
         </div>
         <!-- /page content -->
@@ -305,7 +333,9 @@
         $('#AddBranch').bootstrapValidator({
             message: 'This value is not valid',
             feedbackIcons: {
-                invalid: 'glyphicon glyphicon-remove'
+                valid: "glyphicon glyphicon-ok",
+                invalid: "glyphicon glyphicon-remove",
+                validating: "glyphicon glyphicon-refresh"
             },
             fields: {
                 group: 'form-group',
@@ -313,6 +343,15 @@
                     validators: {
                         notEmpty: {
                             message: 'Branch Code is required.'
+                        },
+                        remote: {
+                            message: 'Branch Code already exists',
+                            url: 'function/check.php',
+                            data: {
+                                type: 'BranchCode'
+                            },
+                            type: 'POST'
+
                         }
                     }
                 },
@@ -349,22 +388,11 @@
             e.preventDefault();
             $.ajax({
                 type: 'POST',
-                url: 'function/admin-add.php',
+                url: 'function/functions.php',
                 data: $('#AddBranch').serialize(),
                 success: function (data) {
                     if (data == "True") {
-                        $('#BranchCode').val("");
-                        $('#BranchName').val("");
-                        $('#BranchArea').val("");
-                        $('#bBrand').val("");
-                        $('#BranchType').val("");
-                        $('#LoginError').show();
-                        $("#LoginError").fadeTo(5000, 500).slideUp(500, function () {
-
-                        });
-
-                        RefreshTable();
-
+                        window.location.href = "branch.php";
                     }
                 }
             })

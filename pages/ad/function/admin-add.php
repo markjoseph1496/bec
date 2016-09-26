@@ -28,13 +28,14 @@ if (isset($_POST['ItemCode'])) {
     $ModelName = db_quote($_POST['ModelName']);
     $ItemDescription = db_quote($_POST['ItemDescription']);
     $iBrand = db_quote($_POST['iBrand']);
+    $ItemColor = db_quote($_POST['ItemColor']);
     $Category = db_quote($_POST['Category']);
     $SRP = db_quote($_POST['SRP']);
     $DP = db_quote($_POST['DP']);
 
-    $AddItem = db_query("INSERT INTO `itemstbl` (`ItemCode`,`ModelName`,`ItemDescription`,`Brand`,`Category`,`SRP`,`DP`)
+    $AddItem = db_query("INSERT INTO `itemstbl` (`ItemCode`,`ModelName`,`ItemDescription`,`Color`,`Brand`,`Category`,`SRP`,`DP`)
 		VALUES
-		(" . $ItemCode . "," . $ModelName . "," . $ItemDescription . "," . $iBrand . "," . $Category . "," . $SRP . "," . $DP . ")");
+		(" . $ItemCode . "," . $ModelName . "," . $ItemDescription . "," . $iBrand . ",". $ItemColor ."," . $Category . "," . $SRP . "," . $DP . ")");
 
     header("location: ../item.php");
 }
@@ -66,15 +67,23 @@ if (isset($_POST['btnaddaccount'])) {
     $aPassword = db_quote($_POST['aPassword']);
     $aEmpID = db_quote($_POST['aEmpID']);
 
-    $salt = hash('sha512', mt_rand(0, PHP_INT_MAX) . mt_rand(0, PHP_INT_MAX) . mt_rand(0, PHP_INT_MAX));
-    $aPassword = hash('sha512', $aPassword . $salt);
+    $aSaltedPassword = hash('sha512', mt_rand(0, PHP_INT_MAX) . mt_rand(0, PHP_INT_MAX) . mt_rand(0, PHP_INT_MAX));
+    $aPassword = hash('sha512', $aPassword . $aSaltedPassword);
+
 
     $AddAccount = db_query("INSERT INTO `accountstbl` (`aUsername`,`aPassword`,`aSaltedPassword`,`aEmpID`)
-        VALUES (" . $aUsername . "," . $aPassword . "," . $salt . "," . $aEmpID . ")");
+        VALUES (". $aUsername .",". $aPassword .",". $aSaltedPassword .",". $aEmpID .")");
 
-    header("location: ../employee.php?Accountadded");
+    echo db_error();
+    die();
+
+    //header("location: ../employee.php?Accountadded");
+    //echo $_POST['aEmpID'];
+    //echo $_POST['aUsername'];
+    //echo $_POST['aPassword'];
+    //echo $salt;
+    //die();
 }
-
 // End of add account
 
 //Update Branch

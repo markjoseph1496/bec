@@ -17,13 +17,11 @@ function addItemToOrder(r) {
             var tCategory = document.getElementsByName('tCategory[]');
             var tType = document.getElementsByName('tType[]');
             var tSRP = document.getElementsByName('tSRP[]');
-
             var tTotalPrice = parseFloat(tSRP[i].value.replace(/,/g, "")) * parseFloat(tQty[i].value.replace(/,/g, ""));
             tTotalPrice = accounting.formatNumber(tTotalPrice, 2, ",", ".");
 
             $('<td>').text(tItemCode[i].value).appendTo(row);
-            $('<td>').text(tModelName[i].value).appendTo(row);
-            $('<td>').text(tColor[i].value).appendTo(row);
+            $('<td>').text(tModelName[i].value + " (" + tColor[i].value + ")").appendTo(row);
             $('<td>').text(tBrand[i].value).appendTo(row);
             $('<td>').text(tSRP[i].value).appendTo(row);
             $('<td><input type="number" onchange="updateTotalAmount(this);" onkeypress="return noenter(event);" name="oQty[]" max="1000" min="1" class="form-control" style="width: 80px;" value=' + tQty[i].value + '>').appendTo(row);
@@ -143,9 +141,9 @@ function countChar() {
 
 }
 
-function ApproveRequest(PONumber){
+function ApproveRequest(PONumber) {
     $('#ApproveRequest').modal('show');
-    $('#Approved').on('click', function() {
+    $('#Approved').on('click', function () {
         $.ajax({
             type: 'POST',
             url: 'php/function.php',
@@ -157,10 +155,9 @@ function ApproveRequest(PONumber){
     });
 }
 
-function RejectRequest(PONumber){
+function RejectRequest(PONumber) {
     $('#RejectRequest').modal('show');
-
-    $('#Rejected').on('click', function() {
+    $('#Rejected').on('click', function () {
         $.ajax({
             type: 'POST',
             url: 'php/function.php',
@@ -178,7 +175,7 @@ function RejectRequest(PONumber){
 
 function logout() {
     var xhr = new XMLHttpRequest();
-    xhr.onload = function() {
+    xhr.onload = function () {
         document.location = '../../index.php';
     }
     xhr.open('GET', '../../functions/logout.php', true);

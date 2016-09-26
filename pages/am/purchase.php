@@ -88,7 +88,6 @@
                                                         <tr>
                                                             <th>Item Code</th>
                                                             <th>Item Name</th>
-                                                            <th>Color</th>
                                                             <th>Brand</th>
                                                             <th>SRP</th>
                                                             <th width="5%">Qty.</th>
@@ -126,7 +125,6 @@
                                                     <tr>
                                                         <th>Item Code</th>
                                                         <th>Model</th>
-                                                        <th>Color</th>
                                                         <th>Description</th>
                                                         <th>Brand</th>
                                                         <th>Category</th>
@@ -156,11 +154,8 @@
                                                                 <input type="hidden" disabled name="tItemCode[]" value="<?php echo $ItemCode ?>">
                                                             </td>
                                                             <td>
-                                                                <?php echo $Model ?>
+                                                                <?php echo $Model ?> (<?php echo $Color ?>)
                                                                 <input type="hidden" disabled name="tModelName[]" value="<?php echo $Model ?>">
-                                                            </td>
-                                                            <td>
-                                                                <?php echo $Color ?>
                                                                 <input type="hidden" disabled name="tColor[]" value="<?php echo $Color ?>">
                                                             </td>
                                                             <td>

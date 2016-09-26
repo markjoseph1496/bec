@@ -22,8 +22,7 @@ function addItemToOrder(r) {
             tTotalPrice = accounting.formatNumber(tTotalPrice, 2, ",", ".");
 
             $('<td>').text(tItemCode[i].value).appendTo(row);
-            $('<td>').text(tModelName[i].value).appendTo(row);
-            $('<td>').text(tColor[i].value).appendTo(row);
+            $('<td>').text(tModelName[i].value + " (" + tColor[i].value + ")").appendTo(row);
             $('<td>').text(tBrand[i].value).appendTo(row);
             $('<td>').text(tSRP[i].value).appendTo(row);
             $('<td><input type="number" onchange="updateTotalAmount(this);" onkeypress="return noenter(event);" name="oQty[]" max="1000" min="1" class="form-control" style="width: 80px;" value=' + tQty[i].value + '>').appendTo(row);

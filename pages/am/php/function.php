@@ -132,7 +132,6 @@ if (isset($_POST['PONumber'])) {
                                     <tr>
                                         <th>Item Code</th>
                                         <th>Item Name</th>
-                                        <th>Color</th>
                                         <th>Brand</th>
                                         <th>SRP</th>
                                         <th width="5%">Qty.</th>
@@ -168,8 +167,7 @@ if (isset($_POST['PONumber'])) {
                                         ?>
                                         <tr>
                                             <td><?php echo $ItemCode ?></td>
-                                            <td><?php echo $ModelName ?></td>
-                                            <td><?php echo $Color ?></td>
+                                            <td><?php echo $ModelName ?> (<?php echo $Color ?>)</td>
                                             <td><?php echo $Brand ?></td>
                                             <td><?php echo $SRP ?></td>
                                             <td width="5%"><?php echo $Qty ?></td>

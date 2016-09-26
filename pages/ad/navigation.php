@@ -1,5 +1,22 @@
-<?php 
+<?php
 include('../../connection.php');
+session_start();
+$EmpID = db_quote($_SESSION['EmpID']);
+$checkAccount = db_select("SELECT * FROM `employeetbl` WHERE EmpID =" . $EmpID);
+
+if($checkAccount[0]['Position'] != "Admin"){
+    unset($_SESSION['EmpID']);
+    header('location: ../../index.php');
+}
+else{
+    $FirstName = $checkAccount[0]['Firstname'];
+    $LastName = $checkAccount[0]['Lastname'];
+    $BranchCode = $checkAccount[0]['Branch'];
+    $Initials = $checkAccount[0]['Initials'];
+    $AccountType = $checkAccount[0]['Position'];
+    $FullName = $FirstName . " " . $LastName;
+}
+
 ?>
 <div class="col-md-3 left_col menu_fixed">
     <div class="left_col scroll-view">
@@ -16,7 +33,7 @@ include('../../connection.php');
             </div>
             <div class="profile_info">
                 <span>Welcome,</span>
-                <h2>Admin TJ</h2>
+                <h2><?php echo $FullName ?></h2>
             </div>
         </div>
         <!-- /menu profile quick info -->
@@ -48,22 +65,44 @@ include('../../connection.php');
     <div class="nav_menu">
         <nav>
             <div class="nav toggle">
-                <a id="menu_toggle"><i class="fa fa-bars"></i></a>
-            </div>
-            <ul class="nav navbar-nav navbar-right">
-                <li class="">
-                    <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown"
-                       aria-expanded="false">
-                        <img src="../../img/man-icon.png" alt="">Admin TJ
-                        <span class=" fa fa-angle-down"></span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-usermenu pull-right">
-                        <li><a href="javascript:;"> Account Settings</a></li>
-                        <li><a href=""><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </nav>
-    </div>
+    <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+</div>
+<ul class="nav navbar-nav navbar-right">
+    <li class="">
+        <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown"
+           aria-expanded="false">
+            <img src="../../img/man-icon.png" alt=""><?php echo $FullName ?>
+            <span class=" fa fa-angle-down"></span>
+        </a>
+        <ul class="dropdown-menu dropdown-usermenu pull-right">
+            <li><a href="javascript:;"> Account Settings</a></li>
+            <li><a data-toggle="modal" data-target="#LogoutModal"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+        </ul>
+    </li>
+</ul>
+</nav>
+</div>
 </div>
 <!-- /top navigation -->
+
+<!-- Log out Modal -->
+<div class="modal fade" id="LogoutModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header modal-header-dark">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Log out</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to log out?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-dismiss="modal">Close</button>
+                <button class="btn btn-dark" onclick="logout();">Log out</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
