@@ -32,3 +32,16 @@ function logout() {
     xhr.open('GET', '../../functions/logout.php', true);
     xhr.send();
 }
+
+function EmployeeDetails(EmpID) {
+    alert(EmpID);
+    $.ajax({
+        type: 'POST',
+        url: 'function/functions.php',
+        data: 'EmpID=' + EmpID,
+        success: function (data) {
+            $('#EmployeeUpdateModal').html(data);
+            $('#EmployeeUpdateModal').modal('show');
+        }
+    })
+}

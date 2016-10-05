@@ -7,7 +7,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Administrator</title>
+    <title>Purchase Request</title>
+    <link rel="shortcut icon" href="../../img/B%20LOGO%20BLACK.png">
 
     <!-- Bootstrap -->
     <link href="../../src/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -15,6 +16,8 @@
     <link href="../../src/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <!-- NProgress -->
     <link href="../../src/nprogress/nprogress.css" rel="stylesheet">
+    <!-- Bootstrap Validator -->
+    <link href="../../src/validator/bootstrapValidator.min.css">
 
     <!-- Custom Theme Style -->
     <link href="../../build/css/custom.min.css" rel="stylesheet">
@@ -67,22 +70,23 @@
                                             purchaserequeststbl._Date,
                                             purchaserequeststbl.Status,
                                             purchaserequeststbl.Remarks,
-                                            purchaserequeststbl.Branch,
+                                            purchaserequeststbl.BranchCode,
                                             employeetbl.Firstname,
                                             employeetbl.Lastname
                                             FROM purchaserequeststbl
                                             LEFT JOIN employeetbl ON purchaserequeststbl.EmpID = employeetbl.EmpID
-                                            WHERE purchaserequeststbl.Branch IN (SELECT `BranchCode` FROM `branchtbl` WHERE Area = " . db_quote($Area) . ")
+                                            WHERE purchaserequeststbl.BranchCode IN (SELECT `BranchCode` FROM `branchtbl` WHERE `AreaID` = " . db_quote($AreaID) . ")
                                             AND purchaserequeststbl.Status = 'Pending'
                                             AND purchaserequeststbl.isDeleted = '0'
                                             ");
+
 
                                             foreach ($PendingOrders as $Order) {
                                                 $PONumber = $Order['PONumber'];
                                                 $_Date = $Order['_Date'];
                                                 $Status = $Order['Status'];
                                                 $Remarks = $Order['Remarks'];
-                                                $Branch = $Order['Branch'];
+                                                $Branch = $Order['BranchCode'];
                                                 $ContactPerson = $Order['Firstname'] . " " . $Order['Lastname'];
                                                 ?>
                                                 <tr>
@@ -104,7 +108,7 @@
                                             ?>
                                             </tbody>
                                         </table>
-                                        <a href="purchase.php" class="btn btn-dark">Purchase now</a>
+                                        <button data-toggle="modal" data-target="#PurchaseNow" class="btn btn-dark">Purchase now</button>
                                     </div>
                                     <!-- PO Details -->
                                     <div class="modal fade" id="PODetails">
@@ -112,37 +116,61 @@
                                     </div>
                                     <!-- /.modal -->
 
-                                    <form id="ReasonFRM" name="ReasonFRM" method="POST">
-                                        <!-- Reject Request Modal -->
-                                        <div class="modal fade" id="RejectRequest">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header modal-header-danger">
-                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                        <h4 class="modal-title">Reject Request?</h4>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="row">
-                                                            <div class="col-lg-12">
-                                                                <div class="form-group">
-                                                                    <label>Reason for rejecting this purchase request:</label>
-                                                                    <textarea rows="4" class="form-control" name="Reason" id="Reason" maxlength="200" onkeyup="countChar();"></textarea>
-                                                                    <div id="charNum">200 characters remaining.</div>
-                                                                </div>
+                                    <!-- Reject Request Modal -->
+                                    <div class="modal fade" id="RejectRequest">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header modal-header-danger">
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                    <h4 class="modal-title">Reject Request?</h4>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
+                                                            <div class="form-group">
+                                                                <p>Are you sure you want to reject this purchase request?</p>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="modal-footer">
-                                                        <button class="btn btn-dark" id="Rejected">Yes</button>
-                                                        <button class="btn btn-default" data-dismiss="modal">Close</button>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button class="btn btn-dark" id="Rejected" onclick="RejectRequest(this.value);">Yes</button>
+                                                    <button class="btn btn-default" data-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                            <!-- /.modal-content -->
+                                        </div>
+                                        <!-- /.modal-dialog -->
+                                    </div>
+                                    <!-- /.modal -->
+
+                                    <!-- Cancel Request Modal -->
+                                    <div class="modal fade" id="CancelRequest">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header modal-header-danger">
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                    <h4 class="modal-title">Cancel Purchase Request?</h4>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
+                                                            <div class="form-group">
+                                                                <p>Are you sure you want to cancel this purchase request?</p>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <!-- /.modal-content -->
+                                                <div class="modal-footer">
+                                                    <button class="btn btn-dark" id="CancelOrder" onclick="CancelRequest(this.value);">Yes</button>
+                                                    <button class="btn btn-default" data-dismiss="modal">Close</button>
+                                                </div>
                                             </div>
-                                            <!-- /.modal-dialog -->
+                                            <!-- /.modal-content -->
                                         </div>
-                                        <!-- /.modal -->
-                                    </form>
+                                        <!-- /.modal-dialog -->
+                                    </div>
+                                    <!-- /.modal -->
 
                                     <!-- Approve Request Modal -->
                                     <div class="modal fade" id="ApproveRequest">
@@ -156,7 +184,7 @@
                                                     <p>Are you sure you want to approve this purchase request?</p>
                                                 </div>
                                                 <div class="modal-footer">
-                                                    <button class="btn btn-dark" id="Approved">Yes</button>
+                                                    <button class="btn btn-dark" id="Approved" onclick="ApproveRequest(this.value);">Yes</button>
                                                     <button class="btn btn-default" data-dismiss="modal">Close</button>
                                                 </div>
                                             </div>
@@ -164,6 +192,63 @@
                                         </div>
                                         <!-- /.modal-dialog -->
                                     </div>
+                                    <!-- /.modal -->
+
+                                    <form method="POST" action="purchase.php" id="frmBrand">
+                                        <!-- Purchase Now Modal -->
+                                        <div class="modal fade" id="PurchaseNow">
+                                            <div class="modal-dialog modal-sm">
+                                                <div class="modal-content">
+                                                    <div class="modal-header modal-header-dark">
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                        <h4 class="modal-title">Select Brand</h4>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <div class="form-group">
+                                                                    <div class="row">
+                                                                        <div class="col-lg-12">
+                                                                            <label for="Brand">Ship to (*)</label>
+                                                                            <select class="form-control" name="ShipToBRCode" id="ShipToBRCode" onchange="getBrand(this.value)">
+                                                                                <option value="" selected="selected">- Select Branch -</option>
+                                                                                <?php
+                                                                                $Branchtbl = db_query("SELECT `BranchID`, `BranchCode` FROM  branchtbl WHERE `AreaID` = ". db_quote($AreaID));
+
+                                                                                foreach ($Branchtbl as $branch) {
+                                                                                    $BranchID = $branch['BranchID'];
+                                                                                    $BranchCode = $branch['BranchCode'];
+                                                                                    ?>
+                                                                                    <option value="<?= @$BranchID ?>"><?= @$BranchCode ?></option>
+                                                                                    <?php
+                                                                                }
+                                                                                ?>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    &nbsp;
+                                                                    <div class="row">
+                                                                        <div class="col-lg-12">
+                                                                            <label for="Brand">Brand (*)</label>
+                                                                            <select class="form-control" name="Brand" id="Brand">
+                                                                                <option value="" selected="selected">- Select Brand -</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button class="btn btn-default" data-dismiss="modal">Close</button>
+                                                        <button type="submit" class="btn btn-dark">Proceed</button>
+                                                    </div>
+                                                </div>
+                                                <!-- /.modal-content -->
+                                            </div>
+                                            <!-- /.modal-dialog -->
+                                        </div>
+                                    </form>
                                     <!-- /.modal -->
                                 </div>
                             </div>
@@ -193,6 +278,8 @@
 <script src="../../src/fastclick/lib/fastclick.js"></script>
 <!-- NProgress -->
 <script src="../../src/nprogress/nprogress.js"></script>
+<!-- validator -->
+<script src="../../src/validator/bootstrapValidator.min.js"></script>
 <!-- Datatables -->
 <script src="../../src/datatables.net/js/jquery.dataTables.min.js"></script>
 <script src="../../src/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
@@ -297,5 +384,31 @@
     });
 </script>
 <!-- /Datatables -->
+
+<!-- validator -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#frmBrand').bootstrapValidator({
+            message: 'This value is not valid',
+            fields: {
+                group: 'form-group',
+                Brand: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Brand is required.'
+                        }
+                    }
+                },
+                ShipToBRCode: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Branch Code is required.'
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
 </body>
 </html>

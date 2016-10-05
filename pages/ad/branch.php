@@ -66,31 +66,100 @@
                                                 <th>Branch Name</th>
                                                 <th>Brand</th>
                                                 <th>Branch Area</th>
-                                                <th>Branch Type</th>
                                                 <th width=12%>Action</th>
                                             </tr>
                                             </thead>
                                             <tbody>
                                             <?php
-                                            $BranchQuery = db_select("SELECT * FROM `branchtbl`");
+                                            $BranchQuery = db_select("
+                                                SELECT  branchtbl.BranchCode, branchtbl.BranchName, brandtbl.Brand, areatbl.Area
+                                                FROM branchtbl
+                                                LEFT JOIN brandtbl ON branchtbl.BrandID = brandtbl.BrandID
+                                                LEFT  JOIN areatbl ON branchtbl.AreaID = areatbl.AreaID");
                                             foreach ($BranchQuery as $Branch) {
                                                 $BranchCode = $Branch['BranchCode'];
                                                 $BranchName = $Branch['BranchName'];
                                                 $Brand = $Branch['Brand'];
                                                 $BranchArea = $Branch['Area'];
-                                                $BranchType = $Branch['BranchType'];
                                                 ?>
                                                 <tr>
                                                     <td><?php echo $BranchCode ?></td>
                                                     <td><?php echo $BranchName ?></td>
                                                     <td><?php echo $Brand ?></td>
                                                     <td><?php echo $BranchArea ?></td>
-                                                    <td><?php echo $BranchType ?></td>
                                                     <td>
-                                                        <button class="btn btn-dark" onclick="BranchDetails('<?php echo $BranchCode ?>');"><i class="fa fa-eye"></i></button>
+                                                        <button class="btn btn-dark" data-target="#EditBranchModal<?= @$BranchCode ?>" data-toggle="modal"><i class="fa fa-eye"></i></button>
                                                         <button class="btn btn-danger" data-toggle="modal" data-target="#CheckDelete" onclick="DeleteBranch('<?php echo $BranchCode ?>');"><i class="fa fa-trash"></i></button>
                                                     </td>
                                                 </tr>
+
+                                                <!-- EditBranch Modal -->
+                                                <div class="modal fade" id="EditBranchModal<?= @$BranchCode ?>" role="dialog">
+                                                    <div class="modal-dialog">
+                                                        <!-- Modal content-->
+                                                        <form action="function/functions.php" id="EditBranch" method="POST" autocomplete="off">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header modal-header-dark">
+                                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                                    <h4 class="modal-title">Update Branch</h4>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <div class="row">
+                                                                        <div class="col-lg-12">
+                                                                            <div class="form-group">
+                                                                                <label>Branch Code <span class="red">(*)</span></label>
+                                                                                <input type="text" class="form-control" style="text-transform: uppercase" id="EditBranchCode" name="EditBranchCode" value="<?php echo $BranchCode ?>" readonly>
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                <label>Branch Name <span class="red">(*)</span></label>
+                                                                                <input type="text" class="form-control" style="text-transform: uppercase" id="EditBranchName" name="EditBranchName" value="<?php echo $BranchName ?>">
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                <label>Brand <span class="red">(*)</span></label>
+                                                                                <select class="form-control" name="EditBrand" id="EditBrand">
+                                                                                    <option selected="selected" value=""><?= @$Brand; ?></option>
+                                                                                    <?php
+                                                                                    $Brandtbl = db_select("SELECT `BrandID`,`Brand` FROM `brandtbl`");
+
+                                                                                    foreach ($Brandtbl as $valueBrand) {
+                                                                                        $BrandID = $valueBrand['BrandID'];
+                                                                                        $Brand = $valueBrand['Brand'];
+                                                                                        ?>
+                                                                                        <option value="<?= @$BrandID; ?>"><?= @$Brand; ?></option>
+                                                                                        <?php
+                                                                                    }
+                                                                                    ?>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                <label>Branch Area <span class="red">(*)</span></label>
+                                                                                <select class="form-control" name="EditBranchArea" id="EditBranchArea">
+                                                                                    <option value="" selected="selected"><?= @$BranchArea; ?></option>
+                                                                                    <?php
+                                                                                    $Areatbl = db_select("SELECT `AreaID`,`Area` FROM `areatbl`");
+
+                                                                                    foreach ($Areatbl as $valueArea) {
+                                                                                        $AreaID = $valueArea['AreaID'];
+                                                                                        $Area = $valueArea['Area'];
+                                                                                        ?>
+                                                                                        <option value="<?= @$AreaID; ?>"><?= @$Area; ?></option>
+                                                                                        <?php
+                                                                                    }
+                                                                                    ?>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="submit" class="btn btn-dark">Save</button>
+                                                                    <button class="btn btn-dark" data-dismiss="modal">Cancel</button>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                                <!-- End EditBranch Modal-->
                                                 <?php
                                             }
                                             ?>
@@ -127,35 +196,36 @@
                                             </div>
                                             <div class="form-group">
                                                 <label>Brand <span class="red">(*)</span></label>
-                                                <select class="form-control" name="bBrand" id="bBrand">
-                                                    <option selected="selected" value=""> - Please Select one -</option>
-                                                    <option value="Berlein Mobile">Berlein Mobile</option>
-                                                    <option value="Cherry Mobile">Cherry Mobile</option>
-                                                    <option value="MyPhone">MyPhone</option>
-                                                    <option value="Oppo">Oppo</option>
-                                                    <option value="Huawei">Huawei</option>
+                                                <select class="form-control" id="bBrand" name="bBrand">
+                                                    <option value="" selected="selected"> - Choose Brand -</option>
+                                                    <?php
+                                                    $brandtbl = db_select("SELECT `BrandID`,`Brand` FROM `brandtbl`");
+
+                                                    foreach ($brandtbl as $vBrand) {
+                                                        $BrandID = $vBrand['BrandID'];
+                                                        $Brand = $vBrand['Brand'];
+                                                        ?>
+                                                        <option value="<?= @$BrandID; ?>"><?= @$Brand; ?></option>
+                                                        <?php
+                                                    }
+                                                    ?>
                                                 </select>
                                             </div>
                                             <div class="form-group">
                                                 <label>Branch Area <span class="red">(*)</span></label>
-                                                <select class="form-control" name="BranchArea" id="BranchArea">
-                                                    <option selected="selected" value=""> - Please Select one -</option>
-                                                    <option value="North Luzon">North Luzon</option>
-                                                    <option value="Central Luzon">Central Luzon</option>
-                                                    <option value="NCR North">NCR North</option>
-                                                    <option value="NCR Central">NCR Central</option>
-                                                    <option value="NCR Central">NCR Mandaluyong</option>
-                                                    <option value="NCR South">NCR South</option>
-                                                    <option value="Cebu">Cebu</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Branch Type <span class="red"> (*)</span></label>
-                                                <select class="form-control" name="BranchType" id="BranchType">
-                                                    <option selected="selected" value=""> - Please Select one -</option>
-                                                    <option value="Inline">Inline</option>
-                                                    <option value="Kiosk">Kiosk</option>
-                                                    <option value="Concept">Concept</option>
+                                                <select class="form-control" id="BranchArea" name="BranchArea">
+                                                    <option value="" selected="selected"> - Choose Branch Area -</option>
+                                                    <?php
+                                                    $areatbl = db_select("SELECT `AreaID`,`Area` FROM `areatbl`");
+
+                                                    foreach ($areatbl as $vArea) {
+                                                        $AreaID = $vArea['AreaID'];
+                                                        $Area = $vArea['Area'];
+                                                        ?>
+                                                        <option value="<?= @$AreaID; ?>"><?= @$Area ?></option>
+                                                        <?php
+                                                    }
+                                                    ?>
                                                 </select>
                                             </div>
                                         </div>
@@ -170,12 +240,6 @@
                     </div>
                     <!-- End Modal addbranch-->
                 </form>
-
-                <!-- EditBranch Modal -->
-                <div class="modal fade" id="EditBranchModal" role="dialog">
-
-                </div>
-                <!-- End EditBranch Modal-->
 
                 <!-- Delete Branch Modal -->
                 <div class="modal fade" id="CheckDelete">

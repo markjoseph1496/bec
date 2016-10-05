@@ -57,20 +57,6 @@
                             </div>
                             <div class="x_content">
                                 <div class="col-lg-12">
-                                    <?php
-                                    if (isset($_GET['id'])) {
-                                        $id = $_GET['id'];
-                                        if ($id = 'EmployeeAddNotif') {
-                                            echo '
-                            <div id="EmployeeAddNotif" class="alert alert-success alert-dismissible fade in" role="alert" style="display: none;">
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
-                                </button>
-                                Employee successfully Added.
-                            </div>
-                        ';
-                                        }
-                                    }
-                                    ?>
                                     <div class="row">
                                         <table id="datatable" class="table table-striped table-bordered">
                                             <thead>
@@ -82,11 +68,18 @@
                                                 <th>Initials</th>
                                                 <th>Position</th>
                                                 <th>Branch</th>
+                                                <th>Area</th>
                                                 <th width='17%'>Action</th>
+                                            </tr>
                                             </thead>
                                             <tbody>
                                             <?php
-                                            $employeetbl = db_select("SELECT * FROM `employeetbl`");
+                                            $employeetbl = db_select("
+                                                SELECT employeetbl.EmpID, employeetbl.Firstname, employeetbl.Middlename, employeetbl.Lastname,
+                                                employeetbl.Initials, employeetbl.Position, branchtbl.BranchName, areatbl.Area
+                                                FROM employeetbl
+                                                LEFT JOIN branchtbl ON employeetbl.BranchID = branchtbl.BranchID
+                                                LEFT JOIN  areatbl ON employeetbl.AreaID = areatbl.AreaID");
                                             foreach ($employeetbl as $value) {
                                             $EmpID = $value['EmpID'];
                                             $Firstname = $value['Firstname'];
@@ -94,39 +87,32 @@
                                             $Lastname = $value['Lastname'];
                                             $Initials = $value['Initials'];
                                             $Position = $value['Position'];
-                                            $Branch = $value['Branch'];
+                                            $BranchName = $value['BranchName'];
+                                            $Area = $value['Area'];
                                             ?>
                                             <tr>
-                                                <td><?php echo $EmpID; ?></td>
-                                                <td><?php echo $Firstname; ?></td>
-                                                <td><?php echo $Middlename; ?></td>
-                                                <td><?php echo $Lastname; ?></td>
-                                                <td><?php echo $Initials; ?></td>
-                                                <td><?php echo $Position; ?></td>
-                                                <td><?php echo $Branch; ?></td>
+                                                <td><?= @$EmpID; ?></td>
+                                                <td><?= @$Firstname; ?></td>
+                                                <td><?= @$Middlename; ?></td>
+                                                <td><?= @$Lastname; ?></td>
+                                                <td><?= @$Initials; ?></td>
+                                                <td><?= @$Position; ?></td>
+                                                <td><?= @$BranchName; ?></td>
+                                                <td><?= @$Area ?></td>
                                                 <td>
-                                                    <button data-toggle='modal'
-                                                            data-target='#AddAccount<?php echo $EmpID; ?>' class='btn btn-dark'>
-                                                        <i class='fa fa-plus'></i>
-                                                    </button>
-                                                    <button name="btnedit" data-toggle='modal'
-                                                            data-target='#UpdateEmployee<?php echo $EmpID; ?>' class='btn btn-dark'>
-                                                        <i class='fa fa-eye'></i>
-                                                    </button>
-                                                    <button class='btn btn-danger' data-toggle="modal"
-                                                            data-target="#DeleteEmployee<?php echo $EmpID; ?>">
-                                                        <i class="fa fa-remove "></i>
-                                                    </button>
+                                                    <button data-toggle='modal' data-target='#AddAccount<?php echo $EmpID; ?>' class='btn btn-dark'><i class='fa fa-plus'></i></button>
+                                                    <button class="btn btn-dark" onclick="EmployeeDetails(this.value);" value="<?= @$EmpID; ?>" data-toggle="modal" data-target="#EmployeeUpdateModal"><i class='fa fa-eye'></i></button>
+                                                    <button class='btn btn-danger' data-toggle="modal" data-target="#DeleteEmployee<?php echo $EmpID; ?>"><i class="fa fa-trash "></i></button>
                                                 </td>
                                             </tr>
                                             </tbody>
 
                                             <!-- Modal add account-->
-                                            <div class="modal fade" id="AddAccount<?php echo $EmpID; ?>" role="dialog">
+                                            <div class="modal fade" id="AddAccount<?= @$EmpID; ?>" role="dialog">
                                                 <div class="modal-dialog">
                                                     <!-- Modal content-->
                                                     <div class="modal-content">
-                                                        <form action="function/admin-add.php" method="POST" name="addAccount" id="addAccount" autocomplete="off">
+                                                        <form action="function/functions.php" method="POST" name="addAccount" id="addAccount" autocomplete="off">
                                                             <div class="modal-header modal-header-dark">
                                                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                                                                 <h4 class="modal-title">Add Account</h4>
@@ -148,20 +134,20 @@
                                                                         <div class="form-group">
                                                                             <label>Employee ID <span class="red">(*)</span></label>
                                                                             <input type="text" readonly="readonly" class="form-control" style="text-transform: uppercase" id="aEmpID" name="aEmpID"
-                                                                                   value="<?php echo $EmpID; ?>">
+                                                                                   value="<?= @$EmpID; ?>">
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                             <div class="modal-footer">
-                                                                <button type="submit" class="btn btn-dark" id="btnaddaccount" name="btnaddaccount">Add Account</button>
+                                                                <button type="submit" class="btn btn-dark" id="btnaddAccount" name="btnaddAccount">Add Account</button>
                                                                 <button class="btn btn-dark" data-dismiss="modal">Cancel</button>
                                                             </div>
+                                                        </form>
                                                     </div>
                                                 </div>
                                             </div>
                                             <!-- End Modal add account -->
-                                            </form>
 
                                             <!-- Modal Delete Employee -->
                                             <div class="modal fade" id="DeleteEmployee<?php echo $EmpID; ?>" role="dialog">
@@ -182,7 +168,7 @@
                                                                 </div>
                                                                 <input type="hidden" name="EmpID" value="<?php echo $EmpID; ?>">
                                                                 <div class="modal-footer">
-                                                                    <button class="btn btn-dark" name="btndeleteemployee" id="btndeleteemployee">Delete</button>
+                                                                    <button class="btn btn-danger" name="btndeleteemployee" id="btndeleteemployee">Delete</button>
                                                                     <button type="button" class="btn btn-dark" data-dismiss="modal">Cancel</button>
                                                                 </div>
                                                             </div>
@@ -192,93 +178,26 @@
                                             </form>
                                             <!-- End Modal Delete Employee -->
 
-
-                                            <!-- Modal edit item-->
-                                            <div class="modal fade" id="UpdateEmployee<?php echo $EmpID; ?>" role="dialog">
-                                                <div class="modal-dialog">
-                                                    <!-- Modal content-->
-                                                    <div class="modal-content">
-                                                        <form action="function/admin-add.php" method="POST" name="EditEmployee" id="EditEmployee" autocomplete="off">
-                                                            <div class="modal-header modal-header-dark">
-                                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                                                <h4 class="modal-title">Edit Employee</h4>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <div class="row">
-                                                                    <div class="col-lg-12">
-                                                                        <div class="form-group">
-                                                                            <label>Employee ID <span class="red">(*)</span></label>
-                                                                            <input type="text" readonly="readonly" class="form-control" style="text-transform: uppercase" id="uEmpID" name="uEmpID"
-                                                                                   value="<?php echo $EmpID; ?>">
-                                                                        </div>
-                                                                        <div class="form-group">
-                                                                            <label>First Name <span class="red">(*)</span></label>
-                                                                            <input type="text" class="form-control" style="text-transform: uppercase" id="uFirstname" name="uFirstname"
-                                                                                   value="<?php echo $Firstname; ?>">
-                                                                        </div>
-                                                                        <div class="form-group">
-                                                                            <label>Middle Name <span class="red">(*)</span></label>
-                                                                            <input type="text" class="form-control" style="text-transform: uppercase" id="uMiddlename" name="uMiddlename"
-                                                                                   value="<?php echo $Middlename; ?>">
-                                                                        </div>
-                                                                        <div class="form-group">
-                                                                            <label>Last Name <span class="red">(*)</span></label>
-                                                                            <input type="text" class="form-control" style="text-transform: uppercase" id="uLastname" name="uLastname"
-                                                                                   value="<?php echo $Lastname; ?>">
-                                                                        </div>
-                                                                        <div class="form-group">
-                                                                            <label>Initials <span class="red">(*)</span></label>
-                                                                            <input type="text" class="form-control" style="text-transform: uppercase" id="uInitials" name="uInitials"
-                                                                                   value="<?php echo $Initials; ?>">
-                                                                        </div>
-                                                                        <div class="form-group">
-                                                                            <label>Position <span class="red">(*)</span></label>
-                                                                            <input type="text" class="form-control" style="text-transform: uppercase" id="uPosition" name="uPosition"
-                                                                                   value="<?php echo $Position; ?>">
-                                                                        </div>
-                                                                        <div class="form-group">
-                                                                            <label>Branch <span class="red">(*)</span></label>
-                                                                            <select class="form-control" id="uBranch" name="uBranch">
-                                                                                <option value="" selected="selected"><?php echo $BranchName; ?></option>
-                                                                                <?php
-                                                                                $branchtbl = db_select("SELECT `BranchName` FROM `branchtbl`");
-
-                                                                                foreach ($branchtbl as $branch) {
-                                                                                    $BranchName = $branch['BranchName'];
-                                                                                    ?>
-                                                                                    <option value="<?php echo $BranchName; ?>"><?php echo $BranchName; ?></option>
-                                                                                    <?php
-                                                                                }
-                                                                                ?>
-
-                                                                            </select>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="submit" class="btn btn-dark" id="btnupdateemployee" name="btnupdateemployee">Update</button>
-                                                                <button class="btn btn-dark" data-dismiss="modal">Cancel</button>
-                                                            </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <!-- End Modal Edit Item-->
-                                            </form>
-
                                             <?php
                                             }
                                             ?>
                                         </table>
                                         <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#myModal">Add Employee</button>
                                     </div>
+
+                                    <!-- Modal edit item-->
+                                    <div class="modal fade" id="EmployeeUpdateModal">
+
+                                    </div>
+                                    <!-- End Modal Edit Item-->
+
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <form action="function/admin-add.php" method="POST" name="AddEmployee" id="AddEmployee" autocomplete="off">
+                <form method="POST" id="AddEmployee" autocomplete="off">
                     <!-- Modal add employee-->
                     <div class="modal fade" id="myModal" role="dialog">
                         <div class="modal-dialog">
@@ -294,7 +213,7 @@
                                         <div class="col-lg-12">
                                             <div class="form-group">
                                                 <label>Employee ID <span class="red">(*)</span></label>
-                                                <input type="text" class="form-control" style="text-transform: uppercase" id="EmpID" name="EmpID">
+                                                <input type="text" class="form-control" style="text-transform: uppercase" id="AddEmpID" name="AddEmpID">
                                             </div>
                                             <div class="form-group">
                                                 <label>First Name <span class="red">(*)</span></label>
@@ -321,16 +240,33 @@
                                                 <select class="form-control" id="Branch" name="Branch">
                                                     <option value="" selected="selected">- Choose Branch -</option>
                                                     <?php
-                                                    $branchtbl = db_select("SELECT `BranchName` FROM `branchtbl`");
+                                                    $branchtbl = db_select("SELECT `BranchName`,`BranchID` FROM `branchtbl`");
 
                                                     foreach ($branchtbl as $value) {
                                                         $BranchName = $value['BranchName'];
+                                                        $BranchID = $value['BranchID'];
                                                         ?>
-                                                        <option value="<?php echo $BranchName; ?>"><?php echo $BranchName; ?></option>
+                                                        <option value="<?php echo $BranchID; ?>"><?php echo $BranchName; ?></option>
                                                         <?php
                                                     }
                                                     ?>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Area <span class="red">(*)</span></label>
+                                                <select class="form-control" id="eArea" name="eArea">
+                                                    <option value="" selected="selected"> - Choose Area -</option>
+                                                    <?php
+                                                    $Areatbl = db_select("SELECT `AreaID`, `Area` FROM `areatbl`");
 
+                                                    foreach ($Areatbl as $vArea) {
+                                                        $AreaID = $vArea['AreaID'];
+                                                        $Area = $vArea['Area'];
+                                                        ?>
+                                                        <option value="<?= @$AreaID; ?>"><?= @$Area; ?></option>
+                                                        <?php
+                                                    }
+                                                    ?>
                                                 </select>
                                             </div>
                                         </div>
@@ -535,16 +471,30 @@
                             message: 'Please enter Branch. Required!'
                         }
                     }
+                },
+                eArea: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Please enter Area. Required!'
+                        }
+                    }
                 }
             }
+        }).on('success.form.bv', function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: 'function/functions.php',
+                data: $('#AddEmployee').serialize(),
+                success: function (data) {
+                    if (data == "True") {
+                        window.location.href = "employee.php";
+                    }
+                }
+            })
         });
     });
 
-
-    $('#EmployeeAddNotif').show();
-    $("#EmployeeAddNotif").fadeTo(5000, 500).slideUp(500, function () {
-        $("#EmployeeAddNotif").alert('close');
-    });
 </script>
 <!-- /validator -->
 </body>

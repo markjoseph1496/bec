@@ -1,3 +1,7 @@
+var ItemsToOrder = document.getElementById("ItemsToOrder");
+var sPrice = document.getElementById("sPrice"); //label of total price
+var arrayItem = ["0"];
+
 function addItemToOrder(r) {
     var i = r.parentNode.parentNode.rowIndex;
     i--;
@@ -6,23 +10,21 @@ function addItemToOrder(r) {
     var tQty = document.getElementsByName('tQty[]');
     var b = arrayItem.indexOf(tItemCode[i].value);
     if (b == -1) {
-        if(tQty[i].value == 0){
+        if (tQty[i].value == 0) {
             alert('Please enter quantity.');
         }
-        else{
+        else {
             var row = $('<tr>');
             var tModelName = document.getElementsByName('tModelName[]');
-            var tColor = document.getElementsByName('tColor[]');
             var tBrand = document.getElementsByName('tBrand[]');
             var tCategory = document.getElementsByName('tCategory[]');
-            var tType = document.getElementsByName('tType[]');
             var tSRP = document.getElementsByName('tSRP[]');
 
             var tTotalPrice = parseFloat(tSRP[i].value.replace(/,/g, "")) * parseFloat(tQty[i].value.replace(/,/g, ""));
             tTotalPrice = accounting.formatNumber(tTotalPrice, 2, ",", ".");
 
             $('<td>').text(tItemCode[i].value).appendTo(row);
-            $('<td>').text(tModelName[i].value + " (" + tColor[i].value + ")").appendTo(row);
+            $('<td>').text(tModelName[i].value).appendTo(row);
             $('<td>').text(tBrand[i].value).appendTo(row);
             $('<td>').text(tSRP[i].value).appendTo(row);
             $('<td><input type="number" onchange="updateTotalAmount(this);" onkeypress="return noenter(event);" name="oQty[]" max="1000" min="1" class="form-control" style="width: 80px;" value=' + tQty[i].value + '>').appendTo(row);
@@ -47,7 +49,7 @@ function addItemToOrder(r) {
 
 }
 
-function updateTotal(){
+function updateTotal() {
     var stPrice = 0;
     var tPrice = document.getElementsByName('oTotalPrice[]'); //value of unit price on table
 
@@ -70,7 +72,7 @@ function updateTotalAmount(r) {
 
     tTotalPrice = accounting.formatNumber(tTotalPrice, 2, ",", ".");
     document.getElementsByName('oTotalPrice[]')[i].value = tTotalPrice;
-    ordertable.rows[i + 1].cells[6].innerHTML = tTotalPrice;
+    ordertable.rows[i + 1].cells[5].innerHTML = tTotalPrice;
     var tPrice = document.getElementsByName('oTotalPrice[]'); //value of unit price on table
 
     for (var x = 0; x < tPrice.length; x++) {
@@ -92,14 +94,16 @@ function deleteItemOrder(r) {
     $("input").remove(oQty[i - 1], oItemCode[i - 1], oSRP[i - 1], oTotalPrice[i - 1]);
     arrayItem.splice(i, 1);
     ItemsToOrder.deleteRow(i);
-    $('#DeleteNotif').show();
-    $("#DeleteNotif").fadeTo(5000, 500).slideUp(500, function () {
-        
+    new PNotify({
+    title: 'Item Deleted',
+        type: 'success',
+        styling: 'bootstrap3',
+        delay:3000
     });
     updateTotal();
 }
 
-function PurchaseOrder(){
+function PurchaseOrder() {
     if (arrayItem == 0) {
         $('#noItemModal').modal('show');
     }
@@ -108,14 +112,21 @@ function PurchaseOrder(){
     }
 }
 
-function PODetails(r){
-    var i = r.parentNode.parentNode.rowIndex;
-    i--;
-    var PONumber = document.getElementsByName('PONumber[]');
+function UpdatePurchaseOrder() {
+    if (arrayItem == 0) {
+        $('#noItemModal').modal('show');
+    }
+    else {
+        $('#CheckItems').modal('show');
+    }
+}
+
+function PODetails(PONumber) {
+    alert(PONumber);
     $.ajax({
         type: 'POST',
         url: 'php/function.php',
-        data: 'PONumber=' + PONumber[i].value,
+        data: 'PONumber=' + PONumber,
         success: function (data) {
             $('#PODetails').html(data);
             $('#PODetails').modal('show');
@@ -129,25 +140,54 @@ function noenter(e) {
     return key !== 13;
 }
 
-function CancelOrder(PONumber){
-    $('#CheckDelete').modal('show');
-    $('#Yes').on('click', function() {
-        $.ajax({
-            type: 'POST',
-            url: 'php/function.php',
-            data: 'dPONumber=' + PONumber,
-            success: function () {
-                window.location.replace("po.php");
-            }
-        })
-    });
+function DeletePR(PRNumber) {
+    $.ajax({
+        type: 'POST',
+        url: 'php/function.php',
+        data: 'dPONumber=' + PRNumber,
+        success: function (data) {
+            window.location.replace("po.php?"+data);
+        }
+    })
 }
 
 function logout() {
     var xhr = new XMLHttpRequest();
-    xhr.onload = function() {
+    xhr.onload = function () {
         document.location = '../../index.php';
-    }
+    };
     xhr.open('GET', '../../functions/logout.php', true);
     xhr.send();
+}
+
+function addItemsToModify() {
+    var tItemCode = document.getElementsByName('aItemCode[]');
+    for (var i = 0; i < tItemCode.length; i++) {
+        var tQty = document.getElementsByName('aQty[]');
+        var row = $('<tr>');
+        var tModelName = document.getElementsByName('aModelName[]');
+        var tBrand = document.getElementsByName('aBrand[]');
+        var tCategory = document.getElementsByName('aCategory[]');
+        var tSRP = document.getElementsByName('aSRP[]');
+
+        var tTotalPrice = parseFloat(tSRP[i].value.replace(/,/g, "")) * parseFloat(tQty[i].value.replace(/,/g, ""));
+        tTotalPrice = accounting.formatNumber(tTotalPrice, 2, ",", ".");
+
+        $('<td>').text(tItemCode[i].value).appendTo(row);
+        $('<td>').text(tModelName[i].value).appendTo(row);
+        $('<td>').text(tBrand[i].value).appendTo(row);
+        $('<td>').text(tSRP[i].value).appendTo(row);
+        $('<td><input type="number" onchange="updateTotalAmount(this);" onkeypress="return noenter(event);" name="oQty[]" max="1000" min="1" class="form-control" style="width: 80px;" value=' + tQty[i].value + '>').appendTo(row);
+        $('<td>').text(tTotalPrice).appendTo(row);
+        $('<td><a class="btn btn-danger" onclick="deleteItemOrder(this);"><i class="fa fa-trash"></i></a>').appendTo(row);
+
+        $('<input type="hidden" name="oItemCode[]" value=' + tItemCode[i].value + '>').appendTo(row);
+        $('<input type="hidden" name="oSRP[]" value=' + tSRP[i].value + '>').appendTo(row);
+        $('<input type="hidden" name="oTotalPrice[]" value=' + tTotalPrice + '>').appendTo(row);
+
+        row.appendTo('#ItemsToOrder');
+
+        arrayItem.push(tItemCode[i].value);
+        updateTotal();
+    }
 }

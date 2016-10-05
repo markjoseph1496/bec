@@ -2,16 +2,24 @@
 include('../../connection.php');
 session_start();
 $EmpID = db_quote($_SESSION['EmpID']);
-$checkAccount = db_select("SELECT * FROM `employeetbl` WHERE EmpID =" . $EmpID);
+$checkAccount = db_select("
+    SELECT 
+    employeetbl.Firstname,
+    employeetbl.Lastname,
+    employeetbl.Position,
+    employeetbl.Initials,
+    branchtbl.BranchCode
+    FROM employeetbl
+    LEFT JOIN branchtbl ON employeetbl.BranchID = branchtbl.BranchID
+    WHERE EmpID =" . $EmpID);
 
-if($checkAccount[0]['Position'] != "Admin"){
+if ($checkAccount[0]['Position'] != "Admin") {
     unset($_SESSION['EmpID']);
     header('location: ../../index.php');
-}
-else{
+} else {
     $FirstName = $checkAccount[0]['Firstname'];
     $LastName = $checkAccount[0]['Lastname'];
-    $BranchCode = $checkAccount[0]['Branch'];
+    $BranchCode = $checkAccount[0]['BranchCode'];
     $Initials = $checkAccount[0]['Initials'];
     $AccountType = $checkAccount[0]['Position'];
     $FullName = $FirstName . " " . $LastName;
@@ -43,16 +51,14 @@ else{
             <div class="menu_section">
                 <h3>Admin</h3>
                 <ul class="nav side-menu">
-                    <li><a href="admin.php"><i class="fa fa-home"></i> Home</span></a></li>
-                    <li><a href="sales_report.php"><i class="fa fa-table"></i> Sales Report</a></li>
-                    <li><a><i class="fa fa-edit"></i> Maintenance <span class="fa fa-chevron-down"></span></a>
-                      <ul class="nav child_menu">
-                        <li><a href="branch.php">Branch</a></li>
-                        <li><a href="item.php">Item</a></li>
-                        <li><a href="employee.php">Employee</a></li>
-                      </ul>
-                    </li>
-                    <li><a href="deliveries.php"><i class="fa fa-table"></i> Deliveries</a></li>
+                    <li><a href="items.php"><i class="fa fa-cubes"></i> Items</a></li>
+                    <li><a href="branch.php"><i class="fa fa-building"></i> Branch</a></li>
+                    <li><a href="employee.php"><i class="fa fa-group"></i> Employee</a></li>
+                    <li><a href="accounts.php"><i class="fa fa-gears"></i> Accounts</a></li>
+                    <li><a href="colors.php"><i class="fa fa-eyedropper"></i> Color</a></li>
+                    <li><a href="brand.php"><i class="fa fa-mobile-phone"></i> Brand</a></li>
+                    <li><a href="area.php"><i class="fa fa-area-chart"></i>Area</a></li>
+                    <li><a href="category.php"><i class="fa fa-list"></i> Category</a></li>
                 </ul>
             </div>
         </div>
@@ -65,23 +71,23 @@ else{
     <div class="nav_menu">
         <nav>
             <div class="nav toggle">
-    <a id="menu_toggle"><i class="fa fa-bars"></i></a>
-</div>
-<ul class="nav navbar-nav navbar-right">
-    <li class="">
-        <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown"
-           aria-expanded="false">
-            <img src="../../img/man-icon.png" alt=""><?php echo $FullName ?>
-            <span class=" fa fa-angle-down"></span>
-        </a>
-        <ul class="dropdown-menu dropdown-usermenu pull-right">
-            <li><a href="javascript:;"> Account Settings</a></li>
-            <li><a data-toggle="modal" data-target="#LogoutModal"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
-        </ul>
-    </li>
-</ul>
-</nav>
-</div>
+                <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+            </div>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="">
+                    <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown"
+                       aria-expanded="false">
+                        <img src="../../img/man-icon.png" alt=""><?php echo $FullName ?>
+                        <span class=" fa fa-angle-down"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-usermenu pull-right">
+                        <li><a href="javascript:;"> Account Settings</a></li>
+                        <li><a data-toggle="modal" data-target="#LogoutModal"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </div>
 </div>
 <!-- /top navigation -->
 

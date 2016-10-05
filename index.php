@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>Berlein Electronics Corp.</title>
-
+    <link rel="shortcut icon" href="img/B%20LOGO%20BLACK.png">
     <!-- Bootstrap -->
     <link href="src/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -117,7 +117,7 @@
                     else{
                         if(result.AccountType == "Admin"){
                             alert("Login Success!");
-                            window.location.href = "pages/ad/admin.php";
+                            window.location.href = "pages/ad/items.php";
                         }
                         else if(result.AccountType == "Cashier"){
                             alert("Login Success!");

@@ -7,7 +7,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Administrator</title>
+    <title>Purchase Request</title>
+    <link rel="shortcut icon" href="../../img/B%20LOGO%20BLACK.png">
 
     <!-- Bootstrap -->
     <link href="../../src/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -32,6 +33,7 @@
     <div class="main_container">
         <?php
         include('navigation.php');
+        $SelectedBrand = db_quote($_POST['Brand']);
         ?>
         <!-- page content -->
         <div class="right_col" role="main">
@@ -57,8 +59,11 @@
                                 Item successfully deleted.
                             </div>
                             <form method="POST" name="frmPurchaseOrder" id="frmPurchaseOrder" action="php/function.php">
-                                <input type="hidden" name="EmpID" value="<?php echo $EmpID ?>">
-                                <input type="hidden" name="Branch" value="<?php echo $BranchCode ?>">
+                                <input type="hidden" name="EmpID" value="<?= @$EmpID ?>">
+                                <input type="hidden" name="Branch" value="<?= @$BranchCode ?>">
+                                <input type="hidden" name="BranchID" value="<?=@$BranchID ?>">
+                                <input type="hidden" name="BrandID" value="<?=@$SelectedBrand ?>">
+
                                 <div class="x_content">
                                     <div class="col-lg-12">
                                         <div class="row">
@@ -115,7 +120,6 @@
                                                         <th>Description</th>
                                                         <th>Brand</th>
                                                         <th>Category</th>
-                                                        <th>Type</th>
                                                         <th>SRP</th>
                                                         <th width="5%">Qty.</th>
                                                         <th width="5%">Add</th>
@@ -123,47 +127,50 @@
                                                     </thead>
                                                     <tbody>
                                                     <?php
-                                                    $itemstbl = db_select("SELECT * FROM `itemstbl` WHERE `Brand` IN (SELECT `Brand` FROM `branchtbl` WHERE `BranchCode` = " . db_quote($BranchCode) . ")");
+                                                    $itemstbl = db_select("
+                                                          SELECT 
+                                                          itemstbl.ItemCode,
+                                                          itemstbl.ModelName,
+                                                          itemstbl.ItemDescription,
+                                                          itemstbl.Category,
+                                                          itemstbl.SRP,
+                                                          brandtbl.Brand
+                                                          FROM itemstbl
+                                                          LEFT JOIN brandtbl ON itemstbl.BrandID = brandtbl.BrandID
+                                                          WHERE itemstbl.BrandID =  $SelectedBrand ");
 
                                                     foreach ($itemstbl as $item) {
                                                         $ItemCode = $item['ItemCode'];
                                                         $Model = $item['ModelName'];
-                                                        $Color = $item['Color'];
                                                         $Description = $item['ItemDescription'];
                                                         $Brand = $item['Brand'];
                                                         $Category = $item['Category'];
-                                                        $Type = $item['ItemType'];
                                                         $SRP = number_format($item['SRP'], 2, ".", ",");
                                                         ?>
                                                         <tr>
                                                             <td>
-                                                                <?php echo $ItemCode ?>
-                                                                <input type="hidden" disabled name="tItemCode[]" value="<?php echo $ItemCode ?>">
+                                                                <?= @$ItemCode ?>
+                                                                <input type="hidden" disabled name="tItemCode[]" value="<?= @$ItemCode ?>">
                                                             </td>
                                                             <td>
-                                                                <?php echo $Model ?> (<?php echo $Color ?>)
-                                                                <input type="hidden" disabled name="tModelName[]" value="<?php echo $Model ?>">
-                                                                <input type="hidden" disabled name="tColor[]" value="<?php echo $Color ?>">
+                                                                <?= @$Model ?>
+                                                                <input type="hidden" disabled name="tModelName[]" value="<?= @$Model ?>">
                                                             </td>
                                                             <td>
-                                                                <?php echo $Description ?>
-                                                                <input type="hidden" disabled name="tDescription[]" value="<?php echo $Description ?>">
+                                                                <?= @$Description ?>
+                                                                <input type="hidden" disabled name="tDescription[]" value="<?= @$Description ?>">
                                                             </td>
                                                             <td>
-                                                                <?php echo $Brand ?>
-                                                                <input type="hidden" disabled name="tBrand[]" value="<?php echo $Brand ?>">
+                                                                <?= @$Brand ?>
+                                                                <input type="hidden" disabled name="tBrand[]" value="<?= @$Brand ?>">
                                                             </td>
                                                             <td>
-                                                                <?php echo $Category ?>
-                                                                <input type="hidden" disabled name="tCategory[]" value="<?php echo $Category ?>">
+                                                                <?= @$Category ?>
+                                                                <input type="hidden" disabled name="tCategory[]" value="<?= @$Category ?>">
                                                             </td>
                                                             <td>
-                                                                <?php echo $Type ?>
-                                                                <input type="hidden" disabled name="tType[]" value="<?php echo $Type ?>">
-                                                            </td>
-                                                            <td>
-                                                                <?php echo $SRP ?>
-                                                                <input type="hidden" disabled name="tSRP[]" value="<?php echo $SRP ?>">
+                                                                <?= @$SRP ?>
+                                                                <input type="hidden" disabled name="tSRP[]" value="<?= @$SRP ?>">
                                                             </td>
                                                             <td>
                                                                 <input type="number" name="tQty[]" id="tQty" max="1000" min="0" class="form-control" style="width: 80px;" value="0">
@@ -175,7 +182,6 @@
                                                         <?php
                                                     }
                                                     ?>
-
                                                     </tbody>
                                                 </table>
                                             </div>

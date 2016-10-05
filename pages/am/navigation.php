@@ -2,16 +2,27 @@
 include('../../connection.php');
 session_start();
 $EmpID = db_quote($_SESSION['EmpID']);
-$checkAccount = db_select("SELECT * FROM `employeetbl` WHERE EmpID =" . $EmpID);
+$checkAccount = db_select("
+    SELECT 
+    employeetbl.Firstname,
+    employeetbl.Lastname,
+    employeetbl.Position,
+    employeetbl.Initials,
+    areatbl.AreaID,
+    areatbl.Area
+    FROM employeetbl
+    LEFT JOIN areatbl ON employeetbl.AreaID = areatbl.AreaID
+    WHERE EmpID =" . $EmpID);
 
 if($checkAccount[0]['Position'] != "Area Manager"){
     unset($_SESSION['EmpID']);
     header('location: ../../index.php');
 }
+
 else{
     $FirstName = $checkAccount[0]['Firstname'];
     $LastName = $checkAccount[0]['Lastname'];
-    $BranchCode = $checkAccount[0]['Branch'];
+    $AreaID = $checkAccount[0]['AreaID'];
     $Area = $checkAccount[0]['Area'];
     $Initials = $checkAccount[0]['Initials'];
     $AccountType = $checkAccount[0]['Position'];
