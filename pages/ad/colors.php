@@ -76,67 +76,10 @@
                                                 <tr>
                                                     <td><?= @$Color ?></td>
                                                     <td>
-                                                        <button class="btn btn-dark" data-target='#EditColorModal<?= @$ColorID; ?>' data-toggle='modal'><i class="fa fa-eye"></i></button>
-                                                        <button class="btn btn-danger" data-toggle="modal" data-target="#DeleteColorModal<?= @$ColorID; ?>"><i class="fa fa-trash"></i></button>
+                                                        <button class="btn btn-dark" onclick="ColorDetails(this.value);" value="<?= @$ColorID; ?>" data-toggle="modal" data-target="#ColorUpdateModal"><i class="fa fa-eye"></i></button>
+                                                        <button class="btn btn-danger" onclick="ColorDelete(this.value);" value="<?= @$ColorID; ?>" data-toggle="modal" data-target="#ColorDeleteModal"><i class="fa fa-trash"></i></button>
                                                     </td>
                                                 </tr>
-
-                                                <!-- Delete Color Modal -->
-                                                <div class="modal fade" id="DeleteColorModal<?= @$ColorID; ?>">
-                                                    <div class="modal-dialog">
-                                                        <div class="modal-content">
-                                                            <form action="function/admin-delete.php" method="POST" name="DeleteColor" id="DeleteColor">
-                                                                <div class="modal-header modal-header-danger">
-                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                                    <h4 class="modal-title">Delete Color</h4>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                    <label>Do you want to delete this <?= @$Color; ?></label>
-                                                                    <div class="form-group"></div>
-                                                                </div>
-                                                                <input type="hidden" name="ColorID" value="<?= @$ColorID; ?>">
-                                                                <div class="modal-footer">
-                                                                    <button class="btn btn-danger" name="btndeleteColor" id="btndeleteColor">Delete</button>
-                                                                    <button class="btn btn-dark" data-dismiss="modal">Cancel</button>
-                                                                </div>
-                                                            </form>
-                                                        </div>
-                                                        <!-- /.modal-content -->
-                                                    </div>
-                                                    <!-- /.modal-dialog -->
-                                                </div>
-                                                <!-- ./modal -->
-
-                                                <!-- Edit Color Modal -->
-                                                <div class="modal fade" id="EditColorModal<?= @$ColorID; ?>">
-                                                    <div class="modal-dialog">
-                                                        <div class="modal-content">
-                                                            <form action="function/functions.php" method="POST" name="UpdateColor" id="UpdateColor" autocomplete="off">
-                                                                <div class="modal-header modal-header-dark">
-                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                                    <h4 class="modal-title">Edit Area</h4>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                    <div class="form-group">
-                                                                        <label>ColorID <span class="red">(*)</span></label>
-                                                                        <input type="text" class="form-control" readonly id="EditColorID" name="EditColorID" value="<?php echo $ColorID; ?>">
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <label>Color <span class="red">(*)</span></label>
-                                                                        <input type="text" class="form-control" style="text-transform: uppercase" id="EditColor" name="EditColor" value="<?php echo $Color; ?>">
-                                                                    </div>
-                                                                </div>
-                                                                <div class="modal-footer">
-                                                                    <button class="btn btn-dark" id="btnupdatecolor" name="btnupdatecolor">Update</button>
-                                                                    <button class="btn btn-default" data-dismiss="modal">Cancel</button>
-                                                                </div>
-                                                            </form>
-                                                        </div>
-                                                        <!-- /.modal-content -->
-                                                    </div>
-                                                    <!-- /.modal-dialog -->
-                                                </div>
-                                                <!-- /.modal -->
 
                                                 <?php
                                             }
@@ -145,6 +88,19 @@
                                         </table>
                                         <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#AddColorModal">Add Color</button>
                                     </div>
+
+                                    <!-- Delete Color Modal -->
+                                    <div class="modal fade" id="ColorDeleteModal">
+
+                                    </div>
+                                    <!-- ./modal -->
+
+
+                                    <!-- Edit Color Modal -->
+                                    <div class="modal fade" id="ColorUpdateModal">
+
+                                    </div>
+                                    <!-- /.modal -->
                                 </div>
                             </div>
                         </div>
@@ -172,9 +128,9 @@
                                                 $colorID = $ID['ColorID'];
                                                 $start++;
                                             }
-                                            echo '<input type="hidden" readonly class="form-control" value="' . $IdFormat . '' . $start . '" name="ColorID" id="ColorID">';
+                                            echo '<input type="hidden" readonly class="form-control" value="' . $IdFormat . '' . $start . '" name="AddColorID" id="AddColorID">';
                                         } else {
-                                            echo '<input type="hidden" readonly class="form-control" value="' . $IdFormat . '' . $start . '" name="ColorID" id="ColorID">';
+                                            echo '<input type="hidden" readonly class="form-control" value="' . $IdFormat . '' . $start . '" name="AddColorID" id="AddColorID">';
                                         }
                                         ?>
                                     </div>

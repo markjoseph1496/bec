@@ -76,90 +76,10 @@
                                                 <tr>
                                                     <td><?php echo $bArea ?></td>
                                                     <td>
-                                                        <button class="btn btn-dark" data-target='#EditAreaModal<?= @$AreaID; ?>' data-toggle='modal'><i class="fa fa-eye"></i></button>
-                                                        <button class="btn btn-danger" data-toggle="modal" data-target="#DeleteAreaModal<?= @$AreaID; ?>"><i class="fa fa-trash"></i></button>
+                                                        <button class="btn btn-dark" onclick="AreaDetails(this.value);" value="<?= @$AreaID; ?>" data-toggle="modal" data-target="#AreaUpdateModal"><i class="fa fa-eye"></i></button>
+                                                        <button class="btn btn-danger" onclick="AreaDelete(this.value);" value="<?= @$AreaID; ?>" data-toggle="modal" data-target="#AreaDeleteModal"><i class="fa fa-trash"></i></button>
                                                     </td>
                                                 </tr>
-
-                                                <!-- Delete Branch Area Modal -->
-                                                <div class="modal fade" id="DeleteAreaModal<?= @$AreaID; ?>">
-                                                    <div class="modal-dialog">
-                                                        <div class="modal-content">
-                                                            <form action="function/admin-delete.php" method="POST" name="DeleteArea" id="DeleteArea">
-                                                                <div class="modal-header modal-header-danger">
-                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                                    <h4 class="modal-title">Delete Area</h4>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                    <label>Do you want to delete this Area "<?= @$bArea; ?>"</label>
-                                                                    <div class="form-group"></div>
-                                                                </div>
-                                                                <input type="hidden" name="AreaID" value="<?= @$AreaID; ?>">
-                                                                <div class="modal-footer">
-                                                                    <button class="btn btn-danger" name="btndeleteArea" id="btndeleteArea">Delete</button>
-                                                                    <button class="btn btn-dark" data-dismiss="modal">Cancel</button>
-                                                                </div>
-                                                            </form>
-                                                        </div>
-                                                        <!-- /.modal-content -->
-                                                    </div>
-                                                    <!-- /.modal-dialog -->
-                                                </div>
-                                                <!-- /.modal -->
-
-                                                <!-- Add Branch in Area Modal -->
-                                                <div class="modal fade" id="AddAreaBranchModal<?= @$AreaID; ?>">
-                                                    <div class="modal-dialog modal-lg">
-                                                        <div class="modal-content">
-                                                            <form action="function/functions.php" method="POST" name="AddBranchArea" id="AddBranchArea" autocomplete="off">
-                                                                <div class="modal-header modal-header-dark">
-                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                                    <h4 class="modal-title">Add Branch Area</h4>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                </div>
-                                                                <div class="modal-footer">
-                                                                    <button id="btnupdatearea" class="btn btn-dark" name="btnupdatearea">Add</button>
-                                                                    <button class="btn btn-default" data-dismiss="modal">Cancel</button>
-                                                                </div>
-                                                            </form>
-                                                        </div>
-                                                        <!-- /.modal-content -->
-                                                    </div>
-                                                    <!-- /.modal-dialog -->
-                                                </div>
-                                                <!-- /.modal -->
-
-                                                <!-- Edit Area Modal -->
-                                                <div class="modal fade" id="EditAreaModal<?= @$AreaID; ?>">
-                                                    <div class="modal-dialog">
-                                                        <div class="modal-content">
-                                                            <form action="function/functions.php" method="POST" name="UpdateArea" id="UpdateArea" autocomplete="off">
-                                                                <div class="modal-header modal-header-dark">
-                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                                    <h4 class="modal-title">Edit Area</h4>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                    <div class="form-group">
-                                                                        <label>AreaID <span class="red">(*)</span></label>
-                                                                        <input type="text" class="form-control" readonly id="EditAreaID" name="EditAreaID" value="<?php echo $AreaID; ?>">
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <label>Area <span class="red">(*)</span></label>
-                                                                        <input type="text" class="form-control" style="text-transform: uppercase" id="EditArea" name="EditArea" value="<?php echo $bArea; ?>">
-                                                                    </div>
-                                                                </div>
-                                                                <div class="modal-footer">
-                                                                    <button id="btnupdatearea" class="btn btn-dark" name="btnupdatearea">Update</button>
-                                                                    <button class="btn btn-default" data-dismiss="modal">Cancel</button>
-                                                                </div>
-                                                            </form>
-                                                        </div>
-                                                        <!-- /.modal-content -->
-                                                    </div>
-                                                    <!-- /.modal-dialog -->
-                                                </div>
-                                                <!-- /.modal -->
 
                                                 <?php
                                             }
@@ -168,6 +88,19 @@
                                         </table>
                                         <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#AddAreaModal">Add Area</button>
                                     </div>
+
+                                    <!-- Delete Area Modal -->
+                                    <div class="modal fade" id="AreaDeleteModal">
+
+                                    </div>
+                                    <!-- /.modal -->
+
+                                    <!-- Edit Area Modal -->
+                                    <div class="modal fade" id="AreaUpdateModal">
+
+                                    </div>
+                                    <!-- /.modal -->
+
                                 </div>
                             </div>
                         </div>
@@ -195,15 +128,15 @@
                                                 $areaID = $ID['AreaID'];
                                                 $start++;
                                             }
-                                            echo '<input type="hidden" readonly class="form-control" value="' . $IdFormat . '' . $start . '" name="AreaID" id="AreaID">';
+                                            echo '<input type="hidden" readonly class="form-control" value="' . $IdFormat . '' . $start . '" name="AddAreaID" id="AddAreaID">';
                                         } else {
-                                            echo '<input type="hidden" readonly class="form-control" value="' . $IdFormat . '' . $start . '" name="AreaID" id="AreaID">';
+                                            echo '<input type="hidden" readonly class="form-control" value="' . $IdFormat . '' . $start . '" name="AddAreaID" id="AddAreaID">';
                                         }
                                         ?>
                                     </div>
                                     <div class="form-group">
                                         <label>Area <span class="red">(*)</span></label>
-                                        <input type="text" class="form-control" style="text-transform: uppercase" id="AddArea" name="AddArea">
+                                        <input type="text" class="form-control" style="text-transform: capitalize" id="AddArea" name="AddArea">
                                     </div>
                                 </div>
                                 <div class="modal-footer">

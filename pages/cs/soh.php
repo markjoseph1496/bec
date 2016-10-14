@@ -1,3 +1,6 @@
+<?php
+include_once('../../functions/encryption.php');
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,6 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>Administrator</title>
+    <link rel="shortcut icon" href="../../img/B%20LOGO%20BLACK.png">
 
     <!-- Bootstrap -->
     <link href="../../src/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -15,12 +19,17 @@
     <link href="../../src/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <!-- NProgress -->
     <link href="../../src/nprogress/nprogress.css" rel="stylesheet">
-    <!-- Animate.css -->
-    <link href="../../src/animate.css/animate.min.css" rel="stylesheet">
+
     <!-- Bootstrap Validator -->
     <link href="../../src/validator/bootstrapValidator.min.css">
-    <!-- Select2 -->
-    <link href="../../src/select2/dist/css/select2.min.css" rel="stylesheet">
+
+    <!-- Custom Theme Style -->
+    <link href="../../build/css/custom.min.css" rel="stylesheet">
+
+    <!-- PNotify -->
+    <link href="../../src/pnotify/dist/pnotify.css" rel="stylesheet">
+    <link href="../../src/pnotify/dist/pnotify.buttons.css" rel="stylesheet">
+    <link href="../../src/pnotify/dist/pnotify.nonblock.css" rel="stylesheet">
 
     <!-- Custom Theme Style -->
     <link href="../../build/css/custom.min.css" rel="stylesheet">
@@ -30,6 +39,7 @@
     <link href="../../src/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
     <link href="../../src/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
     <link href="../../src/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
+
 </head>
 
 <body class="nav-md">
@@ -38,12 +48,13 @@
         <?php
         include('navigation.php');
         ?>
+
         <!-- page content -->
         <div class="right_col" role="main">
             <div class="">
                 <div class="page-title">
                     <div class="title_left">
-                        <h3>Brands</h3>
+                        <h3>Inventory</h3>
                     </div>
                 </div>
 
@@ -53,7 +64,7 @@
                     <div class="col-md-12 col-sm-12 col-xs-12">
                         <div class="x_panel">
                             <div class="x_title">
-                                <h2>Brands</h2>
+                                <h2>Stock On Hand</h2>
                                 <div class="clearfix"></div>
                             </div>
                             <div class="x_content">
@@ -62,44 +73,56 @@
                                         <table id="datatable" class="table table-striped table-bordered">
                                             <thead>
                                             <tr>
-                                                <th>BrandCode</th>
+                                                <th>Item Code</th>
+                                                <th>Model Name</th>
+                                                <th>Item Description</th>
                                                 <th>Brand</th>
-                                                <th width=12%>Action</th>
+                                                <th>Category</th>
+                                                <th>Stocks On Hand</th>
                                             </tr>
                                             </thead>
                                             <tbody>
                                             <?php
-                                            $BrandQuery = db_select("SELECT * FROM brandtbl");
-                                            foreach ($BrandQuery as $vBrand) {
-                                                $BrandID = $vBrand['BrandID'];
-                                                $BrandCode = $vBrand['BrandCode'];
-                                                $Brand = $vBrand['Brand'];
+                                            $getInventory = db_select("
+                                            SELECT DISTINCT 
+                                            invtbl.ItemCode,
+                                            invtbl.ItemColor,
+                                            itemstbl.ModelName,
+                                            itemstbl.ItemDescription,
+                                            itemstbl.Category,
+                                            brandtbl.Brand
+                                            FROM invtbl
+                                            LEFT JOIN itemstbl ON invtbl.ItemCode = itemstbl.ItemCode
+                                            LEFT JOIN brandtbl ON itemstbl.BrandID = brandtbl.BrandID
+                                            WHERE invtbl.BranchCode = " . db_quote($BranchCode) . "
+                                            AND invtbl.Status = 'On Hand'");
+
+                                            foreach($getInventory as $Item){
+                                                $ItemCode = $Item['ItemCode'];
+                                                $ItemColor = $Item['ItemColor'];
+                                                $ModelName = $Item['ModelName'];
+                                                $Description = $Item['ItemDescription'];
+                                                $Category = $Item['Category'];
+                                                $Brand = $Item['Brand'];
+                                                $countItem = db_select("SELECT * FROM `invtbl` WHERE `ItemCode` = " . db_quote($ItemCode) . " AND `ItemColor` = " . db_quote($ItemColor) . " AND `BranchCode` = " . db_quote($BranchCode) . " AND `Status` = 'On Hand'");
+                                                $StockOnHand = count($countItem);
                                                 ?>
                                                 <tr>
-                                                    <td><?= @$BrandCode ?></td>
+                                                    <td><?= @$ItemCode ?></td>
+                                                    <td><?= @$ModelName . " (" . $ItemColor . ")" ?></td>
+                                                    <td><?= @$Description ?></td>
                                                     <td><?= @$Brand ?></td>
-                                                    <td>
-                                                        <button class="btn btn-dark" onclick="BrandDetails(this.value);" value="<?= @$BrandID; ?>" data-toggle="modal" data-target="#BrandUpdateModal"><i class="fa fa-eye"></i></button>
-                                                        <button class="btn btn-danger" onclick="BrandDelete(this.value);" value="<?= @$BrandID; ?>" data-toggle="modal" data-target="#BrandDeleteModal"><i class="fa fa-trash"></i></button>
-                                                    </td>
+                                                    <td><?= @$Category ?></td>
+                                                    <td><?= @$StockOnHand ?></td>
                                                 </tr>
-
-                                                <?php
+                                            <?php
                                             }
                                             ?>
                                             </tbody>
                                         </table>
-                                        <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#AddBrandModal">Add Brand</button>
                                     </div>
-
-                                    <!-- Delete Brand Modal -->
-                                    <div class="modal fade" id="BrandDeleteModal">
-
-                                    </div>
-                                    <!-- /.modal -->
-
-                                    <!-- Edit Brand Modal -->
-                                    <div class="modal fade" id="BrandUpdateModal">
+                                    <!-- PO Details -->
+                                    <div class="modal fade" id="PODetails">
 
                                     </div>
                                     <!-- /.modal -->
@@ -108,56 +131,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Add Brand Modal -->
-                <div class="modal fade" id="AddBrandModal">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <form method="POST" name="AddBrand" id="AddBrand" autocomplete="off">
-                                <div class="modal-header modal-header-dark">
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                    <h4 class="modal-title">Add Area</h4>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="form-group">
-                                        <?php
-                                        $GeneratingBrandID = db_query("SELECT * FROM brandtbl");
-                                        $num = mysqli_num_rows($GeneratingBrandID);
-                                        $IdFormat = "BR-00";
-                                        $start = '1';
-                                        if ($num > 0) {
-                                            while ($ID = mysqli_fetch_array($GeneratingBrandID)) {
-                                                $brandID = $ID['BrandID'];
-                                                $start++;
-                                            }
-                                            echo '<input type="hidden" readonly class="form-control" value="' . $IdFormat . '' . $start . '" name="AddBrandID" id="AddBrandID">';
-                                        } else {
-                                            echo '<input type="hidden" readonly class="form-control" value="' . $IdFormat . '' . $start . '" name="AddBrandID" id="AddBrandID">';
-                                        }
-                                        ?>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Brand Code <span class="red">(*)</span></label>
-                                        <input type="text" class="form-control" style="text-transform: uppercase" id="BrandCode" name="BrandCode">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Brand <span class="red">(*)</span></label>
-                                        <input type="text" class="form-control" style="text-transform: uppercase" id="AddBrand" name="AddBrand">
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="submit" class="btn btn-dark">Add</button>
-                                    <button class="btn btn-default" data-dismiss="modal">Cancel</button>
-                                </div>
-                            </form>
-                        </div>
-                        <!-- /.modal-content -->
-                    </div>
-                    <!-- /.modal-dialog -->
-                </div>
-                <!-- /.modal -->
-
-
             </div>
         </div>
         <!-- /page content -->
@@ -183,6 +156,11 @@
 <script src="../../src/nprogress/nprogress.js"></script>
 <!-- validator -->
 <script src="../../src/validator/bootstrapValidator.min.js"></script>
+<!-- PNotify -->
+<script src="../../src/pnotify/dist/pnotify.js"></script>
+<script src="../../src/pnotify/dist/pnotify.buttons.js"></script>
+<script src="../../src/pnotify/dist/pnotify.nonblock.js"></script>
+
 <!-- Datatables -->
 <script src="../../src/datatables.net/js/jquery.dataTables.min.js"></script>
 <script src="../../src/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
@@ -199,10 +177,34 @@
 <script src="../../src/jszip/dist/jszip.min.js"></script>
 <script src="../../src/pdfmake/build/pdfmake.min.js"></script>
 <script src="../../src/pdfmake/build/vfs_fonts.js"></script>
+<!-- Function Script -->
+<script src="js/function.js"></script>
 <!-- Custom Theme Scripts -->
 <script src="../../build/js/custom.min.js"></script>
-<!-- Function JS -->
-<script src="js/function.js"></script>
+
+<?php
+if (isset($_GET['error'])) {
+    echo "<script type='text/javascript'>
+         new PNotify({
+         title: 'Error :(',
+         text: 'There was an error, Please try again.',
+         type: 'error',
+         styling: 'bootstrap3',
+         delay:3000
+         });
+         </script>";
+} elseif (isset($_GET['success'])) {
+    echo "<script type='text/javascript'>
+         new PNotify({
+         title: 'Success',
+         text: 'Purchase Request Updated',
+         type: 'success',
+         styling: 'bootstrap3',
+         delay:3000
+         });
+         </script>";
+}
+?>
 
 <!-- Datatables -->
 <script>
@@ -285,50 +287,5 @@
     });
 </script>
 <!-- /Datatables -->
-
-<!-- validator -->
-<script type="text/javascript">
-    $(document).ready(function () {
-        $('#AddBrand').bootstrapValidator({
-            message: 'This value is not valid',
-            feedbackIcons: {
-                valid: "glyphicon glyphicon-ok",
-                invalid: "glyphicon glyphicon-remove",
-                validating: "glyphicon glyphicon-refresh"
-            },
-            fields: {
-                group: 'form-group',
-                BrandCode: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Brand Code is required.'
-                        }
-                    }
-                },
-                AddBrand: {
-                    validators: {
-                        notEmpty: {
-                            message: 'Brand is required.'
-                        }
-                    }
-                }
-            }
-        }).on('success.form.bv', function (e) {
-            e.preventDefault();
-            $.ajax({
-                type: 'POST',
-                url: 'function/functions.php',
-                data: $('#AddBrand').serialize(),
-                success: function (data) {
-                    if (data == "True") {
-                        window.location.href = "brand.php";
-                    }
-                }
-            })
-        });
-    });
-</script>
-<!-- /validator-->
-
 </body>
 </html>

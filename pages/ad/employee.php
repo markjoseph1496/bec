@@ -20,6 +20,11 @@
     <!-- Bootstrap Validator -->
     <link href="../../src/validator/bootstrapValidator.min.css">
 
+    <!-- PNotify -->
+    <link href="../../src/pnotify/dist/pnotify.css" rel="stylesheet">
+    <link href="../../src/pnotify/dist/pnotify.buttons.css" rel="stylesheet">
+    <link href="../../src/pnotify/dist/pnotify.nonblock.css" rel="stylesheet">
+
     <!-- Custom Theme Style -->
     <link href="../../build/css/custom.min.css" rel="stylesheet">
     <!-- Datatables -->
@@ -61,10 +66,8 @@
                                         <table id="datatable" class="table table-striped table-bordered">
                                             <thead>
                                             <tr>
-                                                <th>EmployeeID</th>
-                                                <th>First Name</th>
-                                                <th>Middle Name</th>
-                                                <th>Last Name</th>
+                                                <th>Employee ID</th>
+                                                <th>Name</th>
                                                 <th>Initials</th>
                                                 <th>Position</th>
                                                 <th>Branch</th>
@@ -75,114 +78,53 @@
                                             <tbody>
                                             <?php
                                             $employeetbl = db_select("
-                                                SELECT employeetbl.EmpID, employeetbl.Firstname, employeetbl.Middlename, employeetbl.Lastname,
-                                                employeetbl.Initials, employeetbl.Position, branchtbl.BranchName, areatbl.Area
+                                                SELECT 
+                                                employeetbl.EmpID, 
+                                                employeetbl.Firstname,  
+                                                employeetbl.Lastname,
+                                                employeetbl.Initials, 
+                                                employeetbl.Position, 
+                                                branchtbl.BranchCode, 
+                                                areatbl.Area
                                                 FROM employeetbl
                                                 LEFT JOIN branchtbl ON employeetbl.BranchID = branchtbl.BranchID
-                                                LEFT JOIN  areatbl ON employeetbl.AreaID = areatbl.AreaID");
+                                                LEFT JOIN  areatbl ON employeetbl.AreaID = areatbl.AreaID
+                                                WHERE employeetbl.Position != 'Admin'
+                                                ORDER BY employeetbl.EmpID ASC
+                                                ");
                                             foreach ($employeetbl as $value) {
-                                            $EmpID = $value['EmpID'];
-                                            $Firstname = $value['Firstname'];
-                                            $Middlename = $value['Middlename'];
-                                            $Lastname = $value['Lastname'];
-                                            $Initials = $value['Initials'];
-                                            $Position = $value['Position'];
-                                            $BranchName = $value['BranchName'];
-                                            $Area = $value['Area'];
-                                            ?>
-                                            <tr>
-                                                <td><?= @$EmpID; ?></td>
-                                                <td><?= @$Firstname; ?></td>
-                                                <td><?= @$Middlename; ?></td>
-                                                <td><?= @$Lastname; ?></td>
-                                                <td><?= @$Initials; ?></td>
-                                                <td><?= @$Position; ?></td>
-                                                <td><?= @$BranchName; ?></td>
-                                                <td><?= @$Area ?></td>
-                                                <td>
-                                                    <button data-toggle='modal' data-target='#AddAccount<?php echo $EmpID; ?>' class='btn btn-dark'><i class='fa fa-plus'></i></button>
-                                                    <button class="btn btn-dark" onclick="EmployeeDetails(this.value);" value="<?= @$EmpID; ?>" data-toggle="modal" data-target="#EmployeeUpdateModal"><i class='fa fa-eye'></i></button>
-                                                    <button class='btn btn-danger' data-toggle="modal" data-target="#DeleteEmployee<?php echo $EmpID; ?>"><i class="fa fa-trash "></i></button>
-                                                </td>
-                                            </tr>
-                                            </tbody>
+                                                $EmpID = $value['EmpID'];
+                                                $Firstname = $value['Firstname'];
+                                                $Lastname = $value['Lastname'];
+                                                $Initials = $value['Initials'];
+                                                $Position = $value['Position'];
+                                                $BranchName = $value['BranchCode'];
+                                                $Area = $value['Area'];
 
-                                            <!-- Modal add account-->
-                                            <div class="modal fade" id="AddAccount<?= @$EmpID; ?>" role="dialog">
-                                                <div class="modal-dialog">
-                                                    <!-- Modal content-->
-                                                    <div class="modal-content">
-                                                        <form action="function/functions.php" method="POST" name="addAccount" id="addAccount" autocomplete="off">
-                                                            <div class="modal-header modal-header-dark">
-                                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                                                <h4 class="modal-title">Add Account</h4>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <div class="alert alert-primary" id="success-alert">
-                                                                    <strong><span class="fa fa-info-circle"></span> You want to create an account for this employee.</strong>
-                                                                </div>
-                                                                <div class="row">
-                                                                    <div class="col-lg-12">
-                                                                        <div class="form-group">
-                                                                            <label>Username <span class="red">(*)</span></label>
-                                                                            <input type="text" class="form-control" style="text-tranform: uppercase" id="aUsername" name="aUsername">
-                                                                        </div>
-                                                                        <div class="form-group">
-                                                                            <label>Password <span class="red">(*)</span></label>
-                                                                            <input type="password" class="form-control" id="aPassword" name="aPassword">
-                                                                        </div>
-                                                                        <div class="form-group">
-                                                                            <label>Employee ID <span class="red">(*)</span></label>
-                                                                            <input type="text" readonly="readonly" class="form-control" style="text-transform: uppercase" id="aEmpID" name="aEmpID"
-                                                                                   value="<?= @$EmpID; ?>">
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="submit" class="btn btn-dark" id="btnaddAccount" name="btnaddAccount">Add Account</button>
-                                                                <button class="btn btn-dark" data-dismiss="modal">Cancel</button>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <!-- End Modal add account -->
+                                                $rnd = rand(0, 9999);
+                                                $hashEmpID = encrypt_decrypt_rnd('encrypt', $EmpID, $rnd);
 
-                                            <!-- Modal Delete Employee -->
-                                            <div class="modal fade" id="DeleteEmployee<?php echo $EmpID; ?>" role="dialog">
-                                                <div class="modal-dialog" style="padding:100px">
-                                                    <!-- Modal Content -->
-                                                    <div class="modal-content">
-                                                        <form action="function/admin-delete.php" method="POST" name="DeleteEmployee" id="DeleteEmployee" autocomplete="off">
-                                                            <div class="modal-header modal-header-danger">
-                                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                                                <h4 class="modal-title">Delete Employee</h4>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <div class="col-md-15">
-                                                                    <label = "usr" class="control-label">Do you want to delete
-                                                                    Item <?php echo $Firstname;
-                                                                    echo $Lastname; ?>? This cannot be undone.</label>
-                                                                    <div class="form-group"></div>
-                                                                </div>
-                                                                <input type="hidden" name="EmpID" value="<?php echo $EmpID; ?>">
-                                                                <div class="modal-footer">
-                                                                    <button class="btn btn-danger" name="btndeleteemployee" id="btndeleteemployee">Delete</button>
-                                                                    <button type="button" class="btn btn-dark" data-dismiss="modal">Cancel</button>
-                                                                </div>
-                                                            </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            </form>
-                                            <!-- End Modal Delete Employee -->
-
-                                            <?php
+                                                ?>
+                                                <tr>
+                                                    <td><?= @$EmpID; ?></td>
+                                                    <td><?= @$Firstname . " " . @$Lastname; ?></td>
+                                                    <td><?= @$Initials; ?></td>
+                                                    <td><?= @$Position; ?></td>
+                                                    <td><?= @$BranchName; ?></td>
+                                                    <td><?= @$Area ?></td>
+                                                    <td width="15%">
+                                                        <!-- Ipapasa niya kay employee details nasa Function.js yung Employee ID, Hash, at Random Number -->
+                                                        <button class="btn btn-dark" onclick="EmployeeDetails('<?= @$EmpID; ?>','<?= @$hashEmpID ?>','<?= @$rnd ?>');" data-toggle="modal" data-target="#EmployeeUpdateModal"><i class='fa fa-eye'></i></button>
+                                                        <!-- Ipapasa niya kay EmployeDelete nasa function.js yung Employee ID, Hash, at Random -->
+                                                        <button class='btn btn-danger' onclick="EmployeeDelete('<?= @$EmpID; ?>','<?= @$hashEmpID ?>','<?= @$rnd ?>');" data-toggle="modal" data-target="#DeleteEmployee"><i class="fa fa-trash "></i></button>
+                                                    </td>
+                                                </tr>
+                                                <?php
                                             }
                                             ?>
+                                            </tbody>
                                         </table>
-                                        <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#myModal">Add Employee</button>
+                                        <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#AddEmployeeModal">Add Employee</button>
                                     </div>
 
                                     <!-- Modal edit item-->
@@ -191,96 +133,148 @@
                                     </div>
                                     <!-- End Modal Edit Item-->
 
+                                    <!-- Modal add account-->
+                                    <div class="modal fade" id="AddAccount" role="dialog">
+
+                                    </div>
+                                    <!-- End Modal add account -->
+
+                                    <!-- Modal Delete Employee -->
+                                    <div class="modal fade" id="DeleteEmployee" role="dialog">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form method="POST" action="function/admin-delete.php">
+                                                    <div class="modal-header modal-header-danger">
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                        <h4 class="modal-title">Delete</h4>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <!-- Yung value nito galing dun sa button na view, sinet to ni javascript gamit yung EmployeeDelete na function -->
+                                                        <input type="hidden" name="EmpID" id="EmpID">
+                                                        <input type="hidden" name="hashEmpID" id="hashEmpID">
+                                                        <input type="hidden" name="rnd" id="rnd">
+                                                        <label>Are you sure you want to remove this account? This cannot be undone.</label>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <!-- Idedelete niya yung data na laman ni input once submitted -->
+                                                        <button type="submit" class="btn btn-dark">Delete</button>
+                                                        <button class="btn btn-default" data-dismiss="modal">Close</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <!-- /.modal-content -->
+                                        </div>
+                                        <!-- /.modal-dialog -->
+                                    </div>
+                                    <!-- End Modal Delete Employee -->
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <form method="POST" id="AddEmployee" autocomplete="off">
-                    <!-- Modal add employee-->
-                    <div class="modal fade" id="myModal" role="dialog">
-                        <div class="modal-dialog">
-
-                            <!-- Modal content-->
-                            <div class="modal-content">
+                <!-- Add Employee Modal -->
+                <div class="modal fade" id="AddEmployeeModal">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form method="POST" name="AddEmployee" id="AddEmployee" autocomplete="off">
                                 <div class="modal-header modal-header-dark">
-                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                                     <h4 class="modal-title">Add Employee</h4>
                                 </div>
                                 <div class="modal-body">
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="form-group">
-                                                <label>Employee ID <span class="red">(*)</span></label>
-                                                <input type="text" class="form-control" style="text-transform: uppercase" id="AddEmpID" name="AddEmpID">
-                                            </div>
-                                            <div class="form-group">
-                                                <label>First Name <span class="red">(*)</span></label>
-                                                <input type="text" class="form-control" style="text-transform: uppercase" id="Firstname" name="Firstname">
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Middle Name <span class="red">(*)</span></label>
-                                                <input type="text" class="form-control" style="text-transform: uppercase" id="Middlename" name="Middlename">
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Last Name <span class="red"></span>(*)</label>
-                                                <input type="text" class="form-control" style="text-transform: uppercase" id="Lastname" name="Lastname">
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Initials <span class="red">(*)</span></label>
-                                                <input type="text" class="form-control" style="text-transform: uppercase" id="Initials" name="Initials">
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Position <span class="red">(*)</span></label>
-                                                <input type="text" class="form-control" style="text-transform: uppercase" id="Position" name="Position">
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Branch <span class="red">(*)</span></label>
-                                                <select class="form-control" id="Branch" name="Branch">
-                                                    <option value="" selected="selected">- Choose Branch -</option>
-                                                    <?php
-                                                    $branchtbl = db_select("SELECT `BranchName`,`BranchID` FROM `branchtbl`");
+                                    <div class="form-group">
+                                        <label>Employee ID <span class="red">(*)</span></label>
+                                        <input type="text" class="form-control" style="text-transform: uppercase" id="AddEmpID" name="AddEmpID">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>First Name <span class="red">(*)</span></label>
+                                        <input type="text" class="form-control" style="text-transform: capitalize" id="Firstname" name="Firstname">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Middle Name</label>
+                                        <input type="text" class="form-control" style="text-transform: capitalize" id="Middlename" name="Middlename">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Last Name <span class="red">(*)</span></label>
+                                        <input type="text" class="form-control" style="text-transform: capitalize" id="Lastname" name="Lastname">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Initials <span class="red">(*)</span></label>
+                                        <input type="text" class="form-control" style="text-transform: uppercase" id="Initials" name="Initials">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Position <span class="red">(*)</span></label>
+                                        <select class="form-control" onchange="BranchAndArea(this.value)" id="Position" name="Position">
+                                            <option value="" selected="selected">- Select Position -</option>
+                                            <option value="Brand Coordinator">Brand Coordinator</option>
+                                            <option value="Auditor">Auditor</option>
+                                            <option value="Area Manager">Area Manager</option>
+                                            <option value="OIC">Officer In Charge</option>
+                                            <option value="Cashier">Cashier</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="display:none" id="DivBranch">
+                                        <label>Branch <span class="red">(*)</span></label>
+                                        <select class="form-control" id="Branch" name="Branch">
+                                            <option value="" selected="selected">- Select Branch -</option>
+                                            <?php
+                                            $branchtbl = db_select("SELECT `BranchName`,`BranchID` FROM `branchtbl`");
 
-                                                    foreach ($branchtbl as $value) {
-                                                        $BranchName = $value['BranchName'];
-                                                        $BranchID = $value['BranchID'];
-                                                        ?>
-                                                        <option value="<?php echo $BranchID; ?>"><?php echo $BranchName; ?></option>
-                                                        <?php
-                                                    }
-                                                    ?>
-                                                </select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Area <span class="red">(*)</span></label>
-                                                <select class="form-control" id="eArea" name="eArea">
-                                                    <option value="" selected="selected"> - Choose Area -</option>
-                                                    <?php
-                                                    $Areatbl = db_select("SELECT `AreaID`, `Area` FROM `areatbl`");
+                                            foreach ($branchtbl as $value) {
+                                                $BranchName = $value['BranchName'];
+                                                $BranchID = $value['BranchID'];
+                                                ?>
+                                                <option value="<?php echo $BranchID; ?>"><?php echo $BranchName; ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="display:none" id="DivArea">
+                                        <label>Area <span class="red">(*)</span></label>
+                                        <select class="form-control" id="eArea" name="eArea">
+                                            <option value="" selected="selected">- Select Area -</option>
+                                            <?php
+                                            $Areatbl = db_select("SELECT `AreaID`, `Area` FROM `areatbl`");
 
-                                                    foreach ($Areatbl as $vArea) {
-                                                        $AreaID = $vArea['AreaID'];
-                                                        $Area = $vArea['Area'];
-                                                        ?>
-                                                        <option value="<?= @$AreaID; ?>"><?= @$Area; ?></option>
-                                                        <?php
-                                                    }
-                                                    ?>
-                                                </select>
-                                            </div>
-                                        </div>
+                                            foreach ($Areatbl as $vArea) {
+                                                $AreaID = $vArea['AreaID'];
+                                                $Area = $vArea['Area'];
+                                                ?>
+                                                <option value="<?= @$AreaID; ?>"><?= @$Area; ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="display:none" id="DivBrand">
+                                        <label>Brand <span class="red">(*)</span></label>
+                                        <select class="form-control" id="Brand" name="Brand">
+                                            <option value="" selected="selected">- Select Brand -</option>
+                                            <?php
+                                            $brandtbl = db_select("SELECT `BrandID` , `Brand` FROM `brandtbl`");
+
+                                            foreach ($brandtbl as $brand) {
+                                                $BrandID = $brand['BrandID'];
+                                                $Brand = $brand['Brand'];
+                                                ?>
+                                                <option value="<?= @$BrandID ?>"><?= @ $Brand ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="submit" class="btn btn-dark" id="btnaddemployee" name="btnaddemployee">Save</button>
+                                    <button type="submit" class="btn btn-dark">Save</button>
                                     <button class="btn btn-dark" data-dismiss="modal">Cancel</button>
                                 </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
-                    <!-- End Modal add employee-->
-                </form>
+                </div>
+                <!-- End of Add employee modal -->
             </div>
         </div>
         <!-- /page content -->
@@ -307,6 +301,11 @@
 <script src="../../src/nprogress/nprogress.js"></script>
 <!-- validator -->
 <script src="../../src/validator/bootstrapValidator.min.js"></script>
+<!-- PNotify -->
+<script src="../../src/pnotify/dist/pnotify.js"></script>
+<script src="../../src/pnotify/dist/pnotify.buttons.js"></script>
+<script src="../../src/pnotify/dist/pnotify.nonblock.js"></script>
+
 <!-- Datatables -->
 <script src="../../src/datatables.net/js/jquery.dataTables.min.js"></script>
 <script src="../../src/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
@@ -327,6 +326,40 @@
 <script src="../../build/js/custom.min.js"></script>
 <!-- Function JS -->
 <script src="js/function.js"></script>
+
+<?php
+if (isset($_GET['error'])) {
+    echo "<script type='text/javascript'>
+         new PNotify({
+         title: 'Error :(',
+         text: 'There was an error, Please try again.',
+         type: 'error',
+         styling: 'bootstrap3',
+         delay:3000
+         });
+         </script>";
+} elseif (isset($_GET['Updated'])) {
+    echo "<script type='text/javascript'>
+         new PNotify({
+         title: 'Success',
+         text: 'Employee Updated',
+         type: 'success',
+         styling: 'bootstrap3',
+         delay:3000
+         });
+         </script>";
+} elseif (isset($_GET['deleted'])) {
+    echo "<script type='text/javascript'>
+         new PNotify({
+         title: 'Success',
+         text: 'Employee Deleted',
+         type: 'success',
+         styling: 'bootstrap3',
+         delay:3000
+         });
+         </script>";
+}
+?>
 
 <!-- Datatables -->
 <script>
@@ -412,7 +445,6 @@
 
 <!-- validator -->
 <script type="text/javascript">
-
     $(document).ready(function () {
         $('#AddEmployee').bootstrapValidator({
             message: 'This value is not valid',
@@ -423,10 +455,18 @@
             },
             fields: {
                 group: 'form-group',
-                EmpID: {
+                AddEmpID: {
                     validators: {
                         notEmpty: {
                             message: 'Please enter your Employee ID. Required!'
+                        },
+                        remote: {
+                            message: 'Employee ID already exists',
+                            url: 'function/remote.php',
+                            data: {
+                                type: 'AddEmpID'
+                            },
+                            type: 'POST'
                         }
                     }
                 },
@@ -434,13 +474,18 @@
                     validators: {
                         notEmpty: {
                             message: 'Please enter your First Name. Required!'
+                        },
+                        regexp: {
+                            regexp: /^[a-zA-Z ]+$/,
+                            message: "Invalid input."
                         }
                     }
                 },
                 Middlename: {
                     validators: {
-                        notEmpty: {
-                            message: 'Please enter your Middle Name. Required!'
+                        regexp: {
+                            regexp: /^[a-zA-Z ]+$/,
+                            message: "Invalid input."
                         }
                     }
                 },
@@ -448,6 +493,10 @@
                     validators: {
                         notEmpty: {
                             message: 'Please enter your Last Name. Required!'
+                        },
+                        regexp: {
+                            regexp: /^[a-zA-Z ]+$/,
+                            message: "Invalid input."
                         }
                     }
                 },
@@ -455,27 +504,38 @@
                     validators: {
                         notEmpty: {
                             message: 'Please enter your Initial. Required!'
+                        },
+                        regexp: {
+                            regexp: /^[a-zA-Z ]+$/,
+                            message: "Invalid input."
                         }
                     }
                 },
                 Position: {
                     validators: {
                         notEmpty: {
-                            message: 'Please enter your Position. Required!'
+                            message: 'Please select position. Required!'
                         }
                     }
                 },
                 Branch: {
                     validators: {
                         notEmpty: {
-                            message: 'Please enter Branch. Required!'
+                            message: 'Please select Branch. Required!'
                         }
                     }
                 },
                 eArea: {
                     validators: {
                         notEmpty: {
-                            message: 'Please enter Area. Required!'
+                            message: 'Please select Area. Required!'
+                        }
+                    }
+                },
+                Brand: {
+                    validators: {
+                        notEmpty: {
+                            message: 'Please select Brand. Required!'
                         }
                     }
                 }
@@ -488,13 +548,18 @@
                 data: $('#AddEmployee').serialize(),
                 success: function (data) {
                     if (data == "True") {
-                        window.location.href = "employee.php";
+                        window.location.href = "employee.php?Updated";
+                    }
+                    else if (data == "False") {
+                        window.location.href = "employee.php?error";
+                    }
+                    else {
+                        window.location.href = "employee.php?error";
                     }
                 }
             })
         });
     });
-
 </script>
 <!-- /validator -->
 </body>

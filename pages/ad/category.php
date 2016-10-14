@@ -79,71 +79,10 @@
                                                     <td><?php echo $CategoryCode ?></td>
                                                     <td><?= @$Category; ?></td>
                                                     <td>
-                                                        <button class="btn btn-dark" data-target='#EditCategoryModal<?= @$CategoryID; ?>' data-toggle='modal'><i class="fa fa-eye"></i></button>
-                                                        <button class="btn btn-danger" data-toggle="modal" data-target="#DeleteCategoryModal<?= @$CategoryID; ?>"><i class="fa fa-trash"></i></button>
+                                                        <button class="btn btn-dark" onclick="CategoryDetails(this.value);" value="<?= @$CategoryID; ?>" data-toggle="modal" data-target="#CategoryUpdateModal"><i class="fa fa-eye"></i></button>
+                                                        <button class="btn btn-danger" onclick="CategoryDelete(this.value);" value="<?= @$CategoryID; ?>" data-toggle="modal" data-target="#CategoryDeleteModal"><i class="fa fa-trash"></i></button>
                                                     </td>
                                                 </tr>
-
-                                                <!-- Delete Category Modal -->
-                                                <div class="modal fade" id="DeleteCategoryModal<?= @$CategoryID; ?>">
-                                                    <div class="modal-dialog">
-                                                        <div class="modal-content">
-                                                            <form action="function/admin-delete.php" method="POST" name="DeleteCategory" id="DeleteCategory">
-                                                                <div class="modal-header modal-header-danger">
-                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                                    <h4 class="modal-title">Delete Category</h4>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                    <label>Do you want to delete this Category "<?= @$Category; ?>"</label>
-                                                                    <div class="form-group"></div>
-                                                                </div>
-                                                                <input type="hidden" name="CategoryID" value="<?= @$CategoryID; ?>">
-                                                                <div class="modal-footer">
-                                                                    <button class="btn btn-danger" name="btndeleteCategory" id="btndeleteCategory">Delete</button>
-                                                                    <button class="btn btn-dark" data-dismiss="modal">Cancel</button>
-                                                                </div>
-                                                            </form>
-                                                        </div>
-                                                        <!-- /.modal-content -->
-                                                    </div>
-                                                    <!-- /.modal-dialog -->
-                                                </div>
-                                                <!-- /.modal -->
-
-                                                <!-- Edit Category Modal -->
-                                                <div class="modal fade" id="EditCategoryModal<?= @$CategoryID; ?>">
-                                                    <div class="modal-dialog">
-                                                        <div class="modal-content">
-                                                            <form action="function/functions.php" method="POST" name="UpdateCategory" id="UpdateCategory" autocomplete="off">
-                                                                <div class="modal-header modal-header-dark">
-                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                                    <h4 class="modal-title">Edit Category</h4>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                    <div class="form-group">
-                                                                        <label>AreaID <span class="red">(*)</span></label>
-                                                                        <input type="text" class="form-control" readonly id="EditCategoryID" name="EditCategoryID" value="<?php echo $CategoryID; ?>">
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <label>Category Code <span class="red">(*)</span></label>
-                                                                        <input type="text" class="form-control" style="text-transform: uppercase" id="EditCategoryCode" name="EditCategoryCode" value="<?= @$CategoryCode; ?>">
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <label>Area <span class="red">(*)</span></label>
-                                                                        <input type="text" class="form-control" style="text-transform: uppercase" id="EditCategory" name="EditCategory" value="<?php echo $Category; ?>">
-                                                                    </div>
-                                                                </div>
-                                                                <div class="modal-footer">
-                                                                    <button class="btn btn-dark" id="btnupdateCategory" name="btnupdateCategory">Update</button>
-                                                                    <button class="btn btn-default" data-dismiss="modal">Cancel</button>
-                                                                </div>
-                                                            </form>
-                                                        </div>
-                                                        <!-- /.modal-content -->
-                                                    </div>
-                                                    <!-- /.modal-dialog -->
-                                                </div>
-                                                <!-- /.modal -->
 
                                                 <?php
                                             }
@@ -152,6 +91,19 @@
                                         </table>
                                         <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#AddCategoryModal">Add Category</button>
                                     </div>
+
+                                    <!-- Delete Category Modal -->
+                                    <div class="modal fade" id="CategoryDeleteModal">
+
+                                    </div>
+                                    <!-- /.modal -->
+
+                                    <!-- Edit Category Modal -->
+                                    <div class="modal fade" id="CategoryUpdateModal">
+
+                                    </div>
+                                    <!-- /.modal -->
+
                                 </div>
                             </div>
                         </div>
@@ -179,19 +131,19 @@
                                                 $areaID = $ID['CategoryID'];
                                                 $start++;
                                             }
-                                            echo '<input type="hidden" readonly class="form-control" value="' . $IdFormat . '' . $start . '" name="CategoryID" id="CategoryID">';
+                                            echo '<input type="hidden" readonly class="form-control" value="' . $IdFormat . '' . $start . '" name="AddCategoryID" id="AddCategoryID">';
                                         } else {
-                                            echo '<input type="hidden" readonly class="form-control" value="' . $IdFormat . '' . $start . '" name="CategoryID" id="CategoryID">';
+                                            echo '<input type="hidden" readonly class="form-control" value="' . $IdFormat . '' . $start . '" name="AddCategoryID" id="AddCategoryID">';
                                         }
                                         ?>
                                     </div>
                                     <div class="form-group">
                                         <label>Category Code <span class="red">(*)</span></label>
-                                        <input type="text" class="form-control" style="text-transform: uppercase" id="CategoryCode" name="CategoryCode">
+                                        <input type="text" class="form-control" style="text-transform: capitalize" id="CategoryCode" name="CategoryCode">
                                     </div>
                                     <div class="form-group">
                                         <label>Category <span class="red">(*)</span></label>
-                                        <input type="text" class="form-control" style="text-transform: uppercase" id="AddCategory" name="AddCategory">
+                                        <input type="text" class="form-control" style="text-transform: capitalize" id="AddCategory" name="AddCategory">
                                     </div>
                                 </div>
                                 <div class="modal-footer">

@@ -1,8 +1,13 @@
 <?php
 include('../../connection.php');
+include_once('../../functions/encryption.php');
 session_start();
-$EmpID = db_quote($_SESSION['EmpID']);
-$checkAccount = db_select("
+$hashEMPID = $_SESSION['hashEmpID'];
+$EmpID = $_SESSION['EmpID'];
+$rnd = $_SESSION['rnd'];
+
+if (encrypt_decrypt_rnd('decrypt', $hashEMPID, $rnd) == $EmpID) {
+    $checkAccount = db_select("
     SELECT 
     employeetbl.Firstname,
     employeetbl.Lastname,
@@ -12,21 +17,28 @@ $checkAccount = db_select("
     branchtbl.BranchID
     FROM employeetbl
     LEFT JOIN branchtbl ON employeetbl.BranchID = branchtbl.BranchID
-    WHERE EmpID =" . $EmpID);
+    WHERE EmpID =" . db_quote($EmpID));
 
-if($checkAccount[0]['Position'] != "Cashier"){
-    unset($_SESSION['EmpID']);
+
+    if ($checkAccount[0]['Position'] != "OIC") {
+        session_destroy();
+        header('location: ../../index.php');
+    } else {
+        $FirstName = $checkAccount[0]['Firstname'];
+        $LastName = $checkAccount[0]['Lastname'];
+        $BranchID = $checkAccount[0]['BranchID'];
+        $BranchCode = $checkAccount[0]['BranchCode'];
+        $Initials = $checkAccount[0]['Initials'];
+        $AccountType = $checkAccount[0]['Position'];
+        $FullName = $FirstName . " " . $LastName;
+
+        $getPurchaseRequestPending = db_select("SELECT * FROM `purchaserequeststbl` WHERE `Status` = 'Pending' AND `BranchCode` = " . db_quote($BranchCode));
+        $getPurchaseRequestApproved = db_select("SELECT * FROM `purchaserequeststbl` WHERE `Status` = 'Approved' OR `Status` = 'On Going' AND `isBCApproved` = '1' AND `BranchCode` = " . db_quote($BranchCode));
+        $getPRCompleted = db_select("SELECT * FROM `purchaserequeststbl` WHERE `Status` = 'Completed' AND `isBCApproved` = '1' AND `BranchCode` = " . db_quote($BranchCode));
+    }
+}else{
+    session_destroy();
     header('location: ../../index.php');
-}
-
-else{
-    $FirstName = $checkAccount[0]['Firstname'];
-    $LastName = $checkAccount[0]['Lastname'];
-    $BranchID = $checkAccount[0]['BranchID'];
-    $BranchCode = $checkAccount[0]['BranchCode'];
-    $Initials = $checkAccount[0]['Initials'];
-    $AccountType = $checkAccount[0]['Position'];
-    $FullName = $FirstName . " " . $LastName;
 }
 
 ?>
@@ -45,7 +57,7 @@ else{
             </div>
             <div class="profile_info">
                 <span>Welcome,</span>
-                <h2><?=@$FullName ?></h2>
+                <h2><?= @$FullName ?></h2>
             </div>
         </div>
         <!-- /menu profile quick info -->
@@ -53,7 +65,7 @@ else{
         <!-- sidebar menu -->
         <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
             <div class="menu_section">
-                <h3><?=@$BranchCode ?> - Cashier</h3>
+                <h3><?= @$BranchCode . " - " . $checkAccount[0]['Position'] ?></h3>
                 <ul class="nav side-menu">
                     <li>
                         <a><i class="fa fa-bar-chart"></i> Sales Report</span></a>
@@ -66,12 +78,19 @@ else{
                         </ul>
                     </li>
                     <li>
-                        <a><i class="fa fa-table"></i> Inventory <span class="fa fa-chevron-down"></span></a>
+                        <a><i class="fa fa-cube"></i> Purchase Requests <span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
-                            <li><a href="po.php">Purchase Request</a></li>
-                            <li><a href="#">Receiving</a></li>
+                            <li><a href="po.php">Pending <span class="label label-danger pull-right"><?= @count($getPurchaseRequestPending); ?></span></a></li>
+                            <li><a href="receiving.php">Receiving <span class="label label-danger pull-right"><?= @count($getPurchaseRequestApproved); ?></span></a></li>
+                            <li><a href="reportpr.php">Reports</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a><i class="fa fa-cubes"></i> Inventory <span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
                             <li><a href="#">Stock Transfer</a></li>
                             <li><a href="#">Defectives</a></li>
+                            <li><a href="soh.php">Stocks On Hand</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -92,7 +111,7 @@ else{
                 <li class="">
                     <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown"
                        aria-expanded="false">
-                        <img src="../../img/man-icon.png" alt=""><?=@$FullName ?>
+                        <img src="../../img/man-icon.png" alt=""><?= @$FullName ?>
                         <span class=" fa fa-angle-down"></span>
                     </a>
                     <ul class="dropdown-menu dropdown-usermenu pull-right">

@@ -25,6 +25,12 @@ if (encrypt_decrypt('decrypt', $hashPRNumber) != $PONumber) {
     <link href="../../src/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <!-- NProgress -->
     <link href="../../src/nprogress/nprogress.css" rel="stylesheet">
+
+    <!-- PNotify -->
+    <link href="../../src/pnotify/dist/pnotify.css" rel="stylesheet">
+    <link href="../../src/pnotify/dist/pnotify.buttons.css" rel="stylesheet">
+    <link href="../../src/pnotify/dist/pnotify.nonblock.css" rel="stylesheet">
+
     <!-- Datatables -->
     <link href="../../src/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
     <link href="../../src/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
@@ -96,11 +102,6 @@ if (encrypt_decrypt('decrypt', $hashPRNumber) != $PONumber) {
                                 <h2>Modify Purchase Request</h2>
                                 <div class="clearfix"></div>
                             </div>
-                            <div id="DeleteNotif" class="alert alert-success alert-dismissible fade in" role="alert" style="display: none;">
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
-                                </button>
-                                Item successfully deleted.
-                            </div>
                             <form method="POST" name="frmPurchaseOrder" id="frmPurchaseOrder" action="php/function.php">
                                 <input type="hidden" name="aEmpID" value="<?= @$EmpID ?>">
                                 <input type="hidden" name="HashPRNumber" value="<?= @$hashPRNumber ?>">
@@ -158,6 +159,7 @@ if (encrypt_decrypt('decrypt', $hashPRNumber) != $PONumber) {
                                                 "SELECT
                                                     purchaserequestsitemstbl.ItemCode,
                                                     purchaserequestsitemstbl.Qty,
+                                                    purchaserequestsitemstbl.Color,
                                                     itemstbl.ModelName,
                                                     itemstbl.SRP,
                                                     brandtbl.Brand
@@ -173,6 +175,7 @@ if (encrypt_decrypt('decrypt', $hashPRNumber) != $PONumber) {
                                                 $ItemCode = $item['ItemCode'];
                                                 $Qty = $item['Qty'];
                                                 $ModelName = $item['ModelName'];
+                                                $Color = $item['Color'];
                                                 $Brand = $item['Brand'];
                                                 $SRP = $item['SRP'];
                                                 $TotalItems = $TotalItems + ($Qty * $SRP);
@@ -181,6 +184,7 @@ if (encrypt_decrypt('decrypt', $hashPRNumber) != $PONumber) {
                                                 ?>
                                                 <input type="hidden" name="aItemCode[]" value="<?= @$ItemCode ?>">
                                                 <input type="hidden" name="aModelName[]" value="<?= @$ModelName ?>">
+                                                <input type="hidden" name="aColor[]" value="<?= @$Color ?>">
                                                 <input type="hidden" name="aBrand[]" value="<?= @$Brand ?>">
                                                 <input type="hidden" name="aSRP[]" value="<?= @$SRP ?>">
                                                 <input type="hidden" name="aQty[]" value="<?= @$Qty ?>">
@@ -230,6 +234,7 @@ if (encrypt_decrypt('decrypt', $hashPRNumber) != $PONumber) {
                                                     <tr>
                                                         <th>Item Code</th>
                                                         <th>Model</th>
+                                                        <th>Color</th>
                                                         <th>Description</th>
                                                         <th>Brand</th>
                                                         <th>Category</th>
@@ -268,6 +273,21 @@ if (encrypt_decrypt('decrypt', $hashPRNumber) != $PONumber) {
                                                             <td>
                                                                 <?= @$Model ?>
                                                                 <input type="hidden" disabled name="tModelName[]" value="<?= @$Model ?>">
+                                                            </td>
+                                                            <td>
+                                                                <select class="form-control" name="tColor[]">
+                                                                    <option value="">- Select Color -</option>
+                                                                    <?php
+                                                                    $colortbl = db_select("SELECT `Color` FROM `colortbl`");
+
+                                                                    foreach($colortbl as $color){
+                                                                        $Color = $color['Color'];
+                                                                        ?>
+                                                                        <option value="<?= @$Color ?>"><?= @$Color ?></option>
+                                                                        <?php
+                                                                    }
+                                                                    ?>
+                                                                </select>
                                                             </td>
                                                             <td>
                                                                 <?= @$Description ?>
@@ -397,6 +417,11 @@ if (encrypt_decrypt('decrypt', $hashPRNumber) != $PONumber) {
 <script src="../../src/fastclick/lib/fastclick.js"></script>
 <!-- NProgress -->
 <script src="../../src/nprogress/nprogress.js"></script>
+<!-- PNotify -->
+<script src="../../src/pnotify/dist/pnotify.js"></script>
+<script src="../../src/pnotify/dist/pnotify.buttons.js"></script>
+<script src="../../src/pnotify/dist/pnotify.nonblock.js"></script>
+
 <!-- Datatables -->
 <script src="../../src/datatables.net/js/jquery.dataTables.min.js"></script>
 <script src="../../src/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
@@ -500,12 +525,6 @@ if (encrypt_decrypt('decrypt', $hashPRNumber) != $PONumber) {
     });
 </script>
 <!-- /Datatables -->
-<script type="text/javascript">
-    var ItemsToOrder = document.getElementById("ItemsToOrder");
-    var sPrice = document.getElementById("sPrice"); //label of total price
-    var arrayItem = ["0"];
-
-</script>
 
 </body>
 </html>

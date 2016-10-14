@@ -5,7 +5,7 @@ $PONumber = $_GET['pr'];
 $rnd = substr($_GET['id'], 32, 36);
 
 if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
-    header('location: po.php?error');
+    header('location: pending.php?error');
 }
 ?>
 <!DOCTYPE html>
@@ -89,7 +89,7 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
             <div class="">
                 <div class="page-title">
                     <div class="title_left">
-                        <h3>Purchase Order</h3>
+                        <h3>Purchase Request</h3>
                     </div>
                 </div>
 
@@ -99,15 +99,13 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
                     <div class="col-md-12 col-sm-12 col-xs-12">
                         <div class="x_panel">
                             <div class="x_title">
-                                <h2>Modify Purchase Request</h2>
+                                <h2>Approve Purchase Request</h2>
                                 <div class="clearfix"></div>
                             </div>
-                            <form method="POST" name="frmPurchaseOrder" id="frmPurchaseOrder" action="php/function.php">
-                                <input type="hidden" name="aEmpID" value="<?= @$EmpID ?>">
-                                <input type="hidden" name="HashPRNumber" value="<?= @$hashPRNumber ?>">
+                            <form method="POST" name="frmApproveOrder" id="frmApproveOrder" action="php/function.php">
+                                <input type="hidden" name="HashPRNumber" value="<?php echo $_GET['id']; ?>">
                                 <input type="hidden" name="PRNumber" value="<?= @$PONumber ?>">
-                                <input type="hidden" name="BrandID" value="<?= @$BrandID ?>">
-                                <input type="hidden" name="Branch" value="<?= @$Branch ?>">
+                                <input type="hidden" name="ModifyCode" value="<?= @$ModifyCode ?>">
                                 <div class="x_content">
                                     <div class="col-lg-12">
                                         <div class="row">
@@ -148,11 +146,10 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
                                     </div>
                                     &nbsp;
                                     <div class="row">
-                                        <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#AddItemModal"><i class="fa fa-plus-circle"></i> Add Item</button>
                                         <!-- Panel -->
                                         <div class="panel panel-info">
                                             <div class="panel-heading">
-                                                <i class="fa fa-table fa-fw"></i> Items to order
+                                                <i class="fa fa-table fa-fw"></i> Items to Order
                                             </div>
                                             <?php
                                             $OrderedItems = db_select(
@@ -174,8 +171,8 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
                                             foreach ($OrderedItems as $item) {
                                                 $ItemCode = $item['ItemCode'];
                                                 $Qty = $item['Qty'];
-                                                $Color = $item['Color'];
                                                 $ModelName = $item['ModelName'];
+                                                $Color = $item['Color'];
                                                 $Brand = $item['Brand'];
                                                 $SRP = $item['SRP'];
                                                 $TotalItems = $TotalItems + ($Qty * $SRP);
@@ -183,8 +180,7 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
                                                 $SRP = number_format($SRP, 2, '.', ',');
                                                 ?>
                                                 <input type="hidden" name="aItemCode[]" value="<?= @$ItemCode ?>">
-                                                <input type="hidden" name="aModelName[]" value="<?= @$ModelName ?>">
-                                                <input type="hidden" name="aColor[]" value="<?= @$Color?>">
+                                                <input type="hidden" name="aModelName[]" value="<?= @$ModelName . " (" . $Color . ")" ?>">
                                                 <input type="hidden" name="aBrand[]" value="<?= @$Brand ?>">
                                                 <input type="hidden" name="aSRP[]" value="<?= @$SRP ?>">
                                                 <input type="hidden" name="aQty[]" value="<?= @$Qty ?>">
@@ -193,7 +189,7 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
                                             }
                                             ?>
                                             <!-- /.panel-heading -->
-                                            <div class="panel-body" style="height: 400px; overflow-y: scroll;" id="testssss">
+                                            <div class="panel-body" style="height: 400px; overflow-y: scroll;">
                                                 <table id="ItemsToOrder" class="table table-striped table-bordered">
                                                     <thead>
                                                     <tr>
@@ -203,7 +199,7 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
                                                         <th>SRP</th>
                                                         <th width="5%">Qty.</th>
                                                         <th width="10%">Total</th>
-                                                        <th width="5%">Delete</th>
+                                                        <th>Remarks</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -216,159 +212,10 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
                                             </div>
                                         </div>
                                         <!-- End Panel -->
-                                        <button type="button" onclick="UpdatePurchaseOrder();" class="btn btn-dark" style="float: right">Save</button>
-                                        <a href="po.php" class="btn btn-dark" style="float: right">Cancel</a>
+                                        <button type="button" onclick="SubmitPurchaseRequest();" class="btn btn-dark" style="float: right">Save</button>
+                                        <a href="pending.php" class="btn btn-dark" style="float: right">Cancel</a>
                                     </div>
                                 </div>
-                                <!-- Add Item Modal -->
-                                <div class="modal fade" id="AddItemModal">
-                                    <div class="modal-dialog modal-lg">
-                                        <div class="modal-content">
-                                            <div class="modal-header modal-header-dark">
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                <h4 class="modal-title">Add Item</h4>
-                                            </div>
-                                            <div class="modal-body">
-                                                <table id="datatable" class="table table-striped table-bordered">
-                                                    <thead>
-                                                    <tr>
-                                                        <th>Item Code</th>
-                                                        <th>Model</th>
-                                                        <th>Color</th>
-                                                        <th>Description</th>
-                                                        <th>Brand</th>
-                                                        <th>Category</th>
-                                                        <th>SRP</th>
-                                                        <th width="5%">Qty.</th>
-                                                        <th width="5%">Add</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    <?php
-                                                    $itemstbl = db_select("
-                                                    SELECT 
-                                                        itemstbl.ItemCode,
-                                                        itemstbl.ModelName,
-                                                        itemstbl.ItemDescription,
-                                                        itemstbl.Category,
-                                                        itemstbl.SRP,
-                                                        brandtbl.Brand
-                                                        FROM itemstbl
-                                                        LEFT JOIN brandtbl ON itemstbl.BrandID = brandtbl.BrandID
-                                                        WHERE itemstbl.BrandID = " . db_quote($BrandID));
-
-                                                    foreach ($itemstbl as $item) {
-                                                        $ItemCode = $item['ItemCode'];
-                                                        $Model = $item['ModelName'];
-                                                        $Description = $item['ItemDescription'];
-                                                        $Brand = $item['Brand'];
-                                                        $Category = $item['Category'];
-                                                        $SRP = number_format($item['SRP'], 2, ".", ",");
-                                                        ?>
-                                                        <tr>
-                                                            <td>
-                                                                <?= @$ItemCode ?>
-                                                                <input type="hidden" disabled name="tItemCode[]" value="<?= @$ItemCode ?>">
-                                                            </td>
-                                                            <td>
-                                                                <?= @$Model ?>
-                                                                <input type="hidden" disabled name="tModelName[]" value="<?= @$Model ?>">
-                                                            </td>
-                                                            <td>
-                                                                <select class="form-control" name="tColor[]">
-                                                                    <option value="">- Select Color -</option>
-                                                                    <?php
-                                                                    $colortbl = db_select("SELECT `Color` FROM `colortbl`");
-
-                                                                    foreach($colortbl as $color){
-                                                                        $Color = $color['Color'];
-                                                                        ?>
-                                                                        <option value="<?= @$Color ?>"><?= @$Color ?></option>
-                                                                        <?php
-                                                                    }
-                                                                    ?>
-                                                                </select>
-                                                            </td>
-                                                            <td>
-                                                                <?= @$Description ?>
-                                                                <input type="hidden" disabled name="tDescription[]" value="<?= @$Description ?>">
-                                                            </td>
-                                                            <td>
-                                                                <?= @$Brand ?>
-                                                                <input type="hidden" disabled name="tBrand[]" value="<?= @$Brand ?>">
-                                                            </td>
-                                                            <td>
-                                                                <?= @$Category ?>
-                                                                <input type="hidden" disabled name="tCategory[]" value="<?= @$Category ?>">
-                                                            </td>
-                                                            <td>
-                                                                <?= @$SRP ?>
-                                                                <input type="hidden" disabled name="tSRP[]" value="<?= @$SRP ?>">
-                                                            </td>
-                                                            <td>
-                                                                <input type="number" name="tQty[]" id="tQty" max="1000" min="0" class="form-control" style="width: 80px;" value="0">
-                                                            </td>
-                                                            <td>
-                                                                <a class="btn btn-success" onclick="addItemToOrder(this);"><i class="fa fa-plus-circle"></i></a>
-                                                            </td>
-                                                        </tr>
-                                                        <?php
-                                                    }
-                                                    ?>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button class="btn btn-default" data-dismiss="modal">Close</button>
-                                            </div>
-                                        </div>
-                                        <!-- /.modal-content -->
-                                    </div>
-                                    <!-- /.modal-dialog -->
-                                </div>
-                                <!-- /.modal -->
-
-                                <!-- Item Exists Modal -->
-                                <div class="modal fade" id="itemExists">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header modal-header-danger">
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                <h4 class="modal-title">Item Already exists</h4>
-                                            </div>
-                                            <div class="modal-body">
-                                                <p>Please select other item.</p>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button class="btn btn-default" data-dismiss="modal">Close</button>
-                                            </div>
-                                        </div>
-                                        <!-- /.modal-content -->
-                                    </div>
-                                    <!-- /.modal-dialog -->
-                                </div>
-                                <!-- /.modal -->
-
-                                <!-- No Item Modal -->
-                                <div class="modal fade" id="noItemModal">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header modal-header-danger">
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                <h4 class="modal-title">No items added.</h4>
-                                            </div>
-                                            <div class="modal-body">
-                                                <p>Please add item(s) before you can purchase order.</p>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button class="btn btn-default" data-dismiss="modal">Close</button>
-                                            </div>
-                                        </div>
-                                        <!-- /.modal-content -->
-                                    </div>
-                                    <!-- /.modal-dialog -->
-                                </div>
-                                <!-- /.modal -->
 
                                 <!-- Check Before Submit Modal -->
                                 <div class="modal fade" id="CheckItems">
@@ -376,14 +223,14 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
                                         <div class="modal-content">
                                             <div class="modal-header modal-header-dark">
                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                <h4 class="modal-title">Send Purchase Order?</h4>
+                                                <h4 class="modal-title">Approve Purchase Order?</h4>
                                             </div>
                                             <div class="modal-body">
-                                                <p>Please review selected items before submit.</p>
+                                                <p>Please review items before save.</p>
                                             </div>
                                             <div class="modal-footer">
                                                 <button class="btn btn-dark" data-dismiss="modal">Review items</button>
-                                                <button type="submit" class="btn btn-danger">Submit</button>
+                                                <button type="submit" class="btn btn-dark">Save</button>
                                             </div>
                                         </div>
                                         <!-- /.modal-content -->
@@ -525,6 +372,12 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
     });
 </script>
 <!-- /Datatables -->
+<script type="text/javascript">
+    var ItemsToOrder = document.getElementById("ItemsToOrder");
+    var sPrice = document.getElementById("sPrice"); //label of total price
+    var arrayItem = ["0"];
+
+</script>
 
 </body>
 </html>

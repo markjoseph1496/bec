@@ -16,6 +16,10 @@
     <link href="../../src/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <!-- NProgress -->
     <link href="../../src/nprogress/nprogress.css" rel="stylesheet">
+    <!-- PNotify -->
+    <link href="../../src/pnotify/dist/pnotify.css" rel="stylesheet">
+    <link href="../../src/pnotify/dist/pnotify.buttons.css" rel="stylesheet">
+    <link href="../../src/pnotify/dist/pnotify.nonblock.css" rel="stylesheet">
     <!-- Datatables -->
     <link href="../../src/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
     <link href="../../src/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
@@ -52,11 +56,6 @@
                             <div class="x_title">
                                 <h2>Add Purchase Order</h2>
                                 <div class="clearfix"></div>
-                            </div>
-                            <div id="DeleteNotif" class="alert alert-success alert-dismissible fade in" role="alert" style="display: none;">
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
-                                </button>
-                                Item successfully deleted.
                             </div>
                             <form method="POST" name="frmPurchaseOrder" id="frmPurchaseOrder" action="php/function.php">
                                 <input type="hidden" name="EmpID" value="<?= @$EmpID ?>">
@@ -117,6 +116,7 @@
                                                     <tr>
                                                         <th>Item Code</th>
                                                         <th>Model</th>
+                                                        <th>Color</th>
                                                         <th>Description</th>
                                                         <th>Brand</th>
                                                         <th>Category</th>
@@ -139,6 +139,7 @@
                                                           LEFT JOIN brandtbl ON itemstbl.BrandID = brandtbl.BrandID
                                                           WHERE itemstbl.BrandID =  $SelectedBrand ");
 
+
                                                     foreach ($itemstbl as $item) {
                                                         $ItemCode = $item['ItemCode'];
                                                         $Model = $item['ModelName'];
@@ -155,6 +156,21 @@
                                                             <td>
                                                                 <?= @$Model ?>
                                                                 <input type="hidden" disabled name="tModelName[]" value="<?= @$Model ?>">
+                                                            </td>
+                                                            <td>
+                                                                <select class="form-control" name="tColor[]">
+                                                                    <option value="">- Select Color -</option>
+                                                                    <?php
+                                                                    $colortbl = db_select("SELECT `Color` FROM `colortbl`");
+
+                                                                    foreach($colortbl as $color){
+                                                                        $Color = $color['Color'];
+                                                                        ?>
+                                                                        <option value="<?= @$Color ?>"><?= @$Color ?></option>
+                                                                        <?php
+                                                                    }
+                                                                    ?>
+                                                                </select>
                                                             </td>
                                                             <td>
                                                                 <?= @$Description ?>
@@ -285,6 +301,11 @@
 <script src="../../src/fastclick/lib/fastclick.js"></script>
 <!-- NProgress -->
 <script src="../../src/nprogress/nprogress.js"></script>
+<!-- PNotify -->
+<script src="../../src/pnotify/dist/pnotify.js"></script>
+<script src="../../src/pnotify/dist/pnotify.buttons.js"></script>
+<script src="../../src/pnotify/dist/pnotify.nonblock.js"></script>
+
 <!-- Datatables -->
 <script src="../../src/datatables.net/js/jquery.dataTables.min.js"></script>
 <script src="../../src/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
@@ -391,12 +412,5 @@
     });
 </script>
 <!-- /Datatables -->
-
-<script type="text/javascript">
-    var ItemsToOrder = document.getElementById("ItemsToOrder");
-    var sPrice = document.getElementById("sPrice"); //label of total price
-    var arrayItem = ["0"];
-
-</script>
 </body>
 </html>

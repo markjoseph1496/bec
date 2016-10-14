@@ -72,7 +72,7 @@
                                             <tbody>
                                             <?php
                                             $BranchQuery = db_select("
-                                                SELECT  branchtbl.BranchCode, branchtbl.BranchName, brandtbl.Brand, areatbl.Area
+                                                SELECT branchtbl.BranchCode, branchtbl.BranchName, brandtbl.Brand, areatbl.Area
                                                 FROM branchtbl
                                                 LEFT JOIN brandtbl ON branchtbl.BrandID = brandtbl.BrandID
                                                 LEFT  JOIN areatbl ON branchtbl.AreaID = areatbl.AreaID");
@@ -81,6 +81,9 @@
                                                 $BranchName = $Branch['BranchName'];
                                                 $Brand = $Branch['Brand'];
                                                 $BranchArea = $Branch['Area'];
+
+                                                $Branchrnd = rand(0, 9999);
+                                                $hashBranchCode = encrypt_decrypt_rnd('encrypt', $BranchCode, $Branchrnd);
                                                 ?>
                                                 <tr>
                                                     <td><?php echo $BranchCode ?></td>
@@ -88,78 +91,11 @@
                                                     <td><?php echo $Brand ?></td>
                                                     <td><?php echo $BranchArea ?></td>
                                                     <td>
-                                                        <button class="btn btn-dark" data-target="#EditBranchModal<?= @$BranchCode ?>" data-toggle="modal"><i class="fa fa-eye"></i></button>
-                                                        <button class="btn btn-danger" data-toggle="modal" data-target="#CheckDelete" onclick="DeleteBranch('<?php echo $BranchCode ?>');"><i class="fa fa-trash"></i></button>
+                                                        <button class="btn btn-dark" onclick="BranchDetails('<?= @$BranchCode; ?>','<?= @$hashBranchCode; ?>','<?= @$Branchrnd; ?>')" data-toggle="modal" data-target="#BranchUpdateModal"><i class="fa fa-eye"></i></button>
+                                                        <button class="btn btn-danger" onclick="BranchDelete('<?= @$BranchCode; ?>','<?= @$hashBranchCode; ?>','<?= @$Branchrnd; ?>')" data-toggle="modal" data-target="#BranchDeleteModal"><i
+                                                                class="fa fa-trash"></i></button>
                                                     </td>
                                                 </tr>
-
-                                                <!-- EditBranch Modal -->
-                                                <div class="modal fade" id="EditBranchModal<?= @$BranchCode ?>" role="dialog">
-                                                    <div class="modal-dialog">
-                                                        <!-- Modal content-->
-                                                        <form action="function/functions.php" id="EditBranch" method="POST" autocomplete="off">
-                                                            <div class="modal-content">
-                                                                <div class="modal-header modal-header-dark">
-                                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                                                    <h4 class="modal-title">Update Branch</h4>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                    <div class="row">
-                                                                        <div class="col-lg-12">
-                                                                            <div class="form-group">
-                                                                                <label>Branch Code <span class="red">(*)</span></label>
-                                                                                <input type="text" class="form-control" style="text-transform: uppercase" id="EditBranchCode" name="EditBranchCode" value="<?php echo $BranchCode ?>" readonly>
-                                                                            </div>
-                                                                            <div class="form-group">
-                                                                                <label>Branch Name <span class="red">(*)</span></label>
-                                                                                <input type="text" class="form-control" style="text-transform: uppercase" id="EditBranchName" name="EditBranchName" value="<?php echo $BranchName ?>">
-                                                                            </div>
-                                                                            <div class="form-group">
-                                                                                <label>Brand <span class="red">(*)</span></label>
-                                                                                <select class="form-control" name="EditBrand" id="EditBrand">
-                                                                                    <option selected="selected" value=""><?= @$Brand; ?></option>
-                                                                                    <?php
-                                                                                    $Brandtbl = db_select("SELECT `BrandID`,`Brand` FROM `brandtbl`");
-
-                                                                                    foreach ($Brandtbl as $valueBrand) {
-                                                                                        $BrandID = $valueBrand['BrandID'];
-                                                                                        $Brand = $valueBrand['Brand'];
-                                                                                        ?>
-                                                                                        <option value="<?= @$BrandID; ?>"><?= @$Brand; ?></option>
-                                                                                        <?php
-                                                                                    }
-                                                                                    ?>
-                                                                                </select>
-                                                                            </div>
-                                                                            <div class="form-group">
-                                                                                <label>Branch Area <span class="red">(*)</span></label>
-                                                                                <select class="form-control" name="EditBranchArea" id="EditBranchArea">
-                                                                                    <option value="" selected="selected"><?= @$BranchArea; ?></option>
-                                                                                    <?php
-                                                                                    $Areatbl = db_select("SELECT `AreaID`,`Area` FROM `areatbl`");
-
-                                                                                    foreach ($Areatbl as $valueArea) {
-                                                                                        $AreaID = $valueArea['AreaID'];
-                                                                                        $Area = $valueArea['Area'];
-                                                                                        ?>
-                                                                                        <option value="<?= @$AreaID; ?>"><?= @$Area; ?></option>
-                                                                                        <?php
-                                                                                    }
-                                                                                    ?>
-                                                                                </select>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="modal-footer">
-                                                                    <button type="submit" class="btn btn-dark">Save</button>
-                                                                    <button class="btn btn-dark" data-dismiss="modal">Cancel</button>
-                                                                </div>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                                <!-- End EditBranch Modal-->
                                                 <?php
                                             }
                                             ?>
@@ -167,6 +103,39 @@
                                         </table>
                                         <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#AddBranchModal">Add Branch</button>
                                     </div>
+
+                                    <!-- Update Branch Modal -->
+                                    <div class="modal fade" id="BranchUpdateModal">
+
+                                    </div>
+                                    <!-- /.modal -->
+
+                                    <!-- Modal Delete Branch -->
+                                    <div class="modal fade" id="BranchDeleteModal" role="dialog">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form method="POST" action="function/admin-delete.php">
+                                                    <div class="modal-header modal-header-danger">
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                        <h4 class="modal-title">Delete Branch</h4>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <input type="hidden" name="BranchCode" id="BranchCode">
+                                                        <input type="hidden" name="hashBranchCode" id="hashBranchCode">
+                                                        <input type="hidden" name="Branchrnd" id="Branchrnd">
+                                                        <label>Are you sure you want to remove this Branch? This cannot be undone.</label>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="submit" class="btn btn-dark">Delete</button>
+                                                        <button class="btn btn-default" data-dismiss="modal">Close</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <!-- /.modal-content -->
+                                        </div>
+                                        <!-- /.modal-dialog -->
+                                    </div>
+                                    <!-- End Modal Delete Branch -->
                                 </div>
                             </div>
                         </div>
@@ -188,7 +157,7 @@
                                         <div class="col-lg-12">
                                             <div class="form-group">
                                                 <label>Branch Code <span class="red">(*)</span></label>
-                                                <input type="text" class="form-control" style="text-transform: uppercase" id="BranchCode" name="BranchCode">
+                                                <input type="text" class="form-control" style="text-transform: uppercase" id="AddBranchCode" name="AddBranchCode">
                                             </div>
                                             <div class="form-group">
                                                 <label>Branch Name <span class="red">(*)</span></label>

@@ -106,26 +106,35 @@
                 data: $('#LoginForm').serialize(),
                 success: function (data) {
                     var result = $.parseJSON(data);
-                    if(result.Count == 0){
+                    if (result.Count == 0) {
                         $('#Username').val("");
                         $('#Password').val("");
+                        $('#Username').focus();
                         $('#LoginError').show();
                         $("#LoginError").fadeTo(5000, 500).slideUp(500, function () {
 
                         });
                     }
-                    else{
-                        if(result.AccountType == "Admin"){
+                    else {
+                        if (result.AccountType == "Admin") {
                             alert("Login Success!");
                             window.location.href = "pages/ad/items.php";
                         }
-                        else if(result.AccountType == "Cashier"){
+                        else if (result.AccountType == "OIC") {
                             alert("Login Success!");
                             window.location.href = "pages/cs/plain_page.php";
                         }
-                        else if(result.AccountType == "Area Manager"){
+                        else if (result.AccountType == "Area Manager") {
                             alert("Login Success!");
                             window.location.href = "pages/am/plain_page.php";
+                        }
+                        else if (result.AccountType == "Brand Coordinator") {
+                            alert("Login Success!");
+                            window.location.href = "pages/bc/plain_page.php";
+                        }
+                        else if (result.AccountType == "Cashier") {
+                            alert("Login Success!");
+                            window.location.href = "pages/csr/plain_page.php";
                         }
                     }
                 }

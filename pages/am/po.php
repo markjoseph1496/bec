@@ -18,6 +18,10 @@
     <link href="../../src/nprogress/nprogress.css" rel="stylesheet">
     <!-- Bootstrap Validator -->
     <link href="../../src/validator/bootstrapValidator.min.css">
+    <!-- PNotify -->
+    <link href="../../src/pnotify/dist/pnotify.css" rel="stylesheet">
+    <link href="../../src/pnotify/dist/pnotify.buttons.css" rel="stylesheet">
+    <link href="../../src/pnotify/dist/pnotify.nonblock.css" rel="stylesheet">
 
     <!-- Custom Theme Style -->
     <link href="../../build/css/custom.min.css" rel="stylesheet">
@@ -44,7 +48,7 @@
                     <div class="col-md-12 col-sm-12 col-xs-12">
                         <div class="x_panel">
                             <div class="x_title">
-                                <h2>Pending Orders from Branches</h2>
+                                <h2>Pending Purchase Requests from Branches</h2>
                                 <div class="clearfix"></div>
                             </div>
                             <div class="x_content">
@@ -53,7 +57,7 @@
                                         <table id="datatable" class="table table-striped table-bordered">
                                             <thead>
                                             <tr>
-                                                <th>PO No.</th>
+                                                <th>PR No.</th>
                                                 <th>Date Ordered</th>
                                                 <th>Status</th>
                                                 <th width="15%">Remarks</th>
@@ -71,6 +75,7 @@
                                             purchaserequeststbl.Status,
                                             purchaserequeststbl.Remarks,
                                             purchaserequeststbl.BranchCode,
+                                            purchaserequeststbl.isAMApproved,
                                             employeetbl.Firstname,
                                             employeetbl.Lastname
                                             FROM purchaserequeststbl
@@ -87,11 +92,14 @@
                                                 $Status = $Order['Status'];
                                                 $Remarks = $Order['Remarks'];
                                                 $Branch = $Order['BranchCode'];
+                                                $AMApproved = $Order['isAMApproved'];
                                                 $ContactPerson = $Order['Firstname'] . " " . $Order['Lastname'];
+                                                $Pending = "●";
                                                 ?>
                                                 <tr>
                                                     <td>
                                                         <input type="hidden" name="PONumber[]" value="<?php echo $PONumber ?>"/>
+                                                        <?php if($AMApproved == 0) echo $Pending ?>
                                                         <?php echo $PONumber ?>
                                                     </td>
                                                     <td><?php echo $_Date ?></td>
@@ -280,6 +288,10 @@
 <script src="../../src/nprogress/nprogress.js"></script>
 <!-- validator -->
 <script src="../../src/validator/bootstrapValidator.min.js"></script>
+<!-- PNotify -->
+<script src="../../src/pnotify/dist/pnotify.js"></script>
+<script src="../../src/pnotify/dist/pnotify.buttons.js"></script>
+<script src="../../src/pnotify/dist/pnotify.nonblock.js"></script>
 <!-- Datatables -->
 <script src="../../src/datatables.net/js/jquery.dataTables.min.js"></script>
 <script src="../../src/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
@@ -300,9 +312,29 @@
 <script src="../../build/js/custom.min.js"></script>
 <!-- function JS -->
 <script src="../../pages/am/js/function.js"></script>
-
-<!-- Custom Theme Scripts -->
-<script src="../../build/js/custom.min.js"></script>
+<?php
+if (isset($_GET['error'])) {
+    echo "<script type='text/javascript'>
+         new PNotify({
+         title: 'Error :(',
+         text: 'There was an error, Please try again.',
+         type: 'error',
+         styling: 'bootstrap3',
+         delay:3000
+         });
+         </script>";
+} elseif (isset($_GET['success'])) {
+    echo "<script type='text/javascript'>
+         new PNotify({
+         title: 'Success',
+         text: 'Purchase Request Updated',
+         type: 'success',
+         styling: 'bootstrap3',
+         delay:3000
+         });
+         </script>";
+}
+?>
 <!-- Datatables -->
 <script>
     $(document).ready(function () {

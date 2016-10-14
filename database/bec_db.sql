@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50616
 File Encoding         : 65001
 
-Date: 2016-10-05 09:49:44
+Date: 2016-10-13 00:03:34
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -26,15 +26,16 @@ CREATE TABLE `accountstbl` (
   `aSaltedPassword` varchar(255) NOT NULL,
   `aEmpID` varchar(11) NOT NULL,
   PRIMARY KEY (`_count`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Records of accountstbl
 -- ----------------------------
-INSERT INTO `accountstbl` VALUES ('1', 'csb108', '2ff5cf367a6c6604953a946903ea1ad683c81f9fd3fe89d1743b85565f7ae475259393977375134900f76891b85ec3b77897ecc7911965578a1b7094c8a96068', 'f34891db0469dd4aa7d5a2e302b839f2cb7a83daea011b1e854a1ed496c0e6312a26aaa4327c360e3abff0028efb477592a1bd1c7f292941b7da66ba25c0f445', '123651');
 INSERT INTO `accountstbl` VALUES ('2', 'admin', '2ff5cf367a6c6604953a946903ea1ad683c81f9fd3fe89d1743b85565f7ae475259393977375134900f76891b85ec3b77897ecc7911965578a1b7094c8a96068', 'f34891db0469dd4aa7d5a2e302b839f2cb7a83daea011b1e854a1ed496c0e6312a26aaa4327c360e3abff0028efb477592a1bd1c7f292941b7da66ba25c0f445', '123656');
-INSERT INTO `accountstbl` VALUES ('3', 'am', '2ff5cf367a6c6604953a946903ea1ad683c81f9fd3fe89d1743b85565f7ae475259393977375134900f76891b85ec3b77897ecc7911965578a1b7094c8a96068', 'f34891db0469dd4aa7d5a2e302b839f2cb7a83daea011b1e854a1ed496c0e6312a26aaa4327c360e3abff0028efb477592a1bd1c7f292941b7da66ba25c0f445', '123655');
-INSERT INTO `accountstbl` VALUES ('4', 'cs', '2ff5cf367a6c6604953a946903ea1ad683c81f9fd3fe89d1743b85565f7ae475259393977375134900f76891b85ec3b77897ecc7911965578a1b7094c8a96068', 'f34891db0469dd4aa7d5a2e302b839f2cb7a83daea011b1e854a1ed496c0e6312a26aaa4327c360e3abff0028efb477592a1bd1c7f292941b7da66ba25c0f445', '1111');
+INSERT INTO `accountstbl` VALUES ('6', 'markjoseph1496', '2ff5cf367a6c6604953a946903ea1ad683c81f9fd3fe89d1743b85565f7ae475259393977375134900f76891b85ec3b77897ecc7911965578a1b7094c8a96068', 'f34891db0469dd4aa7d5a2e302b839f2cb7a83daea011b1e854a1ed496c0e6312a26aaa4327c360e3abff0028efb477592a1bd1c7f292941b7da66ba25c0f445', '1-0082-MFC');
+INSERT INTO `accountstbl` VALUES ('10', '2', '7754010a58d6b38061bcb5e550c9f667dbd535c848b0e921c28f49265370646c3922d708604ad362b18f90c679640dd2a0e29c864b7cd1801475f02c75eb681c', '1d933a7e0a8bce0d97918685ef6fc9abc6a576ace986a25dcee2a9e0d763047b03e145b20e3be59ec1747e94d421a322cd2354765e8df0f1a30b9fdc5a55daf8', '1-0085-RGM');
+INSERT INTO `accountstbl` VALUES ('14', 'bc', '2ff5cf367a6c6604953a946903ea1ad683c81f9fd3fe89d1743b85565f7ae475259393977375134900f76891b85ec3b77897ecc7911965578a1b7094c8a96068', 'f34891db0469dd4aa7d5a2e302b839f2cb7a83daea011b1e854a1ed496c0e6312a26aaa4327c360e3abff0028efb477592a1bd1c7f292941b7da66ba25c0f445', '1-0086-RRG');
+INSERT INTO `accountstbl` VALUES ('15', '09968111186', '9797868c508422fc460061e16e0276bfda8091d437c45c1e370f4643e69fbb5755fc3d87d97415b2ed49d60ada3d8f5dc2bd22f31aba0b76c8e9bd312f817b21', 'a0d44f9bd24133e713e6b9efc9c89d59361235d9a4b31001f7e9b30a0b7e0102380a56110f8cd5ee34b8932c23010a1a56e365831add27c211cb7327bf4686c6', '1-0083-BDP');
 
 -- ----------------------------
 -- Table structure for `areatbl`
@@ -75,9 +76,9 @@ CREATE TABLE `branchtbl` (
 -- ----------------------------
 -- Records of branchtbl
 -- ----------------------------
-INSERT INTO `branchtbl` VALUES ('86', 'BH-001', 'B107', 'CHERRY MOBILE NORTH EDSA', 'BR-001', 'AR-004');
-INSERT INTO `branchtbl` VALUES ('87', 'BH-002', 'B108', 'CHERRY MOBILE MEGAMALL', 'BR-001', 'AR-002');
-INSERT INTO `branchtbl` VALUES ('88', 'BH-003', 'B207', 'MYPHONE NORTH EDSA', 'BR-002', 'AR-004');
+INSERT INTO `branchtbl` VALUES ('86', 'BH-001', 'B107', 'Cherry Mobile North Edsa', 'BR-001', 'AR-004');
+INSERT INTO `branchtbl` VALUES ('87', 'BH-002', 'B108', 'Cherry Mobile Megamall', 'BR-001', 'AR-002');
+INSERT INTO `branchtbl` VALUES ('88', 'BH-003', 'B207', 'Myphone North Edsa', 'BR-002', 'AR-004');
 
 -- ----------------------------
 -- Table structure for `brandtbl`
@@ -105,18 +106,19 @@ INSERT INTO `brandtbl` VALUES ('4', 'BR-004', '04', 'Huawei');
 DROP TABLE IF EXISTS `categorytbl`;
 CREATE TABLE `categorytbl` (
   `_count` int(6) NOT NULL AUTO_INCREMENT,
+  `CategoryID` varchar(10) DEFAULT NULL,
   `CategoryCode` varchar(6) NOT NULL,
-  `Catergory` varchar(20) NOT NULL,
+  `Category` varchar(20) NOT NULL,
   PRIMARY KEY (`_count`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Records of categorytbl
 -- ----------------------------
-INSERT INTO `categorytbl` VALUES ('1', '1', 'Unit');
-INSERT INTO `categorytbl` VALUES ('2', '2', 'CLS');
-INSERT INTO `categorytbl` VALUES ('3', '3', 'Acc');
-INSERT INTO `categorytbl` VALUES ('4', '4', 'MD');
+INSERT INTO `categorytbl` VALUES ('1', 'CT-001', '1', 'Unit');
+INSERT INTO `categorytbl` VALUES ('2', 'CT-002', '2', 'CLS');
+INSERT INTO `categorytbl` VALUES ('3', 'CT-003', '3', 'Acc');
+INSERT INTO `categorytbl` VALUES ('4', 'CT-004', '4', 'MD');
 
 -- ----------------------------
 -- Table structure for `colortbl`
@@ -153,16 +155,19 @@ CREATE TABLE `employeetbl` (
   `Picture` varchar(255) NOT NULL,
   `BranchID` varchar(255) NOT NULL,
   `AreaID` varchar(255) NOT NULL,
+  `BrandID` varchar(255) NOT NULL,
   PRIMARY KEY (`_count`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Records of employeetbl
 -- ----------------------------
-INSERT INTO `employeetbl` VALUES ('1', '123651', 'Mark Joseph', 'Flaviano', 'Cinco', 'MFC', 'Cashier', '', 'BH-001', 'AR-004');
-INSERT INTO `employeetbl` VALUES ('2', '123655', 'Mark Joseph', 'Flaviano', 'Cinco', 'MFC', 'Area Manager', '', '', 'AR-004');
-INSERT INTO `employeetbl` VALUES ('3', '123656', 'Tim Joseph', 'Lao', 'Rojas', 'TLR', 'Admin', '', 'BH-003', 'AR-003');
-INSERT INTO `employeetbl` VALUES ('4', '1111', 'Camille', 'reyes', 'pajulio', 'crp', 'Cashier', '', 'BH-001', 'AR-004');
+INSERT INTO `employeetbl` VALUES ('3', '123656', 'Tim Joseph', 'Lao', 'Rojas', 'TLR', 'Admin', '', 'BH-001', 'AR-006', '');
+INSERT INTO `employeetbl` VALUES ('18', '1-0082-MFC', 'Mark Joseph', 'Flaviano', 'Cinco', 'MFC', 'OIC', '', 'BH-001', '', 'BR-001');
+INSERT INTO `employeetbl` VALUES ('19', '1-0083-BDP', 'Big John', 'Dela Torre', 'Pascua', 'BDP', 'Area Manager', '', '', 'AR-004', '');
+INSERT INTO `employeetbl` VALUES ('23', '1-0084-RRG', 'Rica Mae', '', 'De Guzman', 'RRG', 'OIC', '', 'BH-002', '', '');
+INSERT INTO `employeetbl` VALUES ('26', '1-0085-RQC', 'Raquel', 'Quimada', 'Calderon', 'RQC', 'Area Manager', '', '', 'AR-002', '');
+INSERT INTO `employeetbl` VALUES ('27', '1-0086-RRG', 'Rica', '', 'De Guzman', 'RRG', 'Brand Coordinator', '', '', '', 'BR-001');
 
 -- ----------------------------
 -- Table structure for `itemstbl`
@@ -206,41 +211,38 @@ CREATE TABLE `purchaserequestsitemstbl` (
   `PONumber` varchar(15) NOT NULL,
   `ItemCode` varchar(11) NOT NULL,
   `Qty` int(11) NOT NULL,
+  `Color` varchar(20) NOT NULL,
   `DateModified` varchar(15) NOT NULL,
   `ModifyCode` varchar(10) NOT NULL,
+  `Remarks` varchar(255) NOT NULL,
+  `Received` int(11) NOT NULL,
+  `ReceivedBy` varchar(11) NOT NULL,
   PRIMARY KEY (`_count`)
-) ENGINE=InnoDB AUTO_INCREMENT=241 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=308 DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Records of purchaserequestsitemstbl
 -- ----------------------------
-INSERT INTO `purchaserequestsitemstbl` VALUES ('214', 'PR-B107-1016001', 'B0137', '3', '2016-10-04', '1110693305');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('215', 'PR-B107-1016001', 'B0137', '3', '2016-10-04', '1146366652');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('216', 'PR-B107-1016001', 'B0137', '6', '2016-10-04', '1277570553');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('217', 'PR-B107-1016001', 'B0137', '9', '2016-10-04', '575119756');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('218', 'PR-B107-1016001', 'B0137', '9', '2016-10-04', '184950595');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('219', 'PR-B107-1016001', 'B0134', '3', '2016-10-04', '184950595');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('220', 'PR-B107-1016001', 'B0134', '3', '2016-10-04', '1082120203');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('221', 'PR-B107-1016001', 'B0134', '3', '2016-10-05', '1380803796');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('222', 'PR-B107-1016001', 'B0142', '10', '2016-10-05', '1380803796');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('223', 'PR-B107-1016001', 'B0142', '10', '2016-10-05', '1274816519');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('224', 'PR-B107-1016001', 'B0142', '14', '2016-10-05', '1113232180');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('225', 'PR-B107-1016002', 'B0134', '3', '2016-10-05', '699008254');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('226', 'PR-B107-1016002', 'B0134', '10', '2016-10-05', '1043133409');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('227', 'PR-B207-1016001', 'B0135', '4', '', '');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('228', 'PR-B107-1016003', 'B0141', '9', '2016-10-05', '1229245863');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('229', 'PR-B207-1016001', 'B0135', '7', '2016-10-05', '1225459066');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('230', 'PR-B107-1016003', 'B0141', '13', '2016-10-05', '1251665421');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('231', 'PR-B107-1016003', 'B0141', '10', '2016-10-05', '32187772');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('232', 'PR-B207-1016001', 'B0135', '1', '2016-10-05', '955176448');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('233', 'PR-B107-1016003', 'B0141', '9', '2016-10-05', '1135651738');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('234', 'PR-B107-1016004', 'B0137', '9', '2016-10-05', '138949621');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('235', 'PR-B107-1016005', 'B0142', '13', '2016-10-05', '1113404308');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('236', 'PR-B107-1016006', 'B0137', '1', '2016-10-05', '1292846835');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('237', 'PR-B107-1016007', 'B0133', '7', '2016-10-05', '216320764');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('238', 'PR-B107-1016008', 'B0134', '3', '2016-10-05', '601756429');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('239', 'PR-B107-1016009', 'B0138', '2', '2016-10-05', '710282581');
-INSERT INTO `purchaserequestsitemstbl` VALUES ('240', 'PR-B107-1016010', 'B0137', '8', '2016-10-05', '618926109');
+INSERT INTO `purchaserequestsitemstbl` VALUES ('288', 'PR-B107-1016001', 'B0133', '3', 'White', '2016-10-12', '1299000380', '', '0', '');
+INSERT INTO `purchaserequestsitemstbl` VALUES ('289', 'PR-B107-1016001', 'B0133', '2', 'Black', '2016-10-12', '1299000380', '', '0', '');
+INSERT INTO `purchaserequestsitemstbl` VALUES ('290', 'PR-B107-1016001', 'B0133', '4', 'Red', '2016-10-12', '1299000380', '', '0', '');
+INSERT INTO `purchaserequestsitemstbl` VALUES ('291', 'PR-B107-1016001', 'B0133', '2', '', '2016-10-12', '937060068', '', '0', '');
+INSERT INTO `purchaserequestsitemstbl` VALUES ('292', 'PR-B107-1016001', 'B0133', '2', '', '2016-10-12', '134216125', '', '0', '');
+INSERT INTO `purchaserequestsitemstbl` VALUES ('293', 'PR-B107-1016001', 'B0133', '2', '', '2016-10-12', '820357877', '', '0', '');
+INSERT INTO `purchaserequestsitemstbl` VALUES ('294', 'PR-B107-1016001', 'B0134', '4', '', '2016-10-12', '820357877', '', '0', '');
+INSERT INTO `purchaserequestsitemstbl` VALUES ('295', 'PR-B107-1016001', 'B0133', '4', '', '2016-10-12', '1219649775', '', '0', '');
+INSERT INTO `purchaserequestsitemstbl` VALUES ('296', 'PR-B107-1016001', 'B0134', '2', '', '2016-10-12', '917179385', '', '0', '');
+INSERT INTO `purchaserequestsitemstbl` VALUES ('297', 'PR-B107-1016001', 'B0133', '3', 'Red', '2016-10-12', '1240003808', '', '0', '');
+INSERT INTO `purchaserequestsitemstbl` VALUES ('298', 'PR-B107-1016002', 'B0133', '3', 'Black', '2016-10-12', '67559896', '', '0', '');
+INSERT INTO `purchaserequestsitemstbl` VALUES ('299', 'PR-B107-1016003', 'B0133', '3', 'White', '2016-10-12', '1357480571', '', '0', '');
+INSERT INTO `purchaserequestsitemstbl` VALUES ('300', 'PR-B107-1016003', 'B0133', '3', 'Black', '2016-10-12', '58178968', '', '0', '');
+INSERT INTO `purchaserequestsitemstbl` VALUES ('301', 'PR-B107-1016003', 'B0133', '3', '', '2016-10-12', '58178968', '', '0', '');
+INSERT INTO `purchaserequestsitemstbl` VALUES ('302', 'PR-B207-1016001', 'B0135', '3', 'White', '2016-10-12', '63170654', '', '0', '');
+INSERT INTO `purchaserequestsitemstbl` VALUES ('303', 'PR-B107-1016004', 'B0133', '10', 'White', '2016-10-12', '1048942699', 'Ship to Branch', '0', '');
+INSERT INTO `purchaserequestsitemstbl` VALUES ('304', 'PR-B107-1016004', 'B0133', '7', 'Black', '2016-10-12', '1048942699', 'Ship to Branch', '0', '');
+INSERT INTO `purchaserequestsitemstbl` VALUES ('305', 'PR-B107-1016004', 'B0133', '9', 'Red', '2016-10-12', '1048942699', 'Ship to Branch', '0', '');
+INSERT INTO `purchaserequestsitemstbl` VALUES ('306', 'PR-B107-1016005', 'B0133', '10', 'White', '2016-10-12', '463753506', 'Ship to Branch', '0', '');
+INSERT INTO `purchaserequestsitemstbl` VALUES ('307', 'PR-B107-1016005', 'B0133', '8', 'Black', '2016-10-12', '463753506', 'Ship to Branch', '0', '');
 
 -- ----------------------------
 -- Table structure for `purchaserequeststbl`
@@ -266,20 +268,17 @@ CREATE TABLE `purchaserequeststbl` (
   `_Time` varchar(11) NOT NULL,
   `LastModified` varchar(11) NOT NULL,
   `ModifyCode` varchar(10) NOT NULL,
+  `DateApproved` varchar(11) NOT NULL,
+  `TimeApproved` varchar(11) NOT NULL,
   PRIMARY KEY (`_count`)
-) ENGINE=InnoDB AUTO_INCREMENT=197 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=231 DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Records of purchaserequeststbl
 -- ----------------------------
-INSERT INTO `purchaserequeststbl` VALUES ('182', 'PR-B107-1016001', '2016-10-04', 'B107', 'BR-001', 'Rejected', '', '123651', '0', '', '2', '0', '', '', '', '123651', '12:35 AM', '2016-10-05', '1113232180');
-INSERT INTO `purchaserequeststbl` VALUES ('183', 'PR-B107-1016002', '2016-10-05', 'B107', 'BR-001', 'Cancelled', 'Cancelled', '123651', '0', '123655', '2', '0', '', '', '', '123651', '01:35 AM', '2016-10-05', '1043133409');
-INSERT INTO `purchaserequeststbl` VALUES ('184', 'PR-B207-1016001', '2016-10-05', 'B207', 'BR-002', 'Pending', 'Waiting for Approval from Brand Coordinator', '123655', '0', '', '1', '0', '123655', '', '', '123655', '02:20 AM', '2016-10-05', '955176448');
-INSERT INTO `purchaserequeststbl` VALUES ('185', 'PR-B107-1016003', '2016-10-05', 'B107', 'BR-001', 'Cancelled', 'Cancelled', '123651', '1', '123651', '0', '0', '', '', '', '123651', '02:21 AM', '2016-10-05', '1135651738');
-INSERT INTO `purchaserequeststbl` VALUES ('186', 'PR-B107-1016004', '2016-10-05', 'B107', 'BR-001', 'Cancelled', 'Cancelled', '123651', '1', '123651', '0', '0', '', '', '', '123651', '02:39 AM', '2016-10-05', '138949621');
-INSERT INTO `purchaserequeststbl` VALUES ('187', 'PR-B107-1016005', '2016-10-05', 'B107', 'BR-001', 'Cancelled', 'Cancelled', '123651', '1', '123651', '0', '0', '', '', '', '123651', '02:39 AM', '2016-10-05', '1113404308');
-INSERT INTO `purchaserequeststbl` VALUES ('188', 'PR-B107-1016006', '2016-10-05', 'B107', 'BR-001', 'Pending', 'Waiting for Approval from Area Manager', '123651', '0', '', '0', '0', '', '', '', '123651', '03:20 AM', '2016-10-05', '1292846835');
-INSERT INTO `purchaserequeststbl` VALUES ('189', 'PR-B107-1016007', '2016-10-05', 'B107', 'BR-001', 'Cancelled', 'Cancelled', '123651', '1', '123651', '0', '0', '', '', '', '123651', '03:55 AM', '2016-10-05', '216320764');
-INSERT INTO `purchaserequeststbl` VALUES ('190', 'PR-B107-1016008', '2016-10-05', 'B107', 'BR-001', 'Cancelled', 'Cancelled', '123651', '1', '123651', '0', '0', '', '', '', '123651', '03:56 AM', '2016-10-05', '601756429');
-INSERT INTO `purchaserequeststbl` VALUES ('195', 'PR-B107-1016009', '2016-10-05', 'B107', 'BR-001', 'Cancelled', 'Cancelled', '123651', '1', '123651', '0', '0', '', '', '', '123651', '04:01 AM', '2016-10-05', '710282581');
-INSERT INTO `purchaserequeststbl` VALUES ('196', 'PR-B107-1016010', '2016-10-05', 'B107', 'BR-001', 'Pending', 'Waiting for Approval from Area Manager', '123651', '0', '', '0', '0', '', '', '', '123651', '09:07 AM', '2016-10-05', '618926109');
+INSERT INTO `purchaserequeststbl` VALUES ('225', 'PR-B107-1016001', '2016-10-12', 'B107', 'BR-001', 'Cancelled', 'Cancelled', '1-0082-MFC', '0', '1-0083-BDP', '2', '0', '1-0083-BDP', '', '', '1-0083-BDP', '06:10 PM', '2016-10-12', '1240003808', '', '');
+INSERT INTO `purchaserequeststbl` VALUES ('226', 'PR-B107-1016002', '2016-10-12', 'B107', 'BR-001', 'Cancelled', 'Cancelled', '1-0083-BDP', '0', '1-0083-BDP', '2', '0', '', '', '', '1-0083-BDP', '06:32 PM', '2016-10-12', '67559896', '', '');
+INSERT INTO `purchaserequeststbl` VALUES ('227', 'PR-B107-1016003', '2016-10-12', 'B107', 'BR-001', 'Cancelled', 'Cancelled', '1-0083-BDP', '0', '1-0083-BDP', '2', '0', '1-0083-BDP', '', '', '1-0083-BDP', '06:34 PM', '2016-10-12', '58178968', '', '');
+INSERT INTO `purchaserequeststbl` VALUES ('228', 'PR-B207-1016001', '2016-10-12', 'B207', 'BR-002', 'Pending', 'Waiting for Approval from Branch Coordinator', '1-0083-BDP', '0', '', '1', '0', '', '', '', '1-0083-BDP', '06:37 PM', '2016-10-12', '63170654', '', '');
+INSERT INTO `purchaserequeststbl` VALUES ('229', 'PR-B107-1016004', '2016-10-12', 'B107', 'BR-001', 'Approved', 'For Delivery', '1-0082-MFC', '0', '', '1', '1', '1-0083-BDP', '1-0086-RRG', '', '1-0082-MFC', '06:39 PM', '2016-10-12', '1048942699', '2016-10-12', '06:41 PM');
+INSERT INTO `purchaserequeststbl` VALUES ('230', 'PR-B107-1016005', '2016-10-12', 'B107', 'BR-001', 'Approved', 'For Delivery', '1-0083-BDP', '0', '', '1', '1', '', '1-0086-RRG', '', '1-0083-BDP', '11:59 PM', '2016-10-12', '463753506', '2016-10-13', '12:02 AM');

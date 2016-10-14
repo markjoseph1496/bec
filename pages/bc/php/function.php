@@ -2,118 +2,7 @@
 include('../../../connection.php');
 include('../../../functions/encryption.php');
 session_start();
-$EmployeeID = db_quote($_SESSION['EmpID']);
-
-function generatePONumber($Branch)
-{
-    $generatePONumber = db_select("SELECT `PONumber` FROM `purchaserequeststbl` WHERE `BranchCode` = " . $Branch . " ORDER BY `PONumber` DESC LIMIT 1");
-    $Branch = str_replace("'", "", $Branch);
-    if ($generatePONumber === false) {
-        echo db_error();
-    }
-    if (count($generatePONumber) == 0) {
-        return str_replace("'", "", "PR-" . $Branch . "-" . date("my") . "001");
-    } else {
-        $pCount = substr($generatePONumber[0]['PONumber'], 12);
-        $gPONumber = "PR-" . $Branch . "-" . date("my") . sprintf("%03s", (int)$pCount + 1);
-        return $gPONumber;
-    }
-}
-
-function mergeArrays($ItemCode, $Qty, $Color)
-{
-    $result = array();
-
-    foreach ($ItemCode as $key => $name) {
-        $result[] = array('ItemCode' => $name, 'Qty' => $Qty[$key], 'Color' => $Color[$key]);
-    }
-
-    return $result;
-}
-
-//Insert Purchase Request
-if (isset($_POST['EmpID'])) {
-    $sEmpID = db_quote($_POST['EmpID']);
-    $Qty = $_POST['oQty'];
-    $ItemCode = $_POST['oItemCode'];
-    $Color = $_POST['oColor'];
-    $_Date = db_quote(date("Y-m-d"));
-    $_Time = db_quote(date("h:i A"));
-    $Branch = db_quote($_POST['Branch']);
-    $SelectedBrand = $_POST['BrandID'];
-    $PONumber = db_quote(generatePONumber($Branch));
-    $ModifyCode = db_quote(rand(0, 9999999999));
-    $Items = mergeArrays($ItemCode, $Qty, $Color);
-
-
-    $PurchaseRequest = db_query("INSERT INTO `purchaserequeststbl` (`PONumber`, `_Date`, `BranchCode`,`BrandID`,`Status`,`Remarks`,`EmpID`,`isAMApproved`,`ModifiedBy`,`_Time`,`LastModified`,`ModifyCode`) VALUES ($PONumber, $_Date, $Branch, $SelectedBrand,'Pending', 'Waiting for Approval from Branch Coordinator', $sEmpID, '1', $sEmpID, $_Time, $_Date, $ModifyCode)");
-
-    if ($PurchaseRequest === false) {
-        header("location: ../po.php?error");
-    } else {
-        foreach($Items as $item){
-            $dItemCode = db_quote($item['ItemCode']);
-            $dQty = db_quote($item['Qty']);
-            $dColor = db_quote($item['Color']);
-
-            $PurchasedItems = db_query("INSERT INTO `purchaserequestsitemstbl` (`PONumber`, `ItemCode`, `Qty`,`Color`,`DateModified`,`ModifyCode`) VALUES ($PONumber ,$dItemCode, $dQty,$dColor, $_Date, $ModifyCode)");
-
-            if ($PurchasedItems === false) {
-                header("location: ../po.php?error");
-            } else {
-                header("location: ../po.php?success");
-            }
-        }
-    }
-
-}
-//End of Purchase Request
-
-//Update Purchase Request
-if (isset($_POST['aEmpID'])) {
-
-    $hashPRNumber = $_POST['HashPRNumber'];
-    $PRNumber = db_quote($_POST['PRNumber']);
-
-    if (db_quote(encrypt_decrypt('decrypt', $hashPRNumber)) != $PRNumber) {
-        header("location: ../po.php?error");
-    } else {
-        $sEmpID = db_quote($_POST['aEmpID']);
-        $Qty = $_POST['oQty'];
-        $ItemCode = $_POST['oItemCode'];
-        $Color = $_POST['oColor'];
-        $_Date = db_quote(date("Y-m-d"));
-        $_Time = db_quote(date("h:i A"));
-        $Branch = db_quote($_POST['Branch']);
-        $SelectedBrand = db_quote($_POST['BrandID']);
-        $ModifyCode = db_quote(rand(0, 9999999999));
-        $Items = mergeArrays($ItemCode, $Qty, $Color);
-
-
-        $PurchaseRequest = db_query("UPDATE `purchaserequeststbl` SET `ModifiedBy` = $sEmpID, `_Time` = $_Time, `LastModified` = $_Date, `ModifyCode` = $ModifyCode, `Remarks` = 'Waiting for Approval from Brand Coordinator', `isAMApproved` = '1', `CheckedByAM` = $EmployeeID  WHERE `PONumber` = $PRNumber");
-
-
-        if ($PurchaseRequest === false) {
-            header("location: ../po.php?error");
-
-        } else {
-            foreach($Items as $item){
-                $dItemCode = db_quote($item['ItemCode']);
-                $dQty = db_quote($item['Qty']);
-                $dColor = db_quote($item['Color']);
-
-                $PurchasedItems = db_query("INSERT INTO `purchaserequestsitemstbl` (`PONumber`, `ItemCode`, `Qty`,`Color`,`DateModified`,`ModifyCode`) VALUES ($PRNumber ,$dItemCode, $dQty,$dColor, $_Date, $ModifyCode)");
-
-                if ($PurchasedItems === false) {
-                    header("location: ../po.php?error");
-                } else {
-                    header("location: ../po.php?success");
-                }
-            }
-        }
-    }
-}
-//End of Update Purchase Request
+$EmpID = db_quote($_SESSION['EmpID']);
 
 
 //List of purchase request items
@@ -161,6 +50,7 @@ if (isset($_POST['PONumber'])) {
     $Status = $purchaserequesttbl[0]['Status'];
     $rnd = rand(0, 9999);
 
+
     if ($Status == "Approved") {
         //Get Brand Coordinator Name
         $CheckedByHO = db_quote($purchaserequesttbl[0]['CheckedByHO']);
@@ -170,7 +60,7 @@ if (isset($_POST['PONumber'])) {
         $TimeApproved = $purchaserequesttbl[0]['TimeApproved'];
     }
 
-    $hashPRNumber = encrypt_decrypt('encrypt', $PONumber);
+    $hashPRNumber = encrypt_decrypt_rnd('encrypt', $PONumber, $rnd);
     ?>
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -247,7 +137,7 @@ if (isset($_POST['PONumber'])) {
                                         <th width="5%">Qty.</th>
                                         <th width="15%">Total Amount</th>
                                         <?php
-                                        if ($Status == "Approved") {
+                                        if ($Status == "Approved" || $Status == "On Going") {
                                             ?>
                                             <th width="15%">Received</th>
                                             <?php
@@ -257,7 +147,6 @@ if (isset($_POST['PONumber'])) {
                                     </thead>
                                     <tbody>
                                     <?php
-
                                     $OrderedItems = db_select(
                                         "SELECT
                                         purchaserequestsitemstbl.ItemCode,
@@ -273,7 +162,6 @@ if (isset($_POST['PONumber'])) {
                                         WHERE purchaserequestsitemstbl.PONumber = " . db_quote($PONumber) . "
                                         AND purchaserequestsitemstbl.ModifyCode = " . db_quote($ModifyCode) . "
                                         ");
-
 
                                     $TotalItems = 0;
                                     foreach ($OrderedItems as $item) {
@@ -327,18 +215,9 @@ if (isset($_POST['PONumber'])) {
             <div class="modal-footer">
                 <?php
                 if ($Status == "Pending") {
-                    if ($purchaserequesttbl[0]['isAMApproved'] == 0) {
-                        ?>
-                        <button class="btn btn-success" onclick="$('#Approved').val('<?= @$PONumber ?>')" data-toggle="modal" data-target="#ApproveRequest"><i class="fa fa-check"></i> Approve</button>
-                        <button class="btn btn-danger" onclick="$('#Rejected').val('<?= @$PONumber ?>')" data-toggle="modal" data-target="#RejectRequest"><i class="fa fa-close"></i> Reject</button>
-                        <?php
-                    } else {
-                        ?>
-                        <button class="btn btn-danger" onclick="$('#CancelOrder').val('<?= @$PONumber ?>')" data-toggle="modal" data-target="#CancelRequest"><i class="fa fa-close"></i> Cancel Order</button>
-                        <?php
-                    }
                     ?>
-                    <a href="modify.php?id=<?= @$hashPRNumber ?>&pr=<?= @$PONumber ?>" class="btn btn-dark" id="btnModify">Modify</a>
+                    <a href="approvepr.php?id=<?= @$hashPRNumber . $rnd ?>&pr=<?= @$PONumber ?>" class="btn btn-success"><i class="fa fa-check"></i> Approve</a>
+                    <button class="btn btn-danger" onclick="$('#Rejected').val('<?= @$PONumber ?>'); $('#hashPRNumber').val('<?= @$hashPRNumber . $rnd ?>');" data-toggle="modal" data-target="#RejectRequest"><i class="fa fa-close"></i> Reject</button>
                     <?php
                 }
                 ?>
@@ -353,68 +232,75 @@ if (isset($_POST['PONumber'])) {
 //End of Purchase Request items
 
 //Approve PR
-if (isset($_POST['approvedPONumber'])) {
+elseif (isset($_POST['approvedPONumber'])) {
     $PONumber = db_quote($_POST['approvedPONumber']);
 
     $updatePR = db_query("UPDATE `purchaserequeststbl` SET `Remarks` = 'Waiting for Approval from Brand Coordinator', `isAMApproved` = '1', `CheckedByAM` = $EmployeeID WHERE `PONumber` = $PONumber");
-
-    if($updatePR === false){
-        echo "error";
-    }else{
-        echo "success";
-    }
 
 }
 //End of Approve PR
 
 //Reject PR
-if (isset($_POST['rejectedPONumber'])) {
-    $PONumber = db_quote($_POST['rejectedPONumber']);
-    $Reason = db_quote($_POST['Reason']);
+elseif (isset($_POST['rejectedPRNumber'])) {
+    $hashPRNumber = substr($_POST['hashPRNumber'], 0, 32);
+    $PRNumber = $_POST['rejectedPRNumber'];
+    $rnd = substr($_POST['hashPRNumber'], 32, 36);
 
-
-    $updatePR = db_query("UPDATE `purchaserequeststbl` SET `Remarks` = " . $Reason . ", Status ='Rejected' , `isAMApproved` = '2', `CancelledBy` = $EmployeeID WHERE `PONumber` = $PONumber");
-
-    if($updatePR === false){
+    if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PRNumber) {
         echo "error";
-    }else{
-        echo "success";
+    } else {
+        $updatePR = db_query("UPDATE `purchaserequeststbl` SET Status ='Rejected' , `CancelledBy` = $EmpID WHERE `PONumber` = " . db_quote($PRNumber));
+
+        if ($updatePR === false) {
+            echo "error";
+        } else {
+            echo "success";
+        }
     }
 
 }
 //End of Reject PR
 
-//Cancel PR
-if (isset($_POST['CancelledPONumber'])) {
-    $PONumber = db_quote($_POST['CancelledPONumber']);
+//Update Purchase Request
+elseif (isset($_POST['HashPRNumber'])) {
 
-    $updatePR = db_query("UPDATE `purchaserequeststbl` SET `Remarks` = 'Cancelled', Status ='Cancelled' , `isAMApproved` = '2', `CancelledBy` = $EmployeeID WHERE `PONumber` = $PONumber");
 
-    if($updatePR === false){
-        echo "error";
-    }else{
-        echo "success";
+    $hashPRNumber = substr($_POST['HashPRNumber'], 0, 32);
+    $PRNumber = $_POST['PRNumber'];
+    $rnd = substr($_POST['HashPRNumber'], 32, 36);
+
+    if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PRNumber) {
+        header("location: ../pending.php?error");
+    } else {
+        $PRNumber = db_quote($PRNumber);
+        $Remarks = $_POST['Remarks'];
+        $ItemCode = $_POST['oItemCode'];
+        $Items = array_combine($ItemCode, $Remarks);
+        $_Date = db_quote(date("Y-m-d"));
+        $_Time = db_quote(date("h:i A"));
+        $ModifyCode = db_quote($_POST['ModifyCode']);
+
+        $PurchaseRequest = db_query("UPDATE `purchaserequeststbl` SET `isBCApproved` = '1', `CheckedByHO` = $EmpID, `DateApproved` = $_Date, `TimeApproved` = $_Time, `Status` = 'Approved', `Remarks` = 'For Delivery' WHERE `PONumber` = $PRNumber AND `ModifyCode` = $ModifyCode");
+
+        if ($PurchaseRequest === false) {
+            echo db_error();
+            header("location: ../pending.php?error");
+
+        } else {
+            foreach ($Items as $item => $remark) {
+                $dItemCode = db_quote($item);
+                $dRemarks = db_quote($remark);
+
+                $PurchasedItems = db_query("UPDATE `purchaserequestsitemstbl` SET `Remarks` = $dRemarks WHERE `PONumber` = $PRNumber AND `ModifyCode` = $ModifyCode AND `ItemCode` = $dItemCode");
+
+                if ($PurchasedItems === false) {
+                    header("location: ../pending.php?error");
+                } else {
+                    header("location: ../pending.php?success");
+                }
+            }
+
+        }
     }
 }
-//End of Cancel PR
-
-//Get Brand
-if (isset($_POST['BranchID'])) {
-    $BranchID = db_quote($_POST['BranchID']);
-
-    $getBrand = db_select("SELECT 
-    brandtbl.BrandID,
-    brandtbl.Brand
-    FROM brandtbl
-    LEFT JOIN branchtbl ON brandtbl.BrandID = branchtbl.BrandID
-    WHERE branchtbl.BranchID = $BranchID
-    ");
-    echo '<option value="">- Select Brand -</option>';
-    foreach ($getBrand as $brand) {
-        $BrandID = $brand['BrandID'];
-        $Brand = $brand['Brand'];
-        ?>
-        <option value="<?= @$BrandID ?>"><?= @$Brand ?></option>
-        <?php
-    }
-}
+//End of Update Purchase Request

@@ -1,8 +1,13 @@
 <?php
 include('../../connection.php');
+include_once('../../functions/encryption.php');
 session_start();
-$EmpID = db_quote($_SESSION['EmpID']);
-$checkAccount = db_select("
+$hashEMPID = $_SESSION['hashEmpID'];
+$EmpID = $_SESSION['EmpID'];
+$rnd = $_SESSION['rnd'];
+
+if (encrypt_decrypt_rnd('decrypt', $hashEMPID, $rnd) == $EmpID) {
+    $checkAccount = db_select("
     SELECT 
     employeetbl.Firstname,
     employeetbl.Lastname,
@@ -12,23 +17,35 @@ $checkAccount = db_select("
     areatbl.Area
     FROM employeetbl
     LEFT JOIN areatbl ON employeetbl.AreaID = areatbl.AreaID
-    WHERE EmpID =" . $EmpID);
+    WHERE EmpID =" . db_quote($EmpID));
 
-if($checkAccount[0]['Position'] != "Area Manager"){
-    unset($_SESSION['EmpID']);
+    if ($checkAccount === false) {
+        session_destroy();
+        header('location: ../../index.php?error');
+    } else {
+        if ($checkAccount[0]['Position'] != "Area Manager") {
+            session_destroy();
+            header('location: ../../index.php');
+        } else {
+            $FirstName = $checkAccount[0]['Firstname'];
+            $LastName = $checkAccount[0]['Lastname'];
+            $AreaID = $checkAccount[0]['AreaID'];
+            $Area = $checkAccount[0]['Area'];
+            $Initials = $checkAccount[0]['Initials'];
+            $AccountType = $checkAccount[0]['Position'];
+            $FullName = $FirstName . " " . $LastName;
+
+
+            $getPurchaseRequestPending = db_select("SELECT * FROM `purchaserequeststbl` WHERE `Status` = 'Pending' AND `BranchCode` IN (SELECT `BranchCode` FROM `branchtbl` WHERE `AreaID` = " . db_quote($AreaID).")");
+            $getPurchaseRequestApproved = db_select("SELECT * FROM `purchaserequeststbl` WHERE `Status` = 'Approved' OR `Status` = 'On Going' AND `isBCApproved` = '1' AND `BranchCode` IN (SELECT `BranchCode` FROM `branchtbl` WHERE `AreaID` = " . db_quote($AreaID).")");
+        }
+    }
+
+
+} else {
+    session_destroy();
     header('location: ../../index.php');
 }
-
-else{
-    $FirstName = $checkAccount[0]['Firstname'];
-    $LastName = $checkAccount[0]['Lastname'];
-    $AreaID = $checkAccount[0]['AreaID'];
-    $Area = $checkAccount[0]['Area'];
-    $Initials = $checkAccount[0]['Initials'];
-    $AccountType = $checkAccount[0]['Position'];
-    $FullName = $FirstName . " " . $LastName;
-}
-
 ?>
 <div class="col-md-3 left_col">
     <div class="left_col scroll-view">
@@ -45,7 +62,7 @@ else{
             </div>
             <div class="profile_info">
                 <span>Welcome,</span>
-                <h2><?php echo $FullName ?></h2>
+                <h2><?= @ $FullName ?></h2>
             </div>
         </div>
         <!-- /menu profile quick info -->
@@ -53,16 +70,18 @@ else{
         <!-- sidebar menu -->
         <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
             <div class="menu_section">
-                <h3><?php echo $Area ?> - Area Manager</h3>
+                <h3><?= @ $Area . " - " . $checkAccount[0]['Position'] ?></h3>
                 <ul class="nav side-menu">
-                    <li><a><i class="fa fa-home"></i> Home <span class="fa fa-chevron-down"></span></a>
-                        <ul class="nav child_menu">
-                            <li><a href="plain_page.php">Sales Report</a></li>
-                        </ul>
+                    <li>
+                        <a><i class="fa fa-bar-chart"></i> Sales Report</span></a>
                     </li>
-                    <li><a><i class="fa fa-home"></i> Inventory <span class="fa fa-chevron-down"></span></a>
+                    <li>
+                        <a><i class="fa fa-credit-card"></i> Purchase Requests <span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
-                            <li><a href="po.php">Purchase Requests</a></li>
+                            <li><a href="po.php">Pending <span class="label label-danger pull-right"><?= @count($getPurchaseRequestPending); ?></span></a></li>
+                            <li><a href="onprocess.php">On Process <span class="label label-danger pull-right"><?= @count($getPurchaseRequestApproved); ?></span></a></li>
+                            <li><a href="#">Complete</a></li>
+                            <li><a href="#">Reports</a></li>
                         </ul>
                     </li>
                 </ul>

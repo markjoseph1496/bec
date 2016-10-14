@@ -78,21 +78,24 @@
                                                                       brandtbl.BrandCode,brandtbl.Brand,categorytbl.CategoryCode,categorytbl.Category,
                                                                       itemstbl.SRP,itemstbl.DP
                                                                       FROM itemstbl
-                                                                      LEFT JOIN brandtbl ON itemstbl.BrandID = brandtbl.BrandID
-                                                                      LEFT JOIN categorytbl ON itemstbl.CategoryID = categorytbl.CategoryID
+                                                                      LEFT JOIN brandtbl ON itemstbl.BrandCode = brandtbl.BrandCode
+                                                                      LEFT JOIN categorytbl ON itemstbl.CategoryCode = categorytbl.CategoryCode
                                                                      ");
-                                            foreach ($ItemsQuery as $Items) {
-                                                $ItemCode = $Items['ItemCode'];
-                                                $ModelName = $Items['ModelName'];
-                                                $ItemDescription = $Items['ItemDescription'];
-                                                $BrandCode = $Items['BrandCode'];
-                                                $Brand = $Items['Brand'];
-                                                $CategoryCode = $Items['CategoryCode'];
-                                                $Category = $Items['Category'];
-                                                $SRP = $Items['SRP'];
-                                                $DP = $Items['DP'];
+                                            foreach ($ItemsQuery as $valueItems) {
+                                                $ItemCode = $valueItems['ItemCode'];
+                                                $ModelName = $valueItems['ModelName'];
+                                                $ItemDescription = $valueItems['ItemDescription'];
+                                                $BrandCode = $valueItems['BrandCode'];
+                                                $Brand = $valueItems['Brand'];
+                                                $CategoryCode = $valueItems['CategoryCode'];
+                                                $Category = $valueItems['Category'];
+                                                $SRP = $valueItems['SRP'];
+                                                $DP = $valueItems['DP'];
                                                 $SRP = number_format($SRP, 2, '.', ',');
                                                 $DP = number_format($DP, 2, '.', ',');
+
+                                                $Itemsrnd = rand(0, 9999);
+                                                $hashItemCode = encrypt_decrypt_rnd('encrypt', $ItemCode, $Itemsrnd);
 
                                                 ?>
                                                 <tr>
@@ -104,86 +107,10 @@
                                                     <td><?= @$SRP; ?></td>
                                                     <td><?= @$DP; ?></td>
                                                     <td>
-                                                        <button class="btn btn-dark" data-target='#EditItemsModal<?= @$ItemCode; ?>' data-toggle='modal'><i class="fa fa-eye"></i></button>
-                                                        <button class="btn btn-danger" data-toggle="modal" data-target="#DeleteItemModal<?= @$ItemCode; ?>" );
-                                                        "><i class="fa fa-trash"></i></button>
+                                                        <button class="btn btn-dark" onclick="ItemsDetails('<?=@$ItemCode; ?>','<?=@$hashItemCode; ?>','<?=@$Itemsrnd; ?>')" data-toggle="modal" data-target="#ItemsUpdateModal"><i class="fa fa-eye"></i></button>
+                                                        <button class="btn btn-danger" onclick="ItemsDelete('<?=@$ItemCode; ?>','<?=@$hashItemCode; ?>','<?=@$Itemsrnd; ?>')" data-toggle="modal" data-target="#ItemsDeleteModal"><i class="fa fa-trash"></i></button>
                                                     </td>
                                                 </tr>
-
-                                                <!-- Delete Items Modal -->
-                                                <div class="modal fade" id="DeleteItemModal<?= @$ItemCode; ?>">
-                                                    <div class="modal-dialog">
-                                                        <div class="modal-content">
-                                                            <form action="function/admin-delete.php" method="POST" name="DeleteItems" id="DeleteItems">
-                                                                <div class="modal-header modal-header-danger">
-                                                                    <button type="button" class="close" data-dissmiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                                    <h4 class="modal-title">Delete Item</h4>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                    <label>Do you want to delete this Account "<?= @$ModelName; ?>"</label>
-                                                                    <div class="form-group"></div>
-                                                                </div>
-                                                                <input type="hidden" name="aEmpID" value="<?= @$ItemCode; ?>">
-                                                                <div class="modal-footer">
-                                                                    <button class="btn btn-danger" name="btndeleteItems" id="btndeleteItems">Delete</button>
-                                                                    <button class="btn btn-dark" data-dismiss="modal">Cancel</button>
-                                                                </div>
-                                                            </form>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Edit Items Modal -->
-                                                <div class="modal fade" id="EditItemsModal<?= @$ItemCode; ?>">
-                                                    <div class="modal-dialog">
-                                                        <div class="modal-content">
-                                                            <form action="function/functions.php" method="POST" name="UpdateItems" id="UpdateItems" autocomplete="off">
-                                                                <div class="modal-header modal-header-dark">
-                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                                    <h4 class="modal-title">Edit Item</h4>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                    <div class="form-group">
-                                                                        <label>Category <span class="red">(*)</span></label>
-                                                                        <input type="text" readonly class="form-control" id="EditCategory" name="EditCategor" value="<?php echo $Category; ?>">
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <label>Brand <span class="red">(*)</span></label>
-                                                                        <input type="text" readonly class="form-control" id="EditBrand" name="EditBrand" value="<?php echo $Brand; ?>">
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <label>Item Code <span class="red">(*)</span></label>
-                                                                        <input type="text" class="form-control" readonly id="EditItemCode" name="EditItemCode" value="<?php echo $ItemCode; ?>">
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <label>Model Name <span class="red">(*)</span></label>
-                                                                        <input type="text" class="form-control" style="text-transform: uppercase" id="EditModelName" name="EditModelName" value="<?php echo $ModelName; ?>">
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <label>Item Description <span class="red">(*)</span></label>
-                                                                        <input type="text" class="form-control" id="EditItemDescription" name="EditItemDescription" value="<?php echo $ItemDescription; ?>">
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <label>SRP <span class="red">(*)</span></label>
-                                                                        <input type="text" class="form-control" id="EditSRP" name="EditSRP" value="<?= @$SRP; ?>">
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <label>Dealer's Price<span class="red">(*)</span></label>
-                                                                        <input type="text" class="form-control" id="EditDP" name="EditDP" value="<?= @$DP; ?>">
-                                                                    </div>
-                                                                </div>
-                                                                <div class="modal-footer">
-                                                                    <button class="btn btn-dark" id="btnupdateItems" name="btnupdateItems">Update</button>
-                                                                    <button class="btn btn-default" data-dismiss="modal">Cancel</button>
-                                                                </div>
-                                                            </form>
-                                                        </div>
-                                                        <!-- /.modal-content -->
-                                                    </div>
-                                                    <!-- /.modal-dialog -->
-                                                </div>
-                                                <!-- /.modal -->
-
                                                 <?php
                                             }
                                             ?>
@@ -191,6 +118,40 @@
                                         </table>
                                         <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#AddItemsModal">Add Items</button>
                                     </div>
+
+                                    <!-- Edit Items Modal -->
+                                    <div class="modal fade" id="ItemsUpdateModal">
+
+                                    </div>
+                                    <!-- /.modal -->
+
+                                    <!-- Modal Delete Items -->
+                                    <div class="modal fade" id="ItemsDeleteModal" role="dialog">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form method="POST" action="function/admin-delete.php">
+                                                    <div class="modal-header modal-header-danger">
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                        <h4 class="modal-title">Delete Item</h4>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <input type="hidden" name="ItemCode" id="ItemCode">
+                                                        <input type="hidden" name="hashItemCode" id="hashItemCode">
+                                                        <input type="hidden" name="Itemsrnd" id="Itemsrnd">
+                                                        <label>Are you sure you want to delete this Item? This cannot be undone.</label>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                                        <button class="btn btn-dark" data-dismiss="modal">Cancel</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <!-- /.modal-content -->
+                                        </div>
+                                        <!-- /.modal-dialog -->
+                                    </div>
+                                    <!-- /.Modal -->
+
                                 </div>
                             </div>
                         </div>
@@ -210,7 +171,7 @@
                                     <div class="form-group">
                                         <label>Category <span class="red">(*)</span></label>
                                         <select class="form-control" name="Category" id="Category">
-                                            <option value=""> - Please Select Category - </option>
+                                            <option value=""> - Please Select Category -</option>
                                             <?php
                                             $Categorytbl = db_select("SELECT * FROM `categorytbl`");
 
@@ -218,9 +179,9 @@
                                                 $CategoryID = $ValueCateg['CategoryID'];
                                                 $CategoryCode = $ValueCateg['CategoryCode'];
                                                 $Category = $ValueCateg['Category'];
-                                            ?>
-                                            <option value="<?=@$CategoryID; ?>">(<?=@$CategoryCode; ?>) <?=@$Category; ?></option>
-                                            <?php
+                                                ?>
+                                                <option value="<?= @$CategoryCode; ?>">(<?= @$CategoryCode; ?>) <?= @$Category; ?></option>
+                                                <?php
                                             }
                                             ?>
                                             ?>
@@ -229,7 +190,7 @@
                                     <div class="form-group">
                                         <label>Brand <span class="red">(*)</span></label>
                                         <select class="form-control" name="ItemBrand" id="ItemBrand">
-                                            <option value=""> - Please Select Brand - </option>
+                                            <option value=""> - Please Select Brand -</option>
                                             <?php
                                             $Brandtbl = db_select("SELECT * FROM `brandtbl`");
 
@@ -237,38 +198,24 @@
                                                 $BrandID = $valueBrand['BrandID'];
                                                 $BrandCode = $valueBrand['BrandCode'];
                                                 $Brand = $valueBrand['Brand'];
-                                            ?>
-                                            <option value="<?=@$BrandID; ?>">(<?=@$BrandCode; ?>) <?=@$Brand; ?></option>
-                                            <?php
+                                                ?>
+                                                <option value="<?= @$BrandCode; ?>">(<?= @$BrandCode; ?>) <?= @$Brand; ?></option>
+                                                <?php
                                             }
                                             ?>
                                         </select>
                                     </div>
                                     <div class="form-group">
                                         <label>Item Code <span class="red">(*)</span></label>
-                                        <?php
-                                        $GeneratingItemsCode = db_query("SELECT * FROM itemstbl");
-                                        $num = mysqli_num_rows($GeneratingItemsCode);
-                                        $IDFormat = "101000";
-                                        $Start = '1';
-                                        if ($num > 0 ){
-                                            while ($ID = mysqli_fetch_array($GeneratingItemsCode)) {
-                                                $ItemCode = $ID['ItemCode'];
-                                                $Start++;
-                                            }
-                                            echo '<input type="text" readonly class="form-control" value="' . $IDFormat . '' . $Start . '" name="ItemCode" id="ItemCode">';
-                                        } else {
-                                            echo '<input type="text" readonly class="form-control" value="' . $IDFormat . '' . $Start . '" name="ItemCode" id="ItemCode">';
-                                        }
-                                        ?>
+                                        <div id="itemcodes"></div>
                                     </div>
                                     <div class="form-group">
                                         <label>Model Name <span class="red">(*)</span></label>
-                                        <input type="text" class="form-control" style="text-transform: uppercase" id="ModelName" name="ModelName" >
+                                        <input type="text" class="form-control" style="text-transform: capitalize" id="ModelName" name="ModelName">
                                     </div>
                                     <div class="form-group">
                                         <label>Item Description <span class="red">(*)</span></label>
-                                        <input type="text" class="form-control" style="text-transform: uppercase" id="ItemDescription" name="ItemDescription">
+                                        <input type="text" class="form-control" style="text-transform: capitalize" id="ItemDescription" name="ItemDescription">
                                     </div>
                                     <div class="form-group">
                                         <label>SRP <span class="red">(*)</span></label>
@@ -420,6 +367,48 @@
 </script>
 <!-- /Datatables -->
 
+<!-- Item Codes -->
+<script>
+    $(document).ready(function () {
+
+        $(("#Category") && ("#ItemBrand")).change(function () {
+            var Category = $("#Category").val();
+            var ItemBrand = $("#ItemBrand").val();
+
+            $.ajax({
+
+                url: "function/fetchitemcode.php",
+                method: "POST",
+                data: {Category: Category, ItemBrand: ItemBrand},
+                dataType: "text",
+                success: function (data) {
+                    $("#itemcodes").html(data);
+                }
+            });
+        });
+
+
+        $(("#ItemBrand") && ("#Category")).change(function () {
+            var Category = $("#Category").val();
+            var ItemBrand = $("#ItemBrand").val();
+
+            $.ajax({
+
+                url: "function/fetchitemcode.php",
+                method: "POST",
+                data: {Category: Category, ItemBrand: ItemBrand},
+                dataType: "text",
+                success: function (data) {
+                    $("#itemcodes").html(data);
+                }
+            });
+        });
+
+
+    });
+</script>
+<!-- /.Item COdes -->
+
 <!-- validator -->
 <script type="text/javascript">
     $(document).ready(function () {
@@ -475,6 +464,18 @@
                     }
                 }
             }
+        }).on('success.form.bv', function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: 'function/functions.php',
+                data: $('#AddItems').serialize(),
+                success: function (data) {
+                    if (data == "True") {
+                        window.location.href = "items.php";
+                    }
+                }
+            })
         });
     });
 </script>

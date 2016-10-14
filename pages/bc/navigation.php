@@ -6,30 +6,42 @@ $hashEMPID = $_SESSION['hashEmpID'];
 $EmpID = $_SESSION['EmpID'];
 $rnd = $_SESSION['rnd'];
 
-if(encrypt_decrypt_rnd('decrypt', $hashEMPID, $rnd) == $EmpID){
+if (encrypt_decrypt_rnd('decrypt', $hashEMPID, $rnd) == $EmpID) {
     $checkAccount = db_select("
     SELECT 
     employeetbl.Firstname,
     employeetbl.Lastname,
     employeetbl.Position,
     employeetbl.Initials,
-    branchtbl.BranchCode
+    branchtbl.BranchCode,
+    branchtbl.BranchID,
+    employeetbl.BrandID,
+    brandtbl.Brand
     FROM employeetbl
     LEFT JOIN branchtbl ON employeetbl.BranchID = branchtbl.BranchID
-    WHERE EmpID =" . $EmpID);
+    LEFT JOIN brandtbl ON employeetbl.BrandID = brandtbl.BrandID
+    WHERE EmpID =" . db_quote($EmpID));
 
-    if ($checkAccount[0]['Position'] != "Admin") {
+    echo db_error();
+    if ($checkAccount[0]['Position'] != "Brand Coordinator") {
         session_destroy();
         header('location: ../../index.php');
     } else {
         $FirstName = $checkAccount[0]['Firstname'];
         $LastName = $checkAccount[0]['Lastname'];
+        $BranchID = $checkAccount[0]['BranchID'];
         $BranchCode = $checkAccount[0]['BranchCode'];
+        $Brand = $checkAccount[0]['Brand'];
+        $BrandID = $checkAccount[0]['BrandID'];
+        $Position = $checkAccount[0]['Position'];
         $Initials = $checkAccount[0]['Initials'];
         $AccountType = $checkAccount[0]['Position'];
         $FullName = $FirstName . " " . $LastName;
+
+        $getPurchaseRequestPending = db_select("SELECT * FROM `purchaserequeststbl` WHERE `Status` = 'Pending' AND `isAMApproved` = '1' AND `BrandID` = " . db_quote($BrandID));
+        $getPurchaseRequestApproved = db_select("SELECT * FROM `purchaserequeststbl` WHERE `Status` = 'Approved' OR `Status` = 'On Going' AND `isBCApproved` = '1' AND `BrandID` = " . db_quote($BrandID));
     }
-} else{
+} else {
     session_destroy();
     header('location: ../../index.php');
 }
@@ -49,7 +61,7 @@ if(encrypt_decrypt_rnd('decrypt', $hashEMPID, $rnd) == $EmpID){
             </div>
             <div class="profile_info">
                 <span>Welcome,</span>
-                <h2><?php echo $FullName ?></h2>
+                <h2><?= @$FullName ?></h2>
             </div>
         </div>
         <!-- /menu profile quick info -->
@@ -57,15 +69,20 @@ if(encrypt_decrypt_rnd('decrypt', $hashEMPID, $rnd) == $EmpID){
         <!-- sidebar menu -->
         <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
             <div class="menu_section">
-                <h3>Admin</h3>
+                <h3><?= @$Brand . " - " . @$Position ?></h3>
                 <ul class="nav side-menu">
-                    <li><a href="items.php"><i class="fa fa-cubes"></i> Items</a></li>
-                    <li><a href="branch.php"><i class="fa fa-building"></i> Branch</a></li>
-                    <li><a href="employee.php"><i class="fa fa-group"></i> Employee</a></li>
-                    <li><a href="colors.php"><i class="fa fa-eyedropper"></i> Color</a></li>
-                    <li><a href="brand.php"><i class="fa fa-mobile-phone"></i> Brand</a></li>
-                    <li><a href="area.php"><i class="fa fa-area-chart"></i>Area</a></li>
-                    <li><a href="category.php"><i class="fa fa-list"></i> Category</a></li>
+                    <li>
+                        <a><i class="fa fa-bar-chart"></i> Sales Report</span></a>
+                    </li>
+                    <li>
+                        <a><i class="fa fa-credit-card"></i> Purchase Requests <span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                            <li><a href="pending.php">Pending <span class="label label-danger pull-right"><?= @count($getPurchaseRequestPending); ?></span></a></li>
+                            <li><a href="onprocess.php">On Process <span class="label label-danger pull-right"><?= @count($getPurchaseRequestApproved); ?></span></a></li>
+                            <li><a href="#">Complete</a></li>
+                            <li><a href="#">Reports</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -84,7 +101,7 @@ if(encrypt_decrypt_rnd('decrypt', $hashEMPID, $rnd) == $EmpID){
                 <li class="">
                     <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown"
                        aria-expanded="false">
-                        <img src="../../img/man-icon.png" alt=""><?php echo $FullName ?>
+                        <img src="../../img/man-icon.png" alt=""><?= @$FullName ?>
                         <span class=" fa fa-angle-down"></span>
                     </a>
                     <ul class="dropdown-menu dropdown-usermenu pull-right">
