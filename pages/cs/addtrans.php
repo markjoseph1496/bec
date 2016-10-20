@@ -15,7 +15,7 @@
 
 </head>
 
-<body class="nav-md" onload="$('#ImeiSN').focus(); aModeOfPayment();">
+<body class="nav-md" onload="aModeOfPayment();">
 <div class="container body">
     <div class="main_container">
         <?php
