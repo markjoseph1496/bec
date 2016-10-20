@@ -6,14 +6,16 @@ function logout() {
     xhr.open('GET', '../../functions/logout.php', true);
     xhr.send();
 }
-function PODetails(r) {
-    var i = r.parentNode.parentNode.rowIndex;
-    i--;
-    var PONumber = document.getElementsByName('PONumber[]');
+
+function PODetails(PONumber, hash, rnd) {
     $.ajax({
         type: 'POST',
         url: 'php/function.php',
-        data: 'PONumber=' + PONumber[i].value,
+        data: {
+            PONumber: PONumber,
+            Hash: hash,
+            rnd: rnd
+        },
         success: function (data) {
             $('#PODetails').html(data);
             $('#PODetails').modal('show');

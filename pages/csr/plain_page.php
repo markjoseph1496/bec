@@ -67,16 +67,7 @@
     </div>
 </div>
 
-<!-- jQuery -->
-<script src="../../src/jquery/dist/jquery.min.js"></script>
-<!-- Bootstrap -->
-<script src="../../src/bootstrap/dist/js/bootstrap.min.js"></script>
-<!-- FastClick -->
-<script src="../../src/fastclick/lib/fastclick.js"></script>
-<!-- NProgress -->
-<script src="../../src/nprogress/nprogress.js"></script>
+<link rel="import" href="../js.html">
 
-<!-- Custom Theme Scripts -->
-<script src="../../build/js/custom.min.js"></script>
 </body>
 </html>

@@ -14,9 +14,12 @@ if (encrypt_decrypt_rnd('decrypt', $hashEMPID, $rnd) == $EmpID) {
     employeetbl.Position,
     employeetbl.Initials,
     branchtbl.BranchCode,
-    branchtbl.BranchID
+    branchtbl.BranchID,
+    brandtbl.BrandID,
+    brandtbl.Brand
     FROM employeetbl
     LEFT JOIN branchtbl ON employeetbl.BranchID = branchtbl.BranchID
+    LEFT JOIN brandtbl ON branchtbl.BrandID = brandtbl.BrandID
     WHERE EmpID =" . db_quote($EmpID));
 
 
@@ -30,13 +33,15 @@ if (encrypt_decrypt_rnd('decrypt', $hashEMPID, $rnd) == $EmpID) {
         $BranchCode = $checkAccount[0]['BranchCode'];
         $Initials = $checkAccount[0]['Initials'];
         $AccountType = $checkAccount[0]['Position'];
+        $sBrandID = db_quote($checkAccount[0]['BrandID']);
+        $sBrand = db_quote($checkAccount[0]['Brand']);
         $FullName = $FirstName . " " . $LastName;
 
         $getPurchaseRequestPending = db_select("SELECT * FROM `purchaserequeststbl` WHERE `Status` = 'Pending' AND `BranchCode` = " . db_quote($BranchCode));
         $getPurchaseRequestApproved = db_select("SELECT * FROM `purchaserequeststbl` WHERE `Status` = 'Approved' OR `Status` = 'On Going' AND `isBCApproved` = '1' AND `BranchCode` = " . db_quote($BranchCode));
         $getPRCompleted = db_select("SELECT * FROM `purchaserequeststbl` WHERE `Status` = 'Completed' AND `isBCApproved` = '1' AND `BranchCode` = " . db_quote($BranchCode));
     }
-}else{
+} else {
     session_destroy();
     header('location: ../../index.php');
 }
@@ -71,10 +76,10 @@ if (encrypt_decrypt_rnd('decrypt', $hashEMPID, $rnd) == $EmpID) {
                         <a><i class="fa fa-bar-chart"></i> Sales Report</span></a>
                     </li>
                     <li>
-                        <a><i class="fa fa-credit-card"></i> Transactions <span class="fa fa-chevron-down"></span></a>
+                        <a><i class="fa fa-shopping-cart"></i> Transactions <span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
-                            <li><a href="addtrans.php">Add Transaction</a></li>
-                            <li><a href="#">Reports</a></li>
+                            <li><a href="addtrans.php">Sales</a></li>
+                            <li><a href="saleshistory.php">Transaction History</a></li>
                         </ul>
                     </li>
                     <li>
@@ -146,3 +151,7 @@ if (encrypt_decrypt_rnd('decrypt', $hashEMPID, $rnd) == $EmpID) {
     <!-- /.modal-dialog -->
 </div>
 <!-- /.modal -->
+
+<script type="text/javascript">
+
+</script>

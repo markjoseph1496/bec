@@ -9,27 +9,8 @@
 
     <title>Administrator</title>
 
-    <!-- Bootstrap -->
-    <link href="../../src/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="../../src/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-    <!-- NProgress -->
-    <link href="../../src/nprogress/nprogress.css" rel="stylesheet">
-    <!-- Animate.css -->
-    <link href="../../src/animate.css/animate.min.css" rel="stylesheet">
-    <!-- Bootstrap Validator -->
-    <link href="../../src/validator/bootstrapValidator.min.css">
-    <!-- Select2 -->
-    <link href="../../src/select2/dist/css/select2.min.css" rel="stylesheet">
+    <link rel="import" href="../css.html">
 
-    <!-- Custom Theme Style -->
-    <link href="../../build/css/custom.min.css" rel="stylesheet">
-    <!-- Datatables -->
-    <link href="../../src/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
-    <link href="../../src/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
-    <link href="../../src/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
-    <link href="../../src/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
-    <link href="../../src/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body class="nav-md">
@@ -78,8 +59,8 @@
                                                                       brandtbl.BrandCode,brandtbl.Brand,categorytbl.CategoryCode,categorytbl.Category,
                                                                       itemstbl.SRP,itemstbl.DP
                                                                       FROM itemstbl
-                                                                      LEFT JOIN brandtbl ON itemstbl.BrandCode = brandtbl.BrandCode
-                                                                      LEFT JOIN categorytbl ON itemstbl.CategoryCode = categorytbl.CategoryCode
+                                                                      LEFT JOIN brandtbl ON itemstbl.BrandID = brandtbl.BrandID
+                                                                      LEFT JOIN categorytbl ON itemstbl.Category = categorytbl.Category
                                                                      ");
                                             foreach ($ItemsQuery as $valueItems) {
                                                 $ItemCode = $valueItems['ItemCode'];
@@ -107,8 +88,10 @@
                                                     <td><?= @$SRP; ?></td>
                                                     <td><?= @$DP; ?></td>
                                                     <td>
-                                                        <button class="btn btn-dark" onclick="ItemsDetails('<?=@$ItemCode; ?>','<?=@$hashItemCode; ?>','<?=@$Itemsrnd; ?>')" data-toggle="modal" data-target="#ItemsUpdateModal"><i class="fa fa-eye"></i></button>
-                                                        <button class="btn btn-danger" onclick="ItemsDelete('<?=@$ItemCode; ?>','<?=@$hashItemCode; ?>','<?=@$Itemsrnd; ?>')" data-toggle="modal" data-target="#ItemsDeleteModal"><i class="fa fa-trash"></i></button>
+                                                        <button class="btn btn-dark" onclick="ItemsDetails('<?= @$ItemCode; ?>','<?= @$hashItemCode; ?>','<?= @$Itemsrnd; ?>')" data-toggle="modal" data-target="#ItemsUpdateModal"><i
+                                                                class="fa fa-eye"></i></button>
+                                                        <button class="btn btn-danger" onclick="ItemsDelete('<?= @$ItemCode; ?>','<?= @$hashItemCode; ?>','<?= @$Itemsrnd; ?>')" data-toggle="modal" data-target="#ItemsDeleteModal"><i
+                                                                class="fa fa-trash"></i></button>
                                                     </td>
                                                 </tr>
                                                 <?php
@@ -170,22 +153,21 @@
                                 <div class="modal-body">
                                     <div class="form-group">
                                         <label>Category <span class="red">(*)</span></label>
-                                        <select class="form-control" name="Category" id="Category">
-                                            <option value=""> - Please Select Category -</option>
-                                            <?php
-                                            $Categorytbl = db_select("SELECT * FROM `categorytbl`");
-
-                                            foreach ($Categorytbl as $ValueCateg) {
-                                                $CategoryID = $ValueCateg['CategoryID'];
-                                                $CategoryCode = $ValueCateg['CategoryCode'];
-                                                $Category = $ValueCateg['Category'];
-                                                ?>
-                                                <option value="<?= @$CategoryCode; ?>">(<?= @$CategoryCode; ?>) <?= @$Category; ?></option>
+                                            <select class="form-control" name="Category" id="Category">
+                                                <option value=""> - Please Select Category -</option>
                                                 <?php
-                                            }
-                                            ?>
-                                            ?>
-                                        </select>
+                                                $Categorytbl = db_select("SELECT * FROM `categorytbl`");
+
+                                                foreach ($Categorytbl as $ValueCateg) {
+                                                    $CategoryID = $ValueCateg['CategoryID'];
+                                                    $CategoryCode = $ValueCateg['CategoryCode'];
+                                                    $Category = $ValueCateg['Category'];
+                                                    ?>
+                                                    <option value="<?= @$CategoryCode; ?>">(<?= @$CategoryCode; ?>) <?= @$Category; ?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
                                     </div>
                                     <div class="form-group">
                                         <label>Brand <span class="red">(*)</span></label>
@@ -227,7 +209,7 @@
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="submit" class="btn btn-dark">Add</button>
+                                    <button type="submit" class="btn btn-dark" name="btnAddItem">Add</button>
                                     <button class="btn btn-default" data-dismiss="modal">Cancel</button>
                                 </div>
                             </form>
@@ -254,35 +236,7 @@
     </div>
 </div>
 
-<!-- jQuery -->
-<script src="../../src/jquery/dist/jquery.min.js"></script>
-<!-- Bootstrap -->
-<script src="../../src/bootstrap/dist/js/bootstrap.min.js"></script>
-<!-- FastClick -->
-<script src="../../src/fastclick/lib/fastclick.js"></script>
-<!-- NProgress -->
-<script src="../../src/nprogress/nprogress.js"></script>
-<!-- validator -->
-<script src="../../src/validator/bootstrapValidator.min.js"></script>
-<!-- Datatables -->
-<script src="../../src/datatables.net/js/jquery.dataTables.min.js"></script>
-<script src="../../src/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-<script src="../../src/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-<script src="../../src/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
-<script src="../../src/datatables.net-buttons/js/buttons.flash.min.js"></script>
-<script src="../../src/datatables.net-buttons/js/buttons.html5.min.js"></script>
-<script src="../../src/datatables.net-buttons/js/buttons.print.min.js"></script>
-<script src="../../src/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
-<script src="../../src/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
-<script src="../../src/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
-<script src="../../src/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
-<script src="../../src/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
-<script src="../../src/jszip/dist/jszip.min.js"></script>
-<script src="../../src/pdfmake/build/pdfmake.min.js"></script>
-<script src="../../src/pdfmake/build/vfs_fonts.js"></script>
-<!-- Custom Theme Scripts -->
-<script src="../../build/js/custom.min.js"></script>
-<!-- Function JS -->
+<link rel="import" href="../js.html">
 <script src="js/function.js"></script>
 
 <!-- Datatables -->
@@ -464,18 +418,6 @@
                     }
                 }
             }
-        }).on('success.form.bv', function (e) {
-            e.preventDefault();
-            $.ajax({
-                type: 'POST',
-                url: 'function/functions.php',
-                data: $('#AddItems').serialize(),
-                success: function (data) {
-                    if (data == "True") {
-                        window.location.href = "items.php";
-                    }
-                }
-            })
         });
     });
 </script>

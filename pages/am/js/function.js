@@ -118,14 +118,15 @@ function PurchaseOrder() {
     }
 }
 
-function PODetails(r) {
-    var i = r.parentNode.parentNode.rowIndex;
-    i--;
-    var PONumber = document.getElementsByName('PONumber[]');
+function PODetails(PONumber, hash, rnd) {
     $.ajax({
         type: 'POST',
         url: 'php/function.php',
-        data: 'PONumber=' + PONumber[i].value,
+        data: {
+            PONumber: PONumber,
+            Hash: hash,
+            rnd: rnd
+        },
         success: function (data) {
             $('#PODetails').html(data);
             $('#PODetails').modal('show');
@@ -223,6 +224,7 @@ function addItemsToModify() {
         $('<td>').text(tTotalPrice).appendTo(row);
         $('<td><a class="btn btn-danger" onclick="deleteItemOrder(this);"><i class="fa fa-trash"></i></a>').appendTo(row);
 
+        $('<input type="hidden" name="oColor[]" value=' + tColor[i].value + '>').appendTo(row);
         $('<input type="hidden" name="oItemCode[]" value=' + tItemCode[i].value + '>').appendTo(row);
         $('<input type="hidden" name="oSRP[]" value=' + tSRP[i].value + '>').appendTo(row);
         $('<input type="hidden" name="oTotalPrice[]" value=' + tTotalPrice + '>').appendTo(row);

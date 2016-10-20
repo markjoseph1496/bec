@@ -10,15 +10,8 @@
     <title>Administrator</title>
     <link rel="shortcut icon" href="../../img/B%20LOGO%20BLACK.png">
 
-    <!-- Bootstrap -->
-    <link href="../../src/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="../../src/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-    <!-- NProgress -->
-    <link href="../../src/nprogress/nprogress.css" rel="stylesheet">
+    <link rel="import" href="../css.html">
 
-    <!-- Custom Theme Style -->
-    <link href="../../build/css/custom.min.css" rel="stylesheet">
 </head>
 
 <body class="nav-md">

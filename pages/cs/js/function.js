@@ -3,6 +3,13 @@ var sPrice = document.getElementById("sPrice"); //label of total price
 var arrayItem = ["0"];
 var imeisnArray = ["0"];
 var ModalClose = $(".modal-header button");
+var lblTotalPrice = document.getElementById("AmountToPay");
+var lblAmountTendered = document.getElementById("AmountTendered");
+var lblChange = document.getElementById("Change");
+
+var sCash = document.getElementById('Cash');
+var sCreditCard = document.getElementById('CreditCard');
+var sHomeCredit = document.getElementById('HomeCredit');
 
 $('.modal').on('shown.bs.modal', function () {
     ModalClose.focus();
@@ -239,51 +246,21 @@ function AddItem(e) {
                                 $('#ImeiSN').val("");
                                 $('#ImeiSN').focus();
                             });
-                        } else if (data == true) {
-                            $.ajax({
-                                type: 'POST',
-                                url: 'php/validate.php',
-                                data: {
-                                    rItemCode: $('#rItemCode').val(),
-                                    rColor: $('#rColor').val(),
-                                    rPRNumber: $('#rPRNumber').val(),
-                                    rhashPRNumber: $('#rhashPRNumber').val(),
-                                    rhashItemCode: $('#rhashItemCode').val(),
-                                    rItemRND: $('#rItemRND').val(),
-                                    rPRRND: $('#rPRRND').val(),
-                                    rQty: $('#rQty').val()
-                                },
-                                success: function (data) {
-                                    if (data == false) {
-                                        $('#ErrorModal').modal('show');
-                                        $('#ErrorModal').on('hidden.bs.modal', function () {
-                                            $('#ImeiSN').val("");
-                                            $('#ImeiSN').focus();
-                                        });
-                                    }
-                                    else if (data == true) {
-                                        var b = imeisnArray.indexOf(ImeiSN);
-                                        if (b == -1) {
-                                            addToReceiving();
-                                        } else {
-                                            $('#ImeiSN').val("");
-                                            $('#itemExists').modal('show');
-                                            $('#itemExists').on('hidden.bs.modal', function () {
-                                                $('#ImeiSN').val("");
-                                                $('#ImeiSN').focus();
-                                            });
-                                        }
-                                    }
-                                    else {
-                                        $('#ErrorModal').modal('show');
-                                        $('#ErrorModal').on('hidden.bs.modal', function () {
-                                            $('#ImeiSN').val("");
-                                            $('#ImeiSN').focus();
-                                        });
-                                    }
-                                }
-                            })
-                        } else {
+                        }
+                        else if (data == true) {
+                            var b = imeisnArray.indexOf(ImeiSN);
+                            if (b == -1) {
+                                addToReceiving();
+                            } else {
+                                $('#ImeiSN').val("");
+                                $('#itemExists').modal('show');
+                                $('#itemExists').on('hidden.bs.modal', function () {
+                                    $('#ImeiSN').val("");
+                                    $('#ImeiSN').focus();
+                                });
+                            }
+                        }
+                        else {
                             $('#ErrorModal').modal('show');
                             $('#ErrorModal').on('hidden.bs.modal', function () {
                                 $('#ImeiSN').val("");
@@ -356,4 +333,288 @@ function ReceiveItems() {
     else {
         $('#CheckItems').modal('show');
     }
+}
+
+function addSaleItem(e) {
+    if (e && e.keyCode == 13) {
+        var ImeiSN = $('#ImeiSN').val();
+        var b = imeisnArray.indexOf(ImeiSN);
+        if (b == -1) {
+            $.ajax({
+                type: 'POST',
+                url: 'php/validate.php',
+                data: 'sImeiSN=' + ImeiSN,
+                success: function (data) {
+                    var result = $.parseJSON(data);
+                    if (result.Count == "1") {
+                        $('#ItemCode').val(result.ItemCode);
+                        $('#ModelName').val(result.ModelName);
+                        $('#Description').val(result.Description);
+                        $('#SRP').val(result.SRP);
+                        $('#Category').val(result.Category);
+                        $('#ItemColor').val(result.Color);
+
+                        AddItemsToSales();
+                    }
+                    else if (result.Count == "0") {
+                        $('#ImeiSN').val("");
+                        $('#itemDontExists').modal('show');
+                        $('#itemDontExists').on('hidden.bs.modal', function () {
+                            $('#ImeiSN').val("");
+                            $('#ImeiSN').focus();
+                        });
+                    }
+                    else {
+                        $('#ErrorModal').modal('show');
+                        $('#ErrorModal').on('hidden.bs.modal', function () {
+                            $('#ImeiSN').val("");
+                            $('#ImeiSN').focus();
+                        });
+                    }
+                }
+            });
+        } else {
+            $('#ImeiSN').val("");
+            $('#itemExists').modal('show');
+            $('#itemExists').on('hidden.bs.modal', function () {
+                $('#ImeiSN').val("");
+                $('#ImeiSN').focus();
+            });
+        }
+    }
+}
+
+function AddItemsToSales() {
+    var IMEISN = document.getElementById('ImeiSN');
+    var ItemCode = document.getElementById('ItemCode');
+    var ModelName = document.getElementById('ModelName');
+    var Description = document.getElementById('Description');
+    var SRP = document.getElementById('SRP');
+    var Category = document.getElementById('Category');
+    var ItemColor = document.getElementById('ItemColor');
+
+    SRP.value = accounting.formatNumber(SRP.value, 2, ",", ".");
+
+    var row = $('<tr>');
+
+    $('<td><a onclick="DeleteSales(this)" class="glyphicon glyphicon-remove red"></a><a onclick="EditSales(this)" class="glyphicon glyphicon-edit"></a>').appendTo(row);
+    if (Category.value == "Unit") {
+        $('<td>' +
+            '<b>' + ModelName.value + " (" + ItemColor.value + ")" + '</b>' +
+            '<i>' +
+            '<br>Description: ' + Description.value + '' +
+            '<br>IMEI: ' + IMEISN.value + '<br>' +
+            '</i>').appendTo(row);
+        $('<td align="right">').text(SRP.value).appendTo(row);
+        $('<td align="center">').text("1").appendTo(row);
+        $('<td align="right">').text(SRP.value).appendTo(row);
+    } else {
+        $('<td>' +
+            '<b>' + ModelName.value + '</b>' +
+            '<i>' +
+            '<br>Description: ' + Description.value + '' +
+            '</i>').appendTo(row);
+        $('<td align="right">').text(SRP.value).appendTo(row);
+        $('<td align="center">').text("1").appendTo(row);
+        $('<td align="right">').text(SRP.value).appendTo(row);
+    }
+
+    $('<input type="hidden" name="sIMEISN[]">').val(IMEISN.value).appendTo(row);
+    $('<input type="hidden" name="sSRP[]">').val(SRP.value).appendTo(row);
+    $('<input type="hidden" name="sQty[]">').val("1").appendTo(row);
+    $('<input type="hidden" name="sTotal[]">').val(SRP.value).appendTo(row);
+
+    row.appendTo('#ItemsToOrder');
+    imeisnArray.push(IMEISN.value);
+    IMEISN.value = "";
+    updateTotalSales();
+}
+
+function NumericOnly(e) {
+    // Allow: backspace, delete, tab, escape, enter and .
+    if ($.inArray(e.keyCode, [46, 8, 9, 27, 13]) !== -1 ||
+        // Allow: Ctrl+A, Command+A
+        (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+        // Allow: home, end, left, right, down, up
+        (e.keyCode >= 35 && e.keyCode <= 40)) {
+        // let it happen, don't do anything
+        return;
+    }
+    // Ensure that it is a number and stop the keypress
+    if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+        e.preventDefault();
+    }
+}
+
+function ConvertToMoney() {
+    if ($('#Cash').length == 0) {
+        Cash.value = "0.00";
+    }
+    if ($('#HomeCredit').length == 0) {
+        Cash.value = "0.00";
+    }
+    if ($('#CreditCard').length == 0) {
+        Cash.value = "0.00";
+    }
+
+    $('#Cash').val(accounting.formatNumber($('#Cash').val(), 2, ",", "."));
+    $('#CreditCard').val(accounting.formatNumber($('#CreditCard').val(), 2, ",", "."));
+    $('#HomeCredit').val(accounting.formatNumber($('#HomeCredit').val(), 2, ",", "."));
+
+    updateAmountTendered();
+
+}
+
+function aModeOfPayment() {
+    if ($('#ModeOfPayment').val() == "Cash") {
+        $('#DivCash').show();
+        $('#divCreditCard').hide();
+        $('#divHomeCredit').hide();
+    }
+    else if ($('#ModeOfPayment').val() == "Credit Card") {
+        $('#DivCash').hide();
+        $('#divCreditCard').show();
+        $('#divHomeCredit').hide();
+    }
+    else if ($('#ModeOfPayment').val() == "Home Credit") {
+        $('#DivCash').hide();
+        $('#divCreditCard').hide();
+        $('#divHomeCredit').show();
+    }
+    else if ($('#ModeOfPayment').val() == "HomeCredit Credit Card") {
+        $('#DivCash').hide();
+        $('#divCreditCard').show();
+        $('#divHomeCredit').show();
+    }
+    else if ($('#ModeOfPayment').val() == "Cash CreditCard") {
+        $('#DivCash').show();
+        $('#divCreditCard').show();
+        $('#divHomeCredit').hide();
+    }
+    else if ($('#ModeOfPayment').val() == "Cash Home Credit") {
+        $('#DivCash').show();
+        $('#divCreditCard').hide();
+        $('#divHomeCredit').show();
+    }
+    else if ($('#ModeOfPayment').val() == "Cash CreditCard Home Credit") {
+        $('#DivCash').show();
+        $('#divCreditCard').show();
+        $('#divHomeCredit').show();
+    }
+    else {
+        $('#DivCash').hide();
+        $('#divCreditCard').hide();
+        $('#divHomeCredit').hide();
+    }
+
+    $('#Cash').val("0.00");
+    ClearCreditCard();
+    ClearHomeCredit();
+    updateAmountTendered();
+}
+
+function updateTotalSales() {
+    var sTotalPrice = 0;
+    var TotalPrice = document.getElementsByName('sTotal[]');
+    for (i = 0; i < TotalPrice.length; i++) {
+        sTotalPrice = parseFloat(sTotalPrice) + parseFloat(TotalPrice[i].value.replace(/,/g, ''));
+    }
+
+    lblTotalPrice.value = accounting.formatNumber(sTotalPrice, 2, ",", ".");
+    ChangeOfCustomer();
+    return lblTotalPrice.value;
+}
+
+function updateAmountTendered() {
+
+    lblAmountTendered.value = accounting.formatNumber(parseFloat(sCash.value.replace(/,/g, '')) + parseFloat(sCreditCard.value.replace(/,/g, '')) + parseFloat(sHomeCredit.value.replace(/,/g, '')), 2, ",", ".");
+    ChangeOfCustomer();
+}
+
+function ChangeOfCustomer() {
+    var TotalAmountTendered = parseFloat(sCash.value.replace(/,/g, '')) + parseFloat(sCreditCard.value.replace(/,/g, '')) + parseFloat(sHomeCredit.value.replace(/,/g, ''));
+    lblChange.value = accounting.formatNumber(parseFloat(TotalAmountTendered - parseFloat(lblTotalPrice.value.replace(/,/g, '')) || 0), 2, ",", ".");
+}
+
+function ClearCreditCard() {
+    $('#CreditCard').val("0.00");
+    $('#CardHolderName').val("");
+    $('#CardNumber').val("");
+    $('#MID').val("");
+    $('#BatchNum').val("");
+    $('#ApprCode').val("");
+    $('#Terms').val("");
+    $('#IDPresented').val("");
+}
+
+function ClearHomeCredit() {
+    $('#HomeCredit').val("0.00");
+    $('#ReferenceNo').val("");
+}
+
+function DeleteSales(r) {
+    var i = r.parentNode.parentNode.rowIndex;
+
+    var SRP = document.getElementsByName('sSRP[]');
+    var QTY = document.getElementsByName('sQty[]');
+    var Total = document.getElementsByName('sTotal[]');
+
+    $("input").remove(SRP[i - 1], QTY[i - 1], Total[i - 1]);
+    ItemsToOrder.deleteRow(i);
+    imeisnArray.splice(i, 1);
+
+    updateTotalSales();
+
+}
+
+function EditSales(r) {
+    var i = r.parentNode.parentNode.rowIndex;
+    i--;
+    var SRP = document.getElementsByName('sSRP[]');
+    var QTY = document.getElementsByName('sQty[]');
+    var Total = document.getElementsByName('sTotal[]');
+
+    alert(SRP[i].value);
+    $('#uItemName').text(SRP[i].value);
+    $('#EditItemModal').modal('show');
+}
+
+function CheckIfNoChange() {
+    var TotalAmountTendered = parseFloat(sCash.value.replace(/,/g, '')) + parseFloat(sCreditCard.value.replace(/,/g, '')) + parseFloat(sHomeCredit.value.replace(/,/g, ''));
+    var TotalAmountToPay = parseFloat(updateTotalSales().replace(/,/g, ''));
+    var Change = TotalAmountTendered - TotalAmountToPay;
+    var sChange = document.getElementById('Change').value;
+
+    if(TotalAmountTendered == 0){
+        $('#AmountTenderedModal').modal('show');
+    }else{
+        if(Change == 0){
+            if(Change != sChange){
+                $('#ErrorModal').modal('show');
+            }else{
+                $('#CheckItems').modal('show');
+                $('#SubmitPayment').click(function() {
+                    document.getElementById('frmSaleItem').submit();
+                });
+            }
+        }else{
+            $('#ChangeModal').modal('show');
+        }
+    }
+}
+
+function TransactionDetails(TransactionID, hash, rnd) {
+    $.ajax({
+        type: 'POST',
+        url: 'php/function.php',
+        data: {
+            TransactionID: TransactionID,
+            Hash: hash,
+            rnd: rnd
+        },
+        success: function (data) {
+            $('#PODetails').html(data);
+            $('#PODetails').modal('show');
+        }
+    })
 }

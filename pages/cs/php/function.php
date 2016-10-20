@@ -16,7 +16,7 @@ $BranchCode = db_quote($getBranchCode[0]['BranchCode']);
 
 function generatePONumber($Branch)
 {
-    $generatePONumber = db_select("SELECT `PONumber` FROM `purchaserequeststbl` WHERE `BranchCode` = " . $Branch . " ORDER BY `PONumber` DESC LIMIT 1");
+    $generatePONumber = db_select("SELECT `PONumber` FROM `purchaserequeststbl` WHERE `BranchCode` = $Branch ORDER BY `PONumber` DESC LIMIT 1");
     $Branch = str_replace("'", "", $Branch);
     if ($generatePONumber === false) {
         echo db_error();
@@ -30,12 +30,39 @@ function generatePONumber($Branch)
     }
 }
 
+function generateTransactionID($Branch)
+{
+    $_Date = db_quote(date("Y-m-d"));
+    $generateTransactionID = db_select("SELECT `TransactionID` FROM `transactiontbl` WHERE `_Date` = $_Date  AND `BranchCode` = $Branch ORDER BY `TransactionID` DESC LIMIT 1");
+    $Branch = str_replace("'", "", $Branch);
+    $_Date = str_replace("'", "", $_Date);
+
+    if (count($generateTransactionID) == 0) {
+        return str_replace("'", "", $Branch . date("md") . "-" . "0001");
+    } else {
+        $tCount = substr($generateTransactionID[0]['TransactionID'], 9);
+        $TID = $Branch . date("md") . "-" . sprintf("%04s", (int)$tCount + 1);
+        return $TID;
+    }
+}
+
 function mergeArrays($ItemCode, $Qty, $Color)
 {
     $result = array();
 
     foreach ($ItemCode as $key => $name) {
         $result[] = array('ItemCode' => $name, 'Qty' => $Qty[$key], 'Color' => $Color[$key]);
+    }
+
+    return $result;
+}
+
+function mergeArraysSales($IMEI, $Qty, $SRP)
+{
+    $result = array();
+
+    foreach ($IMEI as $key => $name) {
+        $result[] = array('Imeisn' => $name, 'Qty' => $Qty[$key], 'SRP' => $SRP[$key]);
     }
 
     return $result;
@@ -285,7 +312,7 @@ elseif (isset($_POST['PONumber'])) {
                                         LEFT JOIN brandtbl ON itemstbl.BrandID = brandtbl.BrandID
                                         WHERE purchaserequestsitemstbl.PONumber = " . db_quote($PONumber) . "
                                         AND purchaserequestsitemstbl.ModifyCode = " . db_quote($ModifyCode) . "
-                                        ORDER BY itemstbl.ModelName ASC");
+                                        ORDER BY purchaserequestsitemstbl.Received ASC");
                                         echo db_error();
                                         $TotalItems = 0;
                                         foreach ($OrderedItems as $item) {
@@ -409,7 +436,7 @@ if (isset($_POST['rItemCode'])) {
         $ItemCode = db_quote($ItemCode);
         $ItemColor = db_quote($ItemColor);
 
-        $getReceived = db_select("SELECT `Received` FROM `purchaserequestsitemstbl` WHERE `PONumber` = " . db_quote($PRNumber) . "AND `ModifyCode` = $ModifyCode AND `Color` = $ItemColor");
+        $getReceived = db_select("SELECT `Received` FROM `purchaserequestsitemstbl` WHERE `ItemCode` = $ItemCode AND `PONumber` = " . db_quote($PRNumber) . "AND `ModifyCode` = $ModifyCode AND `Color` = $ItemColor");
 
         $ItemCount = (int)$getReceived[0]['Received'];
         foreach ($ImeiSN as $item) {
@@ -422,41 +449,181 @@ if (isset($_POST['rItemCode'])) {
 
         }
 
-        $updatePR = db_query("UPDATE `purchaserequestsitemstbl` SET `Received` = " . db_quote($ItemCount) . " WHERE `PONumber` = " . db_quote($PRNumber) . "AND `ModifyCode` = $ModifyCode AND `Color` = $ItemColor");
+        $updatePR = db_query("UPDATE `purchaserequestsitemstbl` SET `Received` = " . db_quote($ItemCount) . " WHERE `ItemCode` = $ItemCode AND `PONumber` = " . db_quote($PRNumber) . "AND `ModifyCode` = $ModifyCode AND `Color` = $ItemColor");
 
-        $CheckStatus = db_select("SELECT `Qty`, `Received` FROM `purchaserequestsitemstbl` WHERE `PONumber` = " . db_quote($PRNumber) . "AND `ModifyCode` = $ModifyCode");
+        $CheckStatus = db_select("SELECT `Qty`, `Received` FROM `purchaserequestsitemstbl` WHERE `ItemCode` = ItemCode AND `PONumber` = " . db_quote($PRNumber) . "AND `ModifyCode` = $ModifyCode");
 
 
         $StatusCount = 0;
-        foreach($CheckStatus as $status){
+        foreach ($CheckStatus as $status) {
             $Qty = $status['Qty'];
             $Received = $status['Received'];
 
-            if($Qty > $Received){
+            if ($Qty > $Received) {
                 $StatusCount++;
             }
         }
 
         $ItemStatus = "";
         $Remarks = "";
-        if($StatusCount == 0){
+        if ($StatusCount == 0) {
             $ItemStatus = "Completed";
             $Remarks = "Already Shipped";
-        }else{
+        } else {
             $ItemStatus = "On Going";
             $Remarks = "For Delivery";
         }
 
-        $UpdateStatus = db_query("UPDATE `purchaserequeststbl` SET `Status` = " . db_quote($ItemStatus) . "`Remarks` = " . db_quote($Remarks) . " WHERE `PONumber` = " . db_quote($PRNumber) . "AND `ModifyCode` = $ModifyCode");
+        $UpdateStatus = db_query("UPDATE `purchaserequeststbl` SET `Status` = " . db_quote($ItemStatus) . ", `Remarks` = " . db_quote($Remarks) . " WHERE `PONumber` = " . db_quote($PRNumber) . "AND `ModifyCode` = $ModifyCode");
 
-        header("location: ../receiving.php?sucess");
+
+        header("location: ../receiving.php?success");
 
     } else {
         header("location: ../receiving.php?error");
     }
 
-
-
 }
 
-//print_r($_POST); for testing only
+print_r($_POST);
+if (isset($_POST['sIMEISN'])) {
+    $sIMEISN = $_POST['sIMEISN'];
+    $sSRP = $_POST['sSRP'];
+    $sQty = $_POST['sQty'];
+    $ORNumber = db_quote($_POST['ORNumber']);
+    $CustomerName = db_quote(ucwords($_POST['CustomerName']));
+    $SalesClerk = db_quote($_POST['SalesClerk']);
+    $ModeOfPayment = db_quote($_POST['ModeOfPayment']);
+    $Cash = $_POST['Cash'];
+    $CreditCard = $_POST['CreditCard'];
+    $CardHolderName = db_quote(ucwords($_POST['CardHolderName']));
+    $CardNumber = db_quote($_POST['CardNumber']);
+    $MID = db_quote($_POST['MID']);
+    $BatchNum = db_quote($_POST['BatchNum']);
+    $ApprCode = db_quote($_POST['ApprCode']);
+    $Terms = db_quote($_POST['Terms']);
+    $IDPresented = db_quote($_POST['IDPresented']);
+    $HomeCredit = $_POST['HomeCredit'];
+    $ReferenceNo = db_quote($_POST['ReferenceNo']);
+    $Items = mergeArraysSales($sIMEISN, $sQty, $sSRP);
+    $_Date = db_quote(date("Y-m-d"));
+    $_Time = db_quote(date("h:i A"));
+    $TransactionID = db_quote(generateTransactionID($BranchCode));
+    $ErrorCount = 0;
+
+
+    $Cash = db_quote((float)str_replace(',', '', $Cash));
+    $CreditCard = db_quote((float)str_replace(',', '', $CreditCard));
+    $HomeCredit = db_quote((float)str_replace(',', '', $HomeCredit));
+
+
+    if ($ModeOfPayment != "Cash" ||
+        $ModeOfPayment != "Credit Card" ||
+        $ModeOfPayment != "Home Credit" ||
+        $ModeOfPayment != "HomeCredit Credit Card" ||
+        $ModeOfPayment != "Cash CreditCard" ||
+        $ModeOfPayment != "Cash Home Credit" ||
+        $ModeOfPayment != "Cash CreditCard Home Credit"
+    ) {
+        $addTransaction = db_query("INSERT INTO `transactiontbl` (`TransactionID`, `ORNumber`, `_Date`, `_Time`, `CustomerName`, `SalesClerk`, `Cashier`, `BranchCode`, `ModeOfPayment`, `Status`)
+                                                          VALUES ($TransactionID, $ORNumber, $_Date, $_Time, $CustomerName, $SalesClerk, $EmpID, $BranchCode, $ModeOfPayment, 'Active')");
+
+        if ($addTransaction === false) {
+            $ErrorCount++;
+            header("location: ../addtrans.php?error");
+        } else {
+            if ($ModeOfPayment == db_quote("Cash")) {
+                $queryCash = db_query("INSERT INTO `cashtransactiontbl` (`TransactionID`, `ORNumber`, `Amount`) VALUES ($TransactionID, $ORNumber, $Cash)");
+                if ($queryCash === false) {
+                    $ErrorCount++;
+                }
+            } elseif ($ModeOfPayment == db_quote("Credit Card")) {
+                $queryCreditCard = db_query("INSERT INTO `credittransactiontbl`  (`TransactionID`, `ORNumber`, `CreditCardNumber`, `CardHolderName`, `MID`, `BatchNum`, `ApprCode`, `Term`, `IDPresented`, `Amount`)
+                                                                VALUES ($TransactionID, $ORNumber, $CardNumber, $CardHolderName, $MID, $BatchNum, $ApprCode,$Terms, $IDPresented, $CreditCard)");
+                if ($queryCreditCard === false) {
+                    $ErrorCount++;
+                }
+            } elseif ($ModeOfPayment == db_quote("Home Credit")) {
+                $queryHomeCredit = db_query("INSERT INTO `homecredittransactiontbl` (`TransactionID`, `ORNumber`, `ReferenceNo`, `Amount`)
+                                                                            VALUES  ($TransactionID, $ORNumber, $ReferenceNo, $HomeCredit)");
+                if ($queryHomeCredit === false) {
+                    $ErrorCount++;
+                }
+            } elseif ($ModeOfPayment == db_quote("HomeCredit Credit Card")) {
+                $queryCreditCard = db_query("INSERT INTO `credittransactiontbl`  (`TransactionID`, `ORNumber`, `CreditCardNumber`, `CardHolderName`, `MID`, `BatchNum`, `ApprCode`, `Term`, `IDPresented`, `Amount`)
+                                                                VALUES ($TransactionID, $ORNumber, $CardNumber, $CardHolderName, $MID, $BatchNum, $ApprCode,$Terms, $IDPresented, $CreditCard)");
+
+                $queryHomeCredit = db_query("INSERT INTO `homecredittransactiontbl` (`TransactionID`, `ORNumber`, `ReferenceNo`, `Amount`)
+                                                                            VALUES  ($TransactionID, $ORNumber, $ReferenceNo, $HomeCredit)");
+                if ($queryCreditCard === false || $queryHomeCredit === false) {
+                    $ErrorCount++;
+                }
+            } elseif ($ModeOfPayment == db_quote("Cash CreditCard")) {
+                $queryCash = db_query("INSERT INTO `cashtransactiontbl` (`TransactionID`, `ORNumber`, `Amount`) VALUES ($TransactionID, $ORNumber, $Cash)");
+
+                $queryCreditCard = db_query("INSERT INTO `credittransactiontbl`  (`TransactionID`, `ORNumber`, `CreditCardNumber`, `CardHolderName`, `MID`, `BatchNum`, `ApprCode`, `Term`, `IDPresented`, `Amount`)
+                                                                VALUES ($TransactionID, $ORNumber, $CardNumber, $CardHolderName, $MID, $BatchNum, $ApprCode,$Terms, $IDPresented, $CreditCard)");
+                if ($queryCreditCard === false || $queryCash === false) {
+                    $ErrorCount++;
+                }
+
+            } elseif ($ModeOfPayment == db_quote("Cash Home Credit")) {
+                $queryCash = db_query("INSERT INTO `cashtransactiontbl` (`TransactionID`, `ORNumber`, `Amount`) VALUES ($TransactionID, $ORNumber, $Cash)");
+
+                $queryHomeCredit = db_query("INSERT INTO `homecredittransactiontbl` (`TransactionID`, `ORNumber`, `ReferenceNo`, `Amount`)
+                                                                            VALUES  ($TransactionID, $ORNumber, $ReferenceNo, $HomeCredit)");
+                if ($queryCash === false || $queryHomeCredit === false) {
+                    $ErrorCount++;
+                }
+            } elseif ($ModeOfPayment == db_quote("Cash CreditCard Home Credit")) {
+                $queryCash = db_query("INSERT INTO `cashtransactiontbl` (`TransactionID`, `ORNumber`, `Amount`) VALUES ($TransactionID, $ORNumber, $Cash)");
+
+                $queryCreditCard = db_query("INSERT INTO `credittransactiontbl`  (`TransactionID`, `ORNumber`, `CreditCardNumber`, `CardHolderName`, `MID`, `BatchNum`, `ApprCode`, `Term`, `IDPresented`, `Amount`)
+                                                                VALUES ($TransactionID, $ORNumber, $CardNumber, $CardHolderName, $MID, $BatchNum, $ApprCode,$Terms, $IDPresented, $CreditCard)");
+
+                $queryHomeCredit = db_query("INSERT INTO `homecredittransactiontbl` (`TransactionID`, `ORNumber`, `ReferenceNo`, `Amount`)
+                                                                            VALUES  ($TransactionID, $ORNumber, $ReferenceNo, $HomeCredit)");
+
+                if ($queryCash === false || $queryHomeCredit === false || $queryCreditCard === false) {
+                    $ErrorCount++;
+                }
+            } else {
+                $ErrorCount++;
+            }
+
+            if($ErrorCount == 0){
+                //Validate Items
+                //Checking of inventory
+                $TotalPrice = 0;
+                foreach ($Items as $item) {
+                    $IMEISN = db_quote($item['Imeisn']);
+                    $Qty = db_quote($item['Qty']);
+                    $SRP = str_replace(',', '', $item['SRP']);
+                    $SRP = db_quote((float)$SRP);
+
+                    //$GrandTotal = number_format($GrandTotal, 2, '.', ',');
+
+                    $checkImei = db_select("SELECT `ItemCode` FROM `invtbl` WHERE `BranchCode` = $BranchCode AND `imeisn` = $IMEISN AND `Status` = 'On Hand'");
+                    $ItemCode = db_quote($checkImei[0]['ItemCode']);
+                    $checkSRP = db_select("SELECT `SRP` FROM `itemstbl` WHERE `ItemCode` = $ItemCode");
+                    if ($checkImei === false || count($checkImei) == 0) {
+                        db_query("DELETE FROM `transactiontbl` WHERE `TransactionID` = $TransactionID");
+                        header("location: ../addtrans.php?error");
+                    } else {
+                        if ($checkSRP === false || count($checkSRP) == 0 || db_quote($checkSRP[0]['SRP']) != $SRP) {
+                            db_query("DELETE FROM `transactiontbl` WHERE `TransactionID` = $TransactionID");
+                            header("location: ../addtrans.php?error");
+                        } else {
+                            $TotalPrice = $TotalPrice + str_replace("'", "", $SRP);
+                            $UpdateInventory = db_query("UPDATE `invtbl` SET `Status` = 'Sold', `TransactionID` = $TransactionID WHERE `imeisn` = $IMEISN");
+                        }
+                    }
+                }
+                header("location: ../addtrans.php?success");
+            }else{
+                db_query("DELETE FROM `transactiontbl` WHERE `TransactionID` = $TransactionID");
+                header("location: ../addtrans.php?error");
+            }
+        }
+    }
+}

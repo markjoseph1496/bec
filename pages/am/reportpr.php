@@ -73,7 +73,8 @@ include_once('../../functions/encryption.php');
                                             WHERE purchaserequeststbl.isAMApproved = '1'
                                             AND purchaserequeststbl.isDeleted = '0'
                                             AND purchaserequeststbl.Status = 'Completed'
-                                            AND purchaserequeststbl.BranchCode = " . db_quote($BranchCode));
+                                            AND purchaserequeststbl.BranchCode IN (SELECT `BranchCode` FROM `branchtbl` WHERE `AreaID` = " . db_quote($AreaID) . ")
+                                            ");
 
                                             foreach ($PendingOrders as $Order) {
                                                 $PONumber = $Order['PONumber'];

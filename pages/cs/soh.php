@@ -13,32 +13,7 @@ include_once('../../functions/encryption.php');
     <title>Administrator</title>
     <link rel="shortcut icon" href="../../img/B%20LOGO%20BLACK.png">
 
-    <!-- Bootstrap -->
-    <link href="../../src/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="../../src/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-    <!-- NProgress -->
-    <link href="../../src/nprogress/nprogress.css" rel="stylesheet">
-
-    <!-- Bootstrap Validator -->
-    <link href="../../src/validator/bootstrapValidator.min.css">
-
-    <!-- Custom Theme Style -->
-    <link href="../../build/css/custom.min.css" rel="stylesheet">
-
-    <!-- PNotify -->
-    <link href="../../src/pnotify/dist/pnotify.css" rel="stylesheet">
-    <link href="../../src/pnotify/dist/pnotify.buttons.css" rel="stylesheet">
-    <link href="../../src/pnotify/dist/pnotify.nonblock.css" rel="stylesheet">
-
-    <!-- Custom Theme Style -->
-    <link href="../../build/css/custom.min.css" rel="stylesheet">
-    <!-- Datatables -->
-    <link href="../../src/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
-    <link href="../../src/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
-    <link href="../../src/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
-    <link href="../../src/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
-    <link href="../../src/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
+    <link rel="import" href="../css.html">
 
 </head>
 
@@ -64,123 +39,129 @@ include_once('../../functions/encryption.php');
                     <div class="col-md-12 col-sm-12 col-xs-12">
                         <div class="x_panel">
                             <div class="x_title">
-                                <h2>Stock On Hand</h2>
+                                <h2>Stocks On Hand</h2>
                                 <div class="clearfix"></div>
                             </div>
                             <div class="x_content">
                                 <div class="col-lg-12">
                                     <div class="row">
-                                        <table id="datatable" class="table table-striped table-bordered">
-                                            <thead>
-                                            <tr>
-                                                <th>Item Code</th>
-                                                <th>Model Name</th>
-                                                <th>Item Description</th>
-                                                <th>Brand</th>
-                                                <th>Category</th>
-                                                <th>Stocks On Hand</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
+                                        <div class="col-lg-12">
                                             <?php
-                                            $getInventory = db_select("
-                                            SELECT DISTINCT 
-                                            invtbl.ItemCode,
-                                            invtbl.ItemColor,
+                                            $itemstbl = db_select("
+                                            SELECT 
+                                            itemstbl.ItemCode,
                                             itemstbl.ModelName,
                                             itemstbl.ItemDescription,
                                             itemstbl.Category,
+                                            itemstbl.CriticalLevel,
                                             brandtbl.Brand
-                                            FROM invtbl
-                                            LEFT JOIN itemstbl ON invtbl.ItemCode = itemstbl.ItemCode
+                                            FROM itemstbl
                                             LEFT JOIN brandtbl ON itemstbl.BrandID = brandtbl.BrandID
-                                            WHERE invtbl.BranchCode = " . db_quote($BranchCode) . "
-                                            AND invtbl.Status = 'On Hand'");
+                                            WHERE itemstbl.BrandID = $sBrandID
+                                             ");
+                                            $CountItems = count($itemstbl);
+                                            $CriticalCount = 0;
+                                            foreach ($itemstbl as $count) {
+                                                $countItemCode = $count['ItemCode'];
+                                                $countCriticalLevel = $count['CriticalLevel'];
+                                                $countItem = db_select("SELECT * FROM `invtbl` WHERE `ItemCode` = " . db_quote($countItemCode) . "  AND `BranchCode` = " . db_quote($BranchCode) . " AND `Status` = 'On Hand'");
 
-                                            foreach($getInventory as $Item){
-                                                $ItemCode = $Item['ItemCode'];
-                                                $ItemColor = $Item['ItemColor'];
-                                                $ModelName = $Item['ModelName'];
-                                                $Description = $Item['ItemDescription'];
-                                                $Category = $Item['Category'];
-                                                $Brand = $Item['Brand'];
-                                                $countItem = db_select("SELECT * FROM `invtbl` WHERE `ItemCode` = " . db_quote($ItemCode) . " AND `ItemColor` = " . db_quote($ItemColor) . " AND `BranchCode` = " . db_quote($BranchCode) . " AND `Status` = 'On Hand'");
-                                                $StockOnHand = count($countItem);
-                                                ?>
-                                                <tr>
-                                                    <td><?= @$ItemCode ?></td>
-                                                    <td><?= @$ModelName . " (" . $ItemColor . ")" ?></td>
-                                                    <td><?= @$Description ?></td>
-                                                    <td><?= @$Brand ?></td>
-                                                    <td><?= @$Category ?></td>
-                                                    <td><?= @$StockOnHand ?></td>
-                                                </tr>
-                                            <?php
+                                                if (count($countItem) <= $countCriticalLevel) {
+                                                    $CriticalCount++;
+                                                }
+
                                             }
                                             ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <!-- PO Details -->
-                                    <div class="modal fade" id="PODetails">
+                                            <label>Total Items: <?= @$CountItems ?></label>
+                                            <br>
+                                            <label>Total Items on Critical Level: <span class="red"><?= @$CriticalCount ?></span> </label>
+                                            <!-- Panel -->
+                                            <div class="panel panel-info">
+                                                <div class="panel-heading">
+                                                    <i class="fa fa-table fa-fw"></i> <b>Items</b>
+                                                </div>
+                                                <!-- /.panel-heading -->
+                                                <div class="panel-body">
+                                                    <table id="datatable" class="table table-striped table-bordered">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>Item Code</th>
+                                                            <th>Model Name</th>
+                                                            <th>Item Description</th>
+                                                            <th>Brand</th>
+                                                            <th>Category</th>
+                                                            <th>Stocks On Hand</th>
+                                                            <th></th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <?php
+                                                        foreach ($itemstbl as $item) {
+                                                            $ItemCode = $item['ItemCode'];
+                                                            $ModelName = $item['ModelName'];
+                                                            $Description = $item['ItemDescription'];
+                                                            $Category = $item['Category'];
+                                                            $Brand = $item['Brand'];
+                                                            $CriticalLevel = $item['CriticalLevel'];
+                                                            $LowLevel = "●";
 
+                                                            $countItem = db_select("SELECT * FROM `invtbl` WHERE `ItemCode` = " . db_quote($ItemCode) . "  AND `BranchCode` = " . db_quote($BranchCode) . " AND `Status` = 'On Hand'");
+                                                            $StockOnHand = count($countItem);
+                                                            ?>
+                                                            <tr <?php if ($StockOnHand <= $CriticalLevel) echo "class='red'" ?>>
+                                                                <td><?php if ($StockOnHand <= $CriticalLevel) echo $LowLevel; ?>
+                                                                    <?= @$ItemCode ?></td>
+                                                                <td><?= @$ModelName ?></td>
+                                                                <td><?= @$Description ?></td>
+                                                                <td><?= @$Brand ?></td>
+                                                                <td><?= @$Category ?></td>
+                                                                <td><?= @$StockOnHand ?></td>
+                                                                <td>
+                                                                    <button class="btn btn-dark"><i class="fa fa-eye"></i></button>
+                                                                </td>
+                                                            </tr>
+                                                            <?php
+                                                        }
+
+                                                        ?>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <!-- /.panel-body -->
+                                                <div class="panel-footer">
+
+                                                </div>
+                                            </div>
+                                            <!-- End Panel -->
+                                        </div>
+                                        <!-- PO Details -->
+                                        <div class="modal fade" id="PODetails">
+
+                                        </div>
+                                        <!-- /.modal -->
                                     </div>
-                                    <!-- /.modal -->
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <!-- /page content -->
+            <!-- /page content -->
 
-        <!-- footer content -->
-        <footer>
-            <div class="pull-right">
-                *Insert Footer Here*
-            </div>
-            <div class="clearfix"></div>
-        </footer>
-        <!-- /footer content -->
+            <!-- footer content -->
+            <footer>
+                <div class="pull-right">
+                    *Insert Footer Here*
+                </div>
+                <div class="clearfix"></div>
+            </footer>
+            <!-- /footer content -->
+        </div>
     </div>
 </div>
 
-<!-- jQuery -->
-<script src="../../src/jquery/dist/jquery.min.js"></script>
-<!-- Bootstrap -->
-<script src="../../src/bootstrap/dist/js/bootstrap.min.js"></script>
-<!-- FastClick -->
-<script src="../../src/fastclick/lib/fastclick.js"></script>
-<!-- NProgress -->
-<script src="../../src/nprogress/nprogress.js"></script>
-<!-- validator -->
-<script src="../../src/validator/bootstrapValidator.min.js"></script>
-<!-- PNotify -->
-<script src="../../src/pnotify/dist/pnotify.js"></script>
-<script src="../../src/pnotify/dist/pnotify.buttons.js"></script>
-<script src="../../src/pnotify/dist/pnotify.nonblock.js"></script>
-
-<!-- Datatables -->
-<script src="../../src/datatables.net/js/jquery.dataTables.min.js"></script>
-<script src="../../src/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-<script src="../../src/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-<script src="../../src/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
-<script src="../../src/datatables.net-buttons/js/buttons.flash.min.js"></script>
-<script src="../../src/datatables.net-buttons/js/buttons.html5.min.js"></script>
-<script src="../../src/datatables.net-buttons/js/buttons.print.min.js"></script>
-<script src="../../src/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
-<script src="../../src/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
-<script src="../../src/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
-<script src="../../src/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
-<script src="../../src/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
-<script src="../../src/jszip/dist/jszip.min.js"></script>
-<script src="../../src/pdfmake/build/pdfmake.min.js"></script>
-<script src="../../src/pdfmake/build/vfs_fonts.js"></script>
-<!-- Function Script -->
+<link rel="import" href="../js.html">
 <script src="js/function.js"></script>
-<!-- Custom Theme Scripts -->
-<script src="../../build/js/custom.min.js"></script>
 
 <?php
 if (isset($_GET['error'])) {

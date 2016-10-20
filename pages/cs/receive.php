@@ -11,10 +11,10 @@ $prnd = substr($_GET['pid'], 32, 36);
 
 
 if (encrypt_decrypt_rnd('decrypt', $hashItemCode, $random) != $ItemCode) {
-    header('location: receiving.php?errorq');
+    header('location: receiving.php?error');
 }
 if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $prnd) != $PRNumber) {
-    header('location: receiving.php?errore');
+    header('location: receiving.php?error');
 }
 ?>
 <!DOCTYPE html>
@@ -29,25 +29,11 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $prnd) != $PRNumber) {
     <title>Purchase Request</title>
     <link rel="shortcut icon" href="../../img/B%20LOGO%20BLACK.png">
 
-    <!-- Bootstrap -->
-    <link href="../../src/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="../../src/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-    <!-- NProgress -->
-    <link href="../../src/nprogress/nprogress.css" rel="stylesheet">
-    <!-- Datatables -->
-    <link href="../../src/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
-    <link href="../../src/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
-    <link href="../../src/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
-    <link href="../../src/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
-    <link href="../../src/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
-
-    <!-- Custom Theme Style -->
-    <link href="../../build/css/custom.min.css" rel="stylesheet">
+    <link rel="import" href="../css.html">
 
 </head>
 
-<body class="nav-md">
+<body class="nav-md" onload="$('#ImeiSN').focus();">
 <div class="container body">
     <div class="main_container">
         <?php
@@ -71,6 +57,7 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $prnd) != $PRNumber) {
         AND `ModifyCode` = " . db_quote($ModifyCode) . "
         AND `PONumber` = " . db_quote(encrypt_decrypt_rnd('decrypt', $hashPRNumber, $prnd)));
 
+        echo db_error();
         $Qty = $getPRDetails[0]['Qty'];
         $Received = $getPRDetails[0]['Received'];
         $ModelName = $getItemDetails[0]['ModelName'];
@@ -164,14 +151,14 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $prnd) != $PRNumber) {
                                         <div class="modal-content">
                                             <div class="modal-header modal-header-dark">
                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                <h4 class="modal-title">Send Purchase Order?</h4>
+                                                <h4 class="modal-title">Save?</h4>
                                             </div>
                                             <div class="modal-body">
-                                                <p>Please review selected items before submit.</p>
+                                                <p>Please review received items before save.</p>
                                             </div>
                                             <div class="modal-footer">
                                                 <button class="btn btn-dark" data-dismiss="modal">Review items</button>
-                                                <button type="submit" class="btn btn-danger">Submit</button>
+                                                <button type="submit" class="btn btn-danger">Save</button>
                                             </div>
                                         </div>
                                         <!-- /.modal-content -->
@@ -302,37 +289,7 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $prnd) != $PRNumber) {
     </div>
 </div>
 
-<!-- jQuery -->
-<script src="../../src/jquery/dist/jquery.min.js"></script>
-<!-- Bootstrap -->
-<script src="../../src/bootstrap/dist/js/bootstrap.min.js"></script>
-<!-- FastClick -->
-<script src="../../src/fastclick/lib/fastclick.js"></script>
-<!-- NProgress -->
-<script src="../../src/nprogress/nprogress.js"></script>
-<!-- Datatables -->
-<script src="../../src/datatables.net/js/jquery.dataTables.min.js"></script>
-<script src="../../src/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-<script src="../../src/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-<script src="../../src/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
-<script src="../../src/datatables.net-buttons/js/buttons.flash.min.js"></script>
-<script src="../../src/datatables.net-buttons/js/buttons.html5.min.js"></script>
-<script src="../../src/datatables.net-buttons/js/buttons.print.min.js"></script>
-<script src="../../src/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
-<script src="../../src/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
-<script src="../../src/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
-<script src="../../src/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
-<script src="../../src/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
-<script src="../../src/jszip/dist/jszip.min.js"></script>
-<script src="../../src/pdfmake/build/pdfmake.min.js"></script>
-<script src="../../src/pdfmake/build/vfs_fonts.js"></script>
-<!-- Custom Theme Scripts -->
-<script src="../../build/js/custom.min.js"></script>
-
-<!-- Accounting JS -->
-<script src="../../src/accountingjs/accounting.min.js"></script>
-
-<!-- Function JS -->
+<link rel="import" href="../js.html">
 <script src="js/function.js"></script>
 
 <!-- Datatables -->

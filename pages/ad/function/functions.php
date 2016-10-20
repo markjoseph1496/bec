@@ -21,25 +21,23 @@ if (isset($_POST['AddBranchCode'])) {
 // End add branch
 
 //Add Item
-if (isset($_POST['AddItemCode'])) {
+if (isset($_POST['btnAddItem'])) {
 
-    $Category = db_quote($_POST['Category']);
+    $CategoryPOST = db_quote($_POST['CategoryID']);
     $ItemBrand = db_quote($_POST['ItemBrand']);
     $AddItemCode = strtoupper(db_quote($_POST['AddItemCode']));
     $ModelName = db_quote(ucwords($_POST['ModelName']));
     $ItemDescription = db_quote(ucwords($_POST['ItemDescription']));
+    $ItemBrandID = db_quote($_POST['ItemBrandID']);
+    $Category = db_quote($_POST['Category']);
     $SRP = db_quote($_POST['SRP']);
     $DP = db_quote($_POST['DP']);
 
-    $AddItem = db_query("INSERT INTO `itemstbl` (`CategoryCode`,`BrandCode`,`ItemCode`,`ModelName`,`ItemDescription`,`SRP`,`DP`)
+    $AddItem = db_query("INSERT INTO `itemstbl` (`CategoryCode`,`BrandCode`,`ItemCode`,`ModelName`,`ItemDescription`,`BrandID`,`Category`,`SRP`,`DP`)
 		VALUES
-        ($Category, $ItemBrand, $AddItemCode, $ModelName, $ItemDescription, $SRP, $DP)");
+        ($CategoryPOST, $ItemBrand, $AddItemCode, $ModelName, $ItemDescription, $ItemBrandID, $Category, $SRP, $DP)");
 
-    if ($AddItem === false) {
-        echo "False";
-    } else {
-        echo "True";
-    }
+    header("location: ../items.php");
 
 }
 //End Add Item
@@ -277,6 +275,7 @@ elseif (isset($_POST['BranchCode'])) {
 //Update Item
 if (isset($_POST['btnUpdateItems'])) {
 
+    $EditItemCode = strtoupper(db_quote($_POST['EditItemCode']));
     $EditItemCode = strtoupper(db_quote($_POST['EditItemCode']));
     $EditModelName = db_quote(ucwords($_POST['EditModelName']));
     $EditItemDescription = strtoupper(db_quote($_POST['EditItemDescription']));
@@ -706,8 +705,7 @@ elseif (isset($_POST['AreaID'])) {
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>AreaID <span class="red">(*)</span></label>
-                        <input type="text" class="form-control" readonly id="EditAreaID" name="EditAreaID" value="<?php echo $AreaID; ?>">
+                        <input type="hidden" class="form-control" readonly id="EditAreaID" name="EditAreaID" value="<?php echo $AreaID; ?>">
                     </div>
                     <div class="form-group">
                         <label>Area <span class="red">(*)</span></label>
@@ -789,8 +787,7 @@ elseif (isset($_POST['BrandID'])) {
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>BrandID <span class="red">(*)</span></label>
-                        <input type="text" class="form-control" readonly id="EditBrandID" name="EditBrandID" value="<?= @$BrandID; ?>">
+                        <input type="hidden" class="form-control" readonly id="EditBrandID" name="EditBrandID" value="<?= @$BrandID; ?>">
                     </div>
                     <div class="form-group">
                         <label>Brand Code <span class="red">(*)</span></label>
@@ -879,8 +876,7 @@ elseif (isset($_POST['ColorID'])) {
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>ColorID <span class="red">(*)</span></label>
-                        <input type="text" class="form-control" readonly id="EditColorID" name="EditColorID" value="<?php echo $ColorID; ?>">
+                        <input type="hidden" class="form-control" readonly id="EditColorID" name="EditColorID" value="<?php echo $ColorID; ?>">
                     </div>
                     <div class="form-group">
                         <label>Color <span class="red">(*)</span></label>
@@ -959,8 +955,7 @@ elseif (isset($_POST['CategoryID'])) {
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>AreaID <span class="red">(*)</span></label>
-                        <input type="text" class="form-control" readonly id="EditCategoryID" name="EditCategoryID" value="<?php echo $CategoryID; ?>">
+                        <input type="hidden" class="form-control" readonly id="EditCategoryID" name="EditCategoryID" value="<?php echo $CategoryID; ?>">
                     </div>
                     <div class="form-group">
                         <label>Category Code <span class="red">(*)</span></label>

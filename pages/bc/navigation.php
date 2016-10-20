@@ -79,8 +79,7 @@ if (encrypt_decrypt_rnd('decrypt', $hashEMPID, $rnd) == $EmpID) {
                         <ul class="nav child_menu">
                             <li><a href="pending.php">Pending <span class="label label-danger pull-right"><?= @count($getPurchaseRequestPending); ?></span></a></li>
                             <li><a href="onprocess.php">On Process <span class="label label-danger pull-right"><?= @count($getPurchaseRequestApproved); ?></span></a></li>
-                            <li><a href="#">Complete</a></li>
-                            <li><a href="#">Reports</a></li>
+                            <li><a href="reportpr.php">Reports</a></li>
                         </ul>
                     </li>
                 </ul>
