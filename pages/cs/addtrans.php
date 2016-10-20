@@ -11,6 +11,7 @@
     <link rel="shortcut icon" href="../../img/B%20LOGO%20BLACK.png">
 
     <link rel="import" href="../css.html">
+    <script src="js/function.js"></script>
 
 </head>
 
@@ -430,7 +431,7 @@
 </div>
 
 <link rel="import" href="../js.html">
-<script src="js/function.js"></script>
+
 
 <?php
 if (isset($_GET['error'])) {
