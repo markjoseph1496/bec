@@ -11,11 +11,10 @@
     <link rel="shortcut icon" href="../../img/B%20LOGO%20BLACK.png">
 
     <link rel="import" href="../css.html">
-    <script src="js/function.js"></script>
 
 </head>
 
-<body class="nav-md" onload="aModeOfPayment();">
+<body class="nav-md" onload="$('#ImeiSN').focus(); aModeOfPayment();">
 <div class="container body">
     <div class="main_container">
         <?php
@@ -430,8 +429,44 @@
     </div>
 </div>
 
-<link rel="import" href="../js.html">
+<!-- jQuery -->
+<script src="../../src/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap -->
+<script src="../../src/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- FastClick -->
+<script src="../../src/fastclick/lib/fastclick.js"></script>
+<!-- NProgress -->
+<script src="../../src/nprogress/nprogress.js"></script>
+<!-- Bootstrap Validator -->
+<script src="../../src/validator/bootstrapValidator.min.js"></script>
+<!-- PNotify -->
+<script src="../../src/pnotify/dist/pnotify.js"></script>
+<script src="../../src/pnotify/dist/pnotify.buttons.js"></script>
+<script src="../../src/pnotify/dist/pnotify.nonblock.js"></script>
+<!-- Datatables -->
+<script src="../../src/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="../../src/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script src="../../src/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+<script src="../../src/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+<script src="../../src/datatables.net-buttons/js/buttons.flash.min.js"></script>
+<script src="../../src/datatables.net-buttons/js/buttons.html5.min.js"></script>
+<script src="../../src/datatables.net-buttons/js/buttons.print.min.js"></script>
+<script src="../../src/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+<script src="../../src/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+<script src="../../src/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+<script src="../../src/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+<script src="../../src/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
+<script src="../../src/jszip/dist/jszip.min.js"></script>
+<script src="../../src/pdfmake/build/pdfmake.min.js"></script>
+<script src="../../src/pdfmake/build/vfs_fonts.js"></script>
+<!-- Custom Theme Scripts -->
+<script src="../../build/js/custom.min.js"></script>
 
+<!-- Accounting JS -->
+<script src="../../src/accountingjs/accounting.min.js"></script>
+
+<!-- Function JS -->
+<script src="js/function.js"></script>
 
 <?php
 if (isset($_GET['error'])) {
