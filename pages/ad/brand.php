@@ -9,7 +9,9 @@
 
     <title>Administrator</title>
 
-    <link rel="import" href="../css.html">
+    <?php
+    include_once('../css.html');
+    ?>
 
 </head>
 
@@ -119,11 +121,11 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Brand Code <span class="red">(*)</span></label>
-                                        <input type="text" class="form-control" style="text-transform: uppercase" id="BrandCode" name="BrandCode">
+                                        <input type="text" class="form-control" style="text-transform: capitalize" id="BrandCode" name="BrandCode">
                                     </div>
                                     <div class="form-group">
                                         <label>Brand <span class="red">(*)</span></label>
-                                        <input type="text" class="form-control" style="text-transform: uppercase" id="AddBrand" name="AddBrand">
+                                        <input type="text" class="form-control" style="text-transform: capitalize" id="AddBrand" name="AddBrand">
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -154,7 +156,10 @@
     </div>
 </div>
 
-<link rel="import" href="../js.html">
+<?php
+include_once('../js.html');
+?>
+
 <script src="js/function.js"></script>
 
 <!-- Datatables -->

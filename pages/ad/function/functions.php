@@ -220,7 +220,7 @@ elseif (isset($_POST['BranchCode'])) {
                             </div>
                             <div class="form-group">
                                 <label>Branch Name <span class="red">(*)</span></label>
-                                <input type="text" class="form-control" style="text-transform: uppercase" id="EditBranchName" name="EditBranchName" value="<?php echo $UpdateBranchName ?>">
+                                <input type="text" class="form-control" style="text-transform: capitalize" id="EditBranchName" name="EditBranchName" value="<?php echo $UpdateBranchName ?>">
                             </div>
                             <div class="form-group">
                                 <label>Brand <span class="red">(*)</span></label>
@@ -266,6 +266,45 @@ elseif (isset($_POST['BranchCode'])) {
                 <!-- /.modal-content -->
             </div>
             <!-- /.modal-dialog -->
+
+            <!-- validator -->
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('#Updatebranch').bootstrapValidator({
+                        message: 'This value is not valid',
+                        feedbackIcons: {
+                            valid: "glyphicon glyphicon-ok",
+                            invalid: "glyphicon glyphicon-remove",
+                            validating: "glyphicon glyphicon-refresh"
+                        },
+                        fields: {
+                            group: 'form-group',
+                            EditBranchName: {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Branch Name is required.'
+                                    }
+                                }
+                            },
+                            EditBrand: {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Brand is required.'
+                                    }
+                                }
+                            },
+                            EditBranchArea: {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Branch Area is required.'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
+            </script>
+            <!-- /validator-->
             <?php
         }
     } else {
@@ -277,11 +316,11 @@ elseif (isset($_POST['BranchCode'])) {
 if (isset($_POST['btnUpdateItems'])) {
 
     $EditItemCode = strtoupper(db_quote($_POST['EditItemCode']));
-    $EditItemCode = strtoupper(db_quote($_POST['EditItemCode']));
     $EditModelName = db_quote(ucwords($_POST['EditModelName']));
-    $EditItemDescription = strtoupper(db_quote($_POST['EditItemDescription']));
+    $EditItemDescription = db_quote(ucwords($_POST['EditItemDescription']));
     $EditSRP = db_quote($_POST['EditSRP']);
     $EditDP = db_quote($_POST['EditDP']);
+    $EditCriticalLevel = db_quote($_POST['EditCriticalLevel']);
 
     $UpdateItem = db_query("
     UPDATE 
@@ -290,12 +329,13 @@ if (isset($_POST['btnUpdateItems'])) {
     `ModelName` = $EditModelName, 
     `ItemDescription` = $EditItemDescription, 
     `SRP` = $EditSRP, 
-    `DP` = $EditDP 
+    `DP` = $EditDP,
+    `CriticalLevel` = $EditCriticalLevel
     WHERE `ItemCode` = $EditItemCode");
 
     header('location: ../items.php?Updated');
 }
-//End Update Item
+//End Update Items
 
 // Update Modal of Items
 elseif (isset($_POST['ItemCode'])) {
@@ -312,7 +352,8 @@ elseif (isset($_POST['ItemCode'])) {
         categorytbl.Category,
         brandtbl.Brand,
         itemstbl.SRP,
-        itemstbl.DP
+        itemstbl.DP,
+        itemstbl.CriticalLevel
         FROM itemstbl
         LEFT JOIN categorytbl ON itemstbl.CategoryCode = categorytbl.CategoryCode
         LEFT JOIN brandtbl ON itemstbl.BrandCode = brandtbl.BrandCode
@@ -328,6 +369,9 @@ elseif (isset($_POST['ItemCode'])) {
             $UpdateIBrand = $UpdateItemstbl[0]['Brand'];
             $UpdateSRP = $UpdateItemstbl[0]['SRP'];
             $UpdateDP = $UpdateItemstbl[0]['DP'];
+            $UpdateCriticalLevel = $UpdateItemstbl[0]['CriticalLevel'];
+            $UpdateSRP = number_format($UpdateSRP, 2, '.', ',');
+            $UpdateDP = number_format($UpdateDP, 2, '.', ',');
             ?>
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -351,19 +395,23 @@ elseif (isset($_POST['ItemCode'])) {
                             </div>
                             <div class="form-group">
                                 <label>Model Name <span class="red">(*)</span></label>
-                                <input type="text" class="form-control" style="text-transform: uppercase" id="EditModelName" name="EditModelName" value="<?php echo $UpdateModelName; ?>">
+                                <input type="text" class="form-control" style="text-transform: capitalize" id="EditModelName" name="EditModelName" value="<?php echo $UpdateModelName; ?>">
                             </div>
                             <div class="form-group">
                                 <label>Item Description <span class="red">(*)</span></label>
-                                <input type="text" class="form-control" id="EditItemDescription" name="EditItemDescription" value="<?php echo $UpdateItemDescription; ?>">
+                                <input type="text" class="form-control" style="text-transform: capitalize" id="EditItemDescription" name="EditItemDescription" value="<?php echo $UpdateItemDescription; ?>">
                             </div>
                             <div class="form-group">
                                 <label>SRP <span class="red">(*)</span></label>
-                                <input type="text" class="form-control" id="EditSRP" name="EditSRP" value="<?= @$UpdateSRP; ?>">
+                                <input type="text" class="form-control" id="EditSRP" name="EditSRP" onblur="UpdateConvertToMoney()" onclick="this.setSelectionRange(0, this.value.length)" value="<?= @$UpdateSRP; ?>">
                             </div>
                             <div class="form-group">
                                 <label>Dealer's Price<span class="red">(*)</span></label>
-                                <input type="text" class="form-control" id="EditDP" name="EditDP" value="<?= @$UpdateDP; ?>">
+                                <input type="text" class="form-control" id="EditDP" name="EditDP" onblur="UpdateConvertToMoney()" onclick="this.setSelectionRange(0, this.value.length)" value="<?= @$UpdateDP; ?>">
+                            </div>
+                            <div class="form-group">
+                                <label>Critical Level<span class="red">(*)</span></label>
+                                <input type="number" class="form-control" id="EditCriticalLevel" name="EditCriticalLevel" value="<?= @$UpdateCriticalLevel; ?>">
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -375,6 +423,85 @@ elseif (isset($_POST['ItemCode'])) {
                 <!-- /.modal-content -->
             </div>
             <!-- /.modal-dialog -->
+
+            <!-- validator -->
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('#UpdateItems').bootstrapValidator({
+                        message: 'This value is not valid',
+                        feedbackIcons: {
+                            valid: "glyphicon glyphicon-ok",
+                            invalid: "glyphicon glyphicon-remove",
+                            validating: "glyphicon glyphicon-refresh"
+                        },
+                        fields: {
+                            group: 'form-group',
+                            EditCategory: {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Category is required.'
+                                    }
+                                }
+                            },
+                            EditItemBrand: {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Brand is required.'
+                                    }
+                                }
+                            },
+                            EditModelName: {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Model Name is required.'
+                                    }
+                                }
+                            },
+                            EditItemDescription: {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Item Description is required.'
+                                    }
+                                }
+                            },
+                            EditSRP: {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'SRP is required.'
+                                    },
+                                    regexp: {
+                                        regexp: /^[0-9\s]+$/i,
+                                        message: "SRP can consist of positive numbers only"
+                                    }
+                                }
+                            },
+                            EditDP: {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'DP is required.'
+                                    },
+                                    regexp: {
+                                        regexp: /^[0-9\s]+$/i,
+                                        message: "DP can consist of positive numbers only"
+                                    }
+                                }
+                            },
+                            EditCriticalLevel: {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Critical Level is required.'
+                                    },
+                                    regexp: {
+                                        regexp: /^[0-9\s]+$/i,
+                                        message: "Critical Level can consist of positive numbers only"
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
+            </script>
+            <!-- /validator-->
             <?php
         }
     }
@@ -792,11 +919,11 @@ elseif (isset($_POST['BrandID'])) {
                     </div>
                     <div class="form-group">
                         <label>Brand Code <span class="red">(*)</span></label>
-                        <input type="text" class="form-control" style="text-transform: uppercase" id="EditBrandCode" name="EditBrandCode" value="<?= @$UpdateBrandCode; ?>">
+                        <input type="text" class="form-control" style="text-transform: capitalize" id="EditBrandCode" name="EditBrandCode" value="<?= @$UpdateBrandCode; ?>">
                     </div>
                     <div class="form-group">
                         <label>Brand <span class="red">(*)</span></label>
-                        <input type="text" class="form-control" style="text-transform: uppercase" id="EditBrand" name="EditBrand" value="<?= @$UpdateBrand; ?>">
+                        <input type="text" class="form-control" style="text-transform: capitalize" id="EditBrand" name="EditBrand" value="<?= @$UpdateBrand; ?>">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -881,7 +1008,7 @@ elseif (isset($_POST['ColorID'])) {
                     </div>
                     <div class="form-group">
                         <label>Color <span class="red">(*)</span></label>
-                        <input type="text" class="form-control" style="text-transform: uppercase" id="EditColor" name="EditColor" value="<?php echo $UpdateColor; ?>">
+                        <input type="text" class="form-control" style="text-transform: capitalize" id="EditColor" name="EditColor" value="<?php echo $UpdateColor; ?>">
                     </div>
                 </div>
                 <div class="modal-footer">

@@ -199,7 +199,7 @@ elseif (isset($_POST['PONumber'])) {
         $getName = db_select("SELECT `Firstname` ,`Lastname` FROM `employeetbl` WHERE `EmpID` = $ModifiedByID");
         $ModifiedBy = $getName[0]['Firstname'] . " " . $getName[0]['Lastname'];
         $Status = $purchaserequesttbl[0]['Status'];
-        $prnd = rand(0, 9999);
+        $prnd = rand(1000, 9999);
 
         if ($Status == "Approved") {
             //Get Brand Coordinator Name
@@ -327,7 +327,7 @@ elseif (isset($_POST['PONumber'])) {
                                             $Total = number_format($Qty * $SRP, 2, '.', ',');
                                             $SRP = number_format($SRP, 2, '.', ',');
 
-                                            $rnd = rand(0, 9999);
+                                            $rnd = rand(1000, 9999);
                                             $rnd = $rnd . $Color;
                                             $hashItemCode = encrypt_decrypt_rnd('encrypt', $ItemCode, $rnd);
                                             ?>
@@ -410,10 +410,9 @@ elseif (isset($_POST['dPONumber'])) {
             echo "success";
         }
     }
-}
-//End of Archive PR
+} //End of Archive PR
 
-if (isset($_POST['rItemCode'])) {
+elseif (isset($_POST['rItemCode'])) {
     $ItemCode = $_POST['rItemCode'];
     $ItemColor = $_POST['rColor'];
     $PRNumber = $_POST['rPRNumber'];
@@ -483,10 +482,7 @@ if (isset($_POST['rItemCode'])) {
         header("location: ../receiving.php?error");
     }
 
-}
-
-print_r($_POST);
-if (isset($_POST['sIMEISN'])) {
+} elseif (isset($_POST['sIMEISN'])) {
     $sIMEISN = $_POST['sIMEISN'];
     $sSRP = $_POST['sSRP'];
     $sQty = $_POST['sQty'];
@@ -510,6 +506,8 @@ if (isset($_POST['sIMEISN'])) {
     $_Time = db_quote(date("h:i A"));
     $TransactionID = db_quote(generateTransactionID($BranchCode));
     $ErrorCount = 0;
+
+    $rnd = rand(1000, 9999);
 
 
     $Cash = db_quote((float)str_replace(',', '', $Cash));
@@ -591,7 +589,7 @@ if (isset($_POST['sIMEISN'])) {
                 $ErrorCount++;
             }
 
-            if($ErrorCount == 0){
+            if ($ErrorCount == 0) {
                 //Validate Items
                 //Checking of inventory
                 $TotalPrice = 0;
@@ -619,11 +617,444 @@ if (isset($_POST['sIMEISN'])) {
                         }
                     }
                 }
-                header("location: ../addtrans.php?success");
-            }else{
+                $TransactionID = str_replace("'", "", $TransactionID);
+                $hashTransactionID = encrypt_decrypt_rnd('encrypt', $TransactionID, $rnd);
+                header("location: ../invoice.php?id=$hashTransactionID$rnd&tid=$TransactionID");
+            } else {
                 db_query("DELETE FROM `transactiontbl` WHERE `TransactionID` = $TransactionID");
                 header("location: ../addtrans.php?error");
             }
         }
+    }
+} elseif (isset($_POST['TransactionID'])) {
+    $TransactionID = $_POST['TransactionID'];
+    $hash = $_POST['Hash'];
+    $rnd = $_POST['rnd'];
+
+    if (encrypt_decrypt_rnd('decrypt', $hash, $rnd) == $TransactionID) {
+        $transactionDetails = db_select("
+        SELECT
+        transactiontbl.ORNumber,
+        transactiontbl._Date,
+        transactiontbl._Time,
+        transactiontbl.CustomerName,
+        transactiontbl.SalesClerk,
+        transactiontbl.Cashier,
+        transactiontbl.ModeOfPayment,
+        branchtbl.BranchName,
+        cashtransactiontbl.Amount Cash,
+        credittransactiontbl.Amount CreditCard,
+        credittransactiontbl.CreditCardNumber,
+        credittransactiontbl.CardHolderName,
+        credittransactiontbl.MID,
+        credittransactiontbl.BatchNum,
+        credittransactiontbl.ApprCode,
+        credittransactiontbl.Term,
+        credittransactiontbl.IDPresented,
+        homecredittransactiontbl.Amount HomeCredit,
+        homecredittransactiontbl.ReferenceNo
+        FROM transactiontbl
+        LEFT JOIN cashtransactiontbl ON transactiontbl.TransactionID = cashtransactiontbl.TransactionID
+        LEFT JOIN credittransactiontbl ON transactiontbl.TransactionID = credittransactiontbl.TransactionID
+        LEFT JOIN homecredittransactiontbl ON transactiontbl.TransactionID = homecredittransactiontbl.TransactionID
+        LEFT JOIN branchtbl ON transactiontbl.BranchCode = branchtbl.BranchCode
+        WHERE transactiontbl.TransactionID = " . db_quote($TransactionID) . "
+        AND transactiontbl.BranchCode = $BranchCode
+        ");
+
+        $EmpSC = $transactionDetails[0]['SalesClerk'];
+        $EmpCS = $transactionDetails[0]['Cashier'];
+        $getSC = db_select("SELECT `Firstname`, `Lastname` FROM `employeetbl` WHERE `EmpID` = " . db_quote($EmpSC));
+        $getCS = db_select("SELECT `Firstname`, `Lastname` FROM `employeetbl` WHERE `EmpID` = " . db_quote($EmpCS));
+
+        $ORNumber = $transactionDetails[0]['ORNumber'];
+        $_Date = $transactionDetails[0]['_Date'];
+        $_Time = $transactionDetails[0]['_Time'];
+        $CustomerName = $transactionDetails[0]['CustomerName'];
+        $Branch = $transactionDetails[0]['BranchName'];
+        $SalesClerk = $getSC[0]['Firstname'] . " " . $getSC[0]['Lastname'];
+        $Cashier = $getCS[0]['Firstname'] . " " . $getCS[0]['Lastname'];
+        $ModeOfPayment = $transactionDetails[0]['ModeOfPayment'];
+        $Cash = $transactionDetails[0]['Cash'];
+        $CreditCard = $transactionDetails[0]['CreditCard'];
+        $CreditCardNumber = $transactionDetails[0]['CreditCardNumber'];
+        $CardHolderName = $transactionDetails[0]['CardHolderName'];
+        $MID = $transactionDetails[0]['MID'];
+        $BatchNum = $transactionDetails[0]['BatchNum'];
+        $ApprCode = $transactionDetails[0]['ApprCode'];
+        $Term = $transactionDetails[0]['Term'];
+        $IDPresented = $transactionDetails[0]['IDPresented'];
+        $HomeCredit = $transactionDetails[0]['HomeCredit'];
+        $ReferenceNo = $transactionDetails[0]['ReferenceNo'];
+
+        $MOD = "";
+        if ($ModeOfPayment == "Cash") {
+            $MOD = "Cash";
+            $CreditCard = 0;
+            $HomeCredit = 0;
+        } elseif ($ModeOfPayment == "Credit Card") {
+            $MOD = "Credit Card";
+            $Cash = 0;
+            $HomeCredit = 0;
+        } elseif ($ModeOfPayment == "Home Credit") {
+            $MOD = "Home Credit";
+            $Cash = 0;
+            $CreditCard = 0;
+        } elseif ($ModeOfPayment == "HomeCredit Credit Card") {
+            $MOD = "Credit Card, Home Credit";
+            $Cash = 0;
+        } elseif ($ModeOfPayment == "Cash CreditCard") {
+            $MOD = "Cash, Credit Card";
+            $Home = 0;
+        } elseif ($ModeOfPayment == "Cash Home Credit") {
+            $MOD = "Cash, Home Credit";
+            $CreditCard = 0;
+        } elseif ($ModeOfPayment == "Cash CreditCard Home Credit") {
+            $MOD = "Cash, Credit Card, Home Credit";
+        } else {
+            $MOD = "Error";
+        }
+
+        $TotalAmountPaid = $Cash + $CreditCard + $HomeCredit;
+        $Cash = number_format($Cash, 2, '.', ',');
+        $CreditCard = number_format($CreditCard, 2, '.', ',');
+        $HomeCredit = number_format($HomeCredit, 2, '.', ',');
+        $TotalAmountPaid = number_format($TotalAmountPaid, 2, '.', ',');
+        ?>
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header modal-header-dark">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><i class="fa fa-globe"></i> Invoice</h4>
+                </div>
+                <div class="modal-body">
+                    <section class="content invoice">
+                        <!-- title row -->
+                        <div class="row">
+                            <div class="col-xs-12 invoice-header">
+                                <label>Transaction # <?= @$TransactionID ?></label>
+                                <label class="pull-right">Date: <?= @$_Date ?></label>
+                            </div>
+                            <!-- /.col -->
+                        </div>
+                        <!-- info row -->
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b>OR # <?= @$ORNumber ?></b>
+                                <br>
+                                <b>Sales Clerk:</b> <?= @$SalesClerk ?>
+                                <br>
+                                <b>Cashier:</b> <?= @$Cashier ?>
+                                <br>
+                                <b>Time purchased:</b> <?= @$_Time ?>
+                                <br>
+                            </div>
+                            <!-- /.col -->
+                            <div class="col-sm-4">
+                                From
+                                <address>
+                                    <strong><?= @$BranchCode = str_replace("'", "", $BranchCode); ?></strong>
+                                    <br>
+                                    <strong><?= @$Branch ?></strong>
+                                </address>
+                            </div>
+                            <!-- /.col -->
+                            <div class="col-sm-4">
+                                To
+                                <address>
+                                    <strong><?= @$CustomerName ?></strong>
+                                </address>
+                            </div>
+                            <!-- /.col -->
+                        </div>
+                        <!-- /.row -->
+
+                        <!-- Table row -->
+                        <div class="row">
+                            <div class="col-xs-12 table">
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>Qty</th>
+                                        <th>Item Name</th>
+                                        <th>IMEI / SN / PDC</th>
+                                        <th style="width: 30%">Description</th>
+                                        <th>SRP</th>
+                                        <th>Subtotal</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <?php
+                                    $Items = db_select("
+                                    SELECT
+                                    invtbl.ItemColor,
+                                    invtbl.imeisn,
+                                    itemstbl.ModelName,
+                                    itemstbl.ItemDescription,
+                                    itemstbl.SRP
+                                    FROM invtbl
+                                    LEFT JOIN itemstbl ON invtbl.ItemCode = itemstbl.ItemCode
+                                    WHERE invtbl.TransactionID = " . db_quote($TransactionID) . "
+                                    AND invtbl.BranchCode = " . db_quote($BranchCode) . "
+                                    AND invtbl.Status = 'Sold'
+                                    ");
+                                    echo db_error();
+                                    foreach ($Items as $item) {
+                                        $ModelName = $item['ModelName'];
+                                        $ItemColor = $item['ItemColor'];
+                                        $ImeiSN = $item['imeisn'];
+                                        $ItemDescription = $item['ItemDescription'];
+                                        $SRP = $item['SRP'];
+
+
+                                        $countItem = db_select("SELECT * FROM `invtbl` WHERE `imeisn` = " . db_quote($ImeiSN) . " AND `Status` = 'Sold' AND `BranchCode` = " . db_quote($BranchCode));
+                                        $Qty = count($countItem);
+
+                                        $Total = $Qty * $SRP;
+                                        $Total = number_format($Total, 2, '.', ',');
+                                        $SRP = number_format($SRP, 2, '.', ',');
+                                        ?>
+                                        <tr>
+                                            <td><?= @$Qty ?></td>
+                                            <td><?= @$ModelName . " (" . $ItemColor . ")" ?></td>
+                                            <td><?= @$ImeiSN ?></td>
+                                            <td><?= @$ItemDescription ?> </td>
+                                            <td>&#x20B1; <?= @$SRP ?></td>
+                                            <td>&#x20B1; <?= @$Total ?></td>
+                                        </tr>
+                                        <?php
+                                    }
+                                    ?>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.col -->
+                        </div>
+                        <!-- /.row -->
+                        &nbsp;
+                        <div class="row">
+                            <!-- accepted payments column -->
+                            <div class="col-xs-6">
+                                <h2><b>Payment Method:</b> <?= @$MOD ?></h2>
+                                <?php
+                                if ($MOD == "Credit Card" || $MOD == "Credit Card, Home Credit" || $MOD == "Cash, Credit Card" || $MOD == "Cash, Credit Card, Home Credit") {
+                                    ?>
+                                    <div id="CreditCardDetails">
+                                        <h4><b>Credit Card Details</b></h4>
+                                        <strong>Cardholder Name:</strong> <?= @$CustomerName ?> <br>
+                                        <strong>Card #:</strong> <?= @$CreditCardNumber ?> <br>
+                                        <strong>MID:</strong> <?= @$MID ?> <br>
+                                        <strong>Batch #:</strong> <?= @$BatchNum ?> <br>
+                                        <strong>Appr Code:</strong> <?= @$ApprCode ?> <br>
+                                        <strong>Terms:</strong> <?= @$Terms ?> <br>
+                                    </div>
+                                    <br>
+                                    <?php
+                                } elseif ($MOD == "Home Credit" || $MOD == "Credit Card, Home Credit" || $MOD == "Cash, Home Credit" || $MOD == "Cash, Credit Card, Home Credit") {
+                                    ?>
+                                    <div id="HomeCreditDetails">
+                                        <h4><b>Home Credit Details</b></h4>
+                                        <strong>Ref #:</strong> <?= @$HomeCredit ?><br>
+                                    </div>
+                                    <br>
+                                    <?php
+                                }
+                                ?>
+                            </div>
+                            <!-- /.col -->
+                            <div class="col-xs-6">
+                                <p class="lead">Total Amount Paid</p>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr>
+                                            <th style="width:50%">Cash:</th>
+                                            <td align="right">&#x20B1; <?= @$Cash ?> </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Credit Card</th>
+                                            <td align="right">&#x20B1; <?= @$CreditCard ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Home Credit:</th>
+                                            <td align="right">&#x20B1; <?= @$HomeCredit ?></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total:</th>
+                                            <td align="right">&#x20B1; <?= @$TotalAmountPaid ?></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- /.col -->
+                        </div>
+                        <!-- /.row -->
+                    </section>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-dark" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+        <?php
+    } else {
+        include_once('errormodal.php');
+    }
+} elseif (isset($_POST['vItemCode'])) {
+    $ItemCode = $_POST['vItemCode'];
+    $hashItemCode = $_POST['Hash'];
+    $rnd = $_POST['rnd'];
+
+    if (encrypt_decrypt_rnd('decrypt', $hashItemCode, $rnd) == $ItemCode) {
+
+        $getStocks = db_select("
+        SELECT
+        invtbl.imeisn,
+        itemstbl.ModelName,
+        invtbl.ItemColor,
+        brandtbl.Brand,
+        invtbl._DateReceived,
+        employeetbl.Firstname,
+        employeetbl.Lastname
+        FROM invtbl
+        LEFT JOIN itemstbl ON invtbl.ItemCode = itemstbl.ItemCode
+        LEFT JOIN brandtbl ON itemstbl.BrandID = brandtbl.BrandID
+        LEFT JOIN employeetbl ON invtbl.ReceivedBy = employeetbl.EmpID
+        WHERE invtbl.ItemCode = " . db_quote($ItemCode));
+
+        ?>
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header modal-header-dark">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Available Stocks</h4>
+                </div>
+                <div class="modal-body">
+                    <table id="sdatatable" class="table table-striped table-bordered">
+                        <thead>
+                        <tr>
+                            <th>IMEI / SN</th>
+                            <th>Model</th>
+                            <th>Brand</th>
+                            <th>Date Received</th>
+                            <th>Received By</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php
+                        foreach ($getStocks as $stocks) {
+                            $ImeiSN = $stocks['imeisn'];
+                            $ModelName = $stocks['ModelName'] . " (" . $stocks['ItemColor'] . ")";
+                            $Brand = $stocks['Brand'];
+                            $DateReceived = $stocks['_DateReceived'];
+                            $ReceivedBy = $stocks['Firstname'] . " " . $stocks['Lastname'];
+                            ?>
+                            <tr>
+                                <td><?= @$ImeiSN ?></td>
+                                <td><?= @$ModelName ?></td>
+                                <td><?= @$Brand ?></td>
+                                <td><?= @$DateReceived ?></td>
+                                <td><?= @$ReceivedBy ?></td>
+                            </tr>
+                            <?php
+                        }
+                        ?>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+
+        <!-- Datatables -->
+        <script>
+            $(document).ready(function () {
+                var handleDataTableButtons = function () {
+                    if ($("#datatable-buttons").length) {
+                        $("#datatable-buttons").DataTable({
+                            dom: "Bfrtip",
+                            buttons: [
+                                {
+                                    extend: "copy",
+                                    className: "btn-sm"
+                                },
+                                {
+                                    extend: "csv",
+                                    className: "btn-sm"
+                                },
+                                {
+                                    extend: "excel",
+                                    className: "btn-sm"
+                                },
+                                {
+                                    extend: "pdfHtml5",
+                                    className: "btn-sm"
+                                },
+                                {
+                                    extend: "print",
+                                    className: "btn-sm"
+                                }
+                            ],
+                            responsive: true
+                        });
+                    }
+                };
+
+                TableManageButtons = function () {
+                    "use strict";
+                    return {
+                        init: function () {
+                            handleDataTableButtons();
+                        }
+                    };
+                }();
+
+                $('#sdatatable').dataTable();
+
+                $('#datatable-keytable').DataTable({
+                    keys: true
+                });
+
+                $('#datatable-responsive').DataTable();
+
+                $('#datatable-scroller').DataTable({
+                    ajax: "js/datatables/json/scroller-demo.json",
+                    deferRender: true,
+                    scrollY: 380,
+                    scrollCollapse: true,
+                    scroller: true
+                });
+
+                $('#datatable-fixed-header').DataTable({
+                    fixedHeader: true
+                });
+
+                var $datatable = $('#datatable-checkbox');
+
+                $datatable.dataTable({
+                    'order': [[1, 'asc']],
+                    'columnDefs': [
+                        {orderable: false, targets: [0]}
+                    ]
+                });
+                $datatable.on('draw.dt', function () {
+                    $('input').iCheck({
+                        checkboxClass: 'icheckbox_flat-green'
+                    });
+                });
+
+                TableManageButtons.init();
+            });
+        </script>
+        <!-- /Datatables -->
+        <?php
     }
 }

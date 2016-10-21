@@ -36,11 +36,10 @@ if (encrypt_decrypt_rnd('decrypt', $hashEMPID, $rnd) == $EmpID) {
             $FullName = $FirstName . " " . $LastName;
 
 
-            $getPurchaseRequestPending = db_select("SELECT * FROM `purchaserequeststbl` WHERE `Status` = 'Pending' AND `BranchCode` IN (SELECT `BranchCode` FROM `branchtbl` WHERE `AreaID` = " . db_quote($AreaID).")");
-            $getPurchaseRequestApproved = db_select("SELECT * FROM `purchaserequeststbl` WHERE `Status` = 'Approved' OR `Status` = 'On Going' AND `isBCApproved` = '1' AND `BranchCode` IN (SELECT `BranchCode` FROM `branchtbl` WHERE `AreaID` = " . db_quote($AreaID).")");
+            $getPurchaseRequestPending = db_select("SELECT * FROM `purchaserequeststbl` WHERE `Status` = 'Pending' AND `BranchCode` IN (SELECT `BranchCode` FROM `branchtbl` WHERE `AreaID` = " . db_quote($AreaID) . ")");
+            $getPurchaseRequestApproved = db_select("SELECT * FROM `purchaserequeststbl` WHERE `Status` = 'Approved' OR `Status` = 'On Going' AND `isBCApproved` = '1' AND `BranchCode` IN (SELECT `BranchCode` FROM `branchtbl` WHERE `AreaID` = " . db_quote($AreaID) . ")");
         }
     }
-
 
 } else {
     session_destroy();
@@ -74,6 +73,12 @@ if (encrypt_decrypt_rnd('decrypt', $hashEMPID, $rnd) == $EmpID) {
                 <ul class="nav side-menu">
                     <li>
                         <a><i class="fa fa-bar-chart"></i> Sales Report</span></a>
+                    </li>
+                    <li>
+                        <a href="st.php"><i class="fa fa-area-chart"></i> Sales Transactions</span></a>
+                    </li>
+                    <li>
+                        <a><i class="fa fa-line-chart"></i> Staff Performance</span></a>
                     </li>
                     <li>
                         <a><i class="fa fa-credit-card"></i> Purchase Requests <span class="fa fa-chevron-down"></span></a>

@@ -51,7 +51,7 @@ if (isset($_POST['PONumber'])) {
         $ModifiedBy = $getName[0]['Firstname'] . " " . $getName[0]['Lastname'];
         $ModifyCode = $purchaserequesttbl[0]['ModifyCode'];
         $Status = $purchaserequesttbl[0]['Status'];
-        $rnd = rand(0, 9999);
+        $rnd = rand(1000, 9999);
 
 
         if ($Status == "Approved" || $Status == "On Going" || $Status == "Completed") {

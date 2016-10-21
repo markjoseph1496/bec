@@ -9,7 +9,9 @@
 
     <title>Administrator</title>
 
-    <link rel="import" href="../css.html">
+    <?php
+    include_once('../css.html');
+    ?>
 
 </head>
 
@@ -269,7 +271,10 @@
     </div>
 </div>
 
-<link rel="import" href="../js.html">
+<?php
+include_once('../js.html');
+?>
+
 <script src="js/function.js"></script>
 
 <?php

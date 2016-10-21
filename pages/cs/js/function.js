@@ -613,8 +613,24 @@ function TransactionDetails(TransactionID, hash, rnd) {
             rnd: rnd
         },
         success: function (data) {
-            $('#PODetails').html(data);
-            $('#PODetails').modal('show');
+            $('#TDetails').html(data);
+            $('#TDetails').modal('show');
+        }
+    })
+}
+
+function ItemDetails(ItemCode, hash, rnd) {
+    $.ajax({
+        type: 'POST',
+        url: 'php/function.php',
+        data: {
+            vItemCode: ItemCode,
+            Hash: hash,
+            rnd: rnd
+        },
+        success: function (data) {
+            $('#ViewItemDetails').html(data);
+            $('#ViewItemDetails').modal('show');
         }
     })
 }

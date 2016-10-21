@@ -19,7 +19,9 @@ if (encrypt_decrypt('decrypt', $hashPRNumber) != $PONumber) {
     <title>Purchase Request</title>
     <link rel="shortcut icon" href="../../img/B%20LOGO%20BLACK.png">
 
-    <link rel="import" href="../css.html">
+    <?php
+    include_once('../css.html');
+    ?>
 
 
 </head>
@@ -390,7 +392,10 @@ if (encrypt_decrypt('decrypt', $hashPRNumber) != $PONumber) {
     </div>
 </div>
 
-<link rel="import" href="../js.html">
+<?php
+include_once('../js.html');
+?>
+
 <script src="js/function.js"></script>
 
 <!-- Datatables -->

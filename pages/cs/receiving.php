@@ -13,7 +13,9 @@ include_once('../../functions/encryption.php');
     <title>Administrator</title>
     <link rel="shortcut icon" href="../../img/B%20LOGO%20BLACK.png">
 
-    <link rel="import" href="../css.html">
+    <?php
+    include_once('../css.html');
+    ?>
 
 </head>
 
@@ -84,7 +86,7 @@ include_once('../../functions/encryption.php');
                                                 $Branch = $Order['BranchCode'];
                                                 $ContactPerson = $Order['Firstname'] . " " . $Order['Lastname'];
 
-                                                $rnd = rand(0, 9999);
+                                                $rnd = rand(1000, 9999);
                                                 $hashPONumber = encrypt_decrypt_rnd('encrypt', $PONumber, $rnd);
                                                 ?>
                                                 <tr>
@@ -132,7 +134,10 @@ include_once('../../functions/encryption.php');
     </div>
 </div>
 
-<link rel="import" href="../js.html">
+<?php
+include_once('../js.html');
+?>
+
 <script src="js/function.js"></script>
 
 <?php

@@ -10,7 +10,9 @@
     <title>Administrator</title>
     <link rel="shortcut icon" href="../../img/B%20LOGO%20BLACK.png">
 
-    <link rel="import" href="../css.html">
+    <?php
+    include_once('../css.html');
+    ?>
 
 </head>
 
@@ -19,6 +21,10 @@
     <div class="main_container">
         <?php
         include('navigation.php');
+        include_once('../../functions/encryption.php');
+        $hashTransactionID = substr($_GET['id'], 0, 32);
+        $trnd = substr($_GET['id'], 32, 4);
+        $TransactionID = $_GET['tid'];
         ?>
 
         <!-- page content -->
@@ -26,7 +32,7 @@
             <div class="">
                 <div class="page-title">
                     <div class="title_left">
-                        <h3>Plain Page</h3>
+                        <h3>Transaction</h3>
                     </div>
                 </div>
 
@@ -36,72 +42,140 @@
                     <div class="col-md-12 col-sm-12 col-xs-12">
                         <div class="x_panel">
                             <div class="x_title">
-                                <h2>Invoice Design
-                                    <small>Sample user invoice design</small>
-                                </h2>
-                                <ul class="nav navbar-right panel_toolbox">
-                                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                    </li>
-                                    <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                        <ul class="dropdown-menu" role="menu">
-                                            <li><a href="#">Settings 1</a>
-                                            </li>
-                                            <li><a href="#">Settings 2</a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                    </li>
-                                </ul>
+                                <h2>Invoice</h2>
                                 <div class="clearfix"></div>
                             </div>
                             <div class="x_content">
+                                <?php
+                                if (encrypt_decrypt_rnd('decrypt', $hashTransactionID, $trnd) == $TransactionID) {
+                                    $transactionDetails = db_select("
+                                    SELECT
+                                    transactiontbl.ORNumber,
+                                    transactiontbl._Date,
+                                    transactiontbl._Time,
+                                    transactiontbl.CustomerName,
+                                    transactiontbl.SalesClerk,
+                                    transactiontbl.Cashier,
+                                    transactiontbl.ModeOfPayment,
+                                    branchtbl.BranchName,
+                                    cashtransactiontbl.Amount Cash,
+                                    credittransactiontbl.Amount CreditCard,
+                                    credittransactiontbl.CreditCardNumber,
+                                    credittransactiontbl.CardHolderName,
+                                    credittransactiontbl.MID,
+                                    credittransactiontbl.BatchNum,
+                                    credittransactiontbl.ApprCode,
+                                    credittransactiontbl.Term,
+                                    credittransactiontbl.IDPresented,
+                                    homecredittransactiontbl.Amount HomeCredit,
+                                    homecredittransactiontbl.ReferenceNo
+                                    FROM transactiontbl
+                                    LEFT JOIN cashtransactiontbl ON transactiontbl.TransactionID = cashtransactiontbl.TransactionID
+                                    LEFT JOIN credittransactiontbl ON transactiontbl.TransactionID = credittransactiontbl.TransactionID
+                                    LEFT JOIN homecredittransactiontbl ON transactiontbl.TransactionID = homecredittransactiontbl.TransactionID
+                                    LEFT JOIN branchtbl ON transactiontbl.BranchCode = branchtbl.BranchCode
+                                    WHERE transactiontbl.TransactionID = " . db_quote($TransactionID) . "
+                                    AND transactiontbl.BranchCode = ". db_quote($BranchCode));
 
+                                    $EmpSC = $transactionDetails[0]['SalesClerk'];
+                                    $EmpCS = $transactionDetails[0]['Cashier'];
+                                    $getSC = db_select("SELECT `Firstname`, `Lastname` FROM `employeetbl` WHERE `EmpID` = " . db_quote($EmpSC));
+                                    $getCS = db_select("SELECT `Firstname`, `Lastname` FROM `employeetbl` WHERE `EmpID` = " . db_quote($EmpCS));
+
+                                    $ORNumber = $transactionDetails[0]['ORNumber'];
+                                    $_Date = $transactionDetails[0]['_Date'];
+                                    $_Time = $transactionDetails[0]['_Time'];
+                                    $CustomerName = $transactionDetails[0]['CustomerName'];
+                                    $Branch = $transactionDetails[0]['BranchName'];
+                                    $SalesClerk = $getSC[0]['Firstname'] . " " . $getSC[0]['Lastname'];
+                                    $Cashier = $getCS[0]['Firstname'] . " " . $getCS[0]['Lastname'];
+                                    $ModeOfPayment = $transactionDetails[0]['ModeOfPayment'];
+                                    $Cash = $transactionDetails[0]['Cash'];
+                                    $CreditCard = $transactionDetails[0]['CreditCard'];
+                                    $CreditCardNumber = $transactionDetails[0]['CreditCardNumber'];
+                                    $CardHolderName = $transactionDetails[0]['CardHolderName'];
+                                    $MID = $transactionDetails[0]['MID'];
+                                    $BatchNum = $transactionDetails[0]['BatchNum'];
+                                    $ApprCode = $transactionDetails[0]['ApprCode'];
+                                    $Term = $transactionDetails[0]['Term'];
+                                    $IDPresented = $transactionDetails[0]['IDPresented'];
+                                    $HomeCredit = $transactionDetails[0]['HomeCredit'];
+                                    $ReferenceNo = $transactionDetails[0]['ReferenceNo'];
+
+                                    $MOD = "";
+                                    if ($ModeOfPayment == "Cash") {
+                                        $MOD = "Cash";
+                                        $CreditCard = 0;
+                                        $HomeCredit = 0;
+                                    } elseif ($ModeOfPayment == "Credit Card") {
+                                        $MOD = "Credit Card";
+                                        $Cash = 0;
+                                        $HomeCredit = 0;
+                                    } elseif ($ModeOfPayment == "Home Credit") {
+                                        $MOD = "Home Credit";
+                                        $Cash = 0;
+                                        $CreditCard = 0;
+                                    } elseif ($ModeOfPayment == "HomeCredit Credit Card") {
+                                        $MOD = "Credit Card, Home Credit";
+                                        $Cash = 0;
+                                    } elseif ($ModeOfPayment == "Cash CreditCard") {
+                                        $MOD = "Cash, Credit Card";
+                                        $Home = 0;
+                                    } elseif ($ModeOfPayment == "Cash Home Credit") {
+                                        $MOD = "Cash, Home Credit";
+                                        $CreditCard = 0;
+                                    } elseif ($ModeOfPayment == "Cash CreditCard Home Credit") {
+                                        $MOD = "Cash, Credit Card, Home Credit";
+                                    } else {
+                                        $MOD = "Error";
+                                    }
+
+                                    $TotalAmountPaid = $Cash + $CreditCard + $HomeCredit;
+                                    $Cash = number_format($Cash, 2, '.', ',');
+                                    $CreditCard = number_format($CreditCard, 2, '.', ',');
+                                    $HomeCredit = number_format($HomeCredit, 2, '.', ',');
+                                    $TotalAmountPaid = number_format($TotalAmountPaid, 2, '.', ',');
+
+                                } else {
+                                    echo '<script type="text/javascript">window.location.href = "addtrans.php";</script>';
+                                }
+                                ?>
                                 <section class="content invoice">
                                     <!-- title row -->
                                     <div class="row">
                                         <div class="col-xs-12 invoice-header">
-                                            <h1>
-                                                <i class="fa fa-globe"></i> Invoice.
-                                                <small class="pull-right">Date: 16/08/2016</small>
-                                            </h1>
+                                            <label>Transaction # <?= @$TransactionID ?></label>
+                                            <label class="pull-right">Date: <?= @$_Date ?></label>
                                         </div>
                                         <!-- /.col -->
                                     </div>
                                     <!-- info row -->
-                                    <div class="row invoice-info">
-                                        <div class="col-sm-4 invoice-col">
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <b>OR # <?= @$ORNumber ?></b>
+                                            <br>
+                                            <b>Sales Clerk:</b> <?= @$SalesClerk ?>
+                                            <br>
+                                            <b>Cashier:</b> <?= @$Cashier ?>
+                                            <br>
+                                            <b>Time purchased:</b> <?= @$_Time ?>
+                                            <br>
+                                        </div>
+                                        <!-- /.col -->
+                                        <div class="col-sm-4">
                                             From
                                             <address>
-                                                <strong>Iron Admin, Inc.</strong>
-                                                <br>795 Freedom Ave, Suite 600
-                                                <br>New York, CA 94107
-                                                <br>Phone: 1 (804) 123-9876
-                                                <br>Email: ironadmin.com
+                                                <strong><?= @$BranchCode = str_replace("'", "", $BranchCode); ?></strong>
+                                                <br>
+                                                <strong><?= @$Branch ?></strong>
                                             </address>
                                         </div>
                                         <!-- /.col -->
-                                        <div class="col-sm-4 invoice-col">
+                                        <div class="col-sm-4">
                                             To
                                             <address>
-                                                <strong>John Doe</strong>
-                                                <br>795 Freedom Ave, Suite 600
-                                                <br>New York, CA 94107
-                                                <br>Phone: 1 (804) 123-9876
-                                                <br>Email: jon@ironadmin.com
+                                                <strong><?= @$CustomerName ?></strong>
                                             </address>
-                                        </div>
-                                        <!-- /.col -->
-                                        <div class="col-sm-4 invoice-col">
-                                            <b>Invoice #007612</b>
-                                            <br>
-                                            <br>
-                                            <b>Order ID:</b> 4F3S8J
-                                            <br>
-                                            <b>Payment Due:</b> 2/22/2014
-                                            <br>
-                                            <b>Account:</b> 968-34567
                                         </div>
                                         <!-- /.col -->
                                     </div>
@@ -114,82 +188,113 @@
                                                 <thead>
                                                 <tr>
                                                     <th>Qty</th>
-                                                    <th>Product</th>
-                                                    <th>Serial #</th>
-                                                    <th style="width: 59%">Description</th>
+                                                    <th>Item Name</th>
+                                                    <th>IMEI / SN / PDC</th>
+                                                    <th style="width: 30%">Description</th>
+                                                    <th>SRP</th>
                                                     <th>Subtotal</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <tr>
-                                                    <td>1</td>
-                                                    <td>Call of Duty</td>
-                                                    <td>455-981-221</td>
-                                                    <td>El snort testosterone trophy driving gloves handsome gerry Richardson helvetica tousled street art master testosterone trophy driving gloves handsome gerry Richardson
-                                                    </td>
-                                                    <td>$64.50</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>1</td>
-                                                    <td>Need for Speed IV</td>
-                                                    <td>247-925-726</td>
-                                                    <td>Wes Anderson umami biodiesel</td>
-                                                    <td>$50.00</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>1</td>
-                                                    <td>Monsters DVD</td>
-                                                    <td>735-845-642</td>
-                                                    <td>Terry Richardson helvetica tousled street art master, El snort testosterone trophy driving gloves handsome letterpress erry Richardson helvetica tousled</td>
-                                                    <td>$10.70</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>1</td>
-                                                    <td>Grown Ups Blue Ray</td>
-                                                    <td>422-568-642</td>
-                                                    <td>Tousled lomo letterpress erry Richardson helvetica tousled street art master helvetica tousled street art master, El snort testosterone</td>
-                                                    <td>$25.99</td>
-                                                </tr>
+                                                <?php
+                                                $Items = db_select("
+                                                SELECT
+                                                invtbl.ItemColor,
+                                                invtbl.imeisn,
+                                                itemstbl.ModelName,
+                                                itemstbl.ItemDescription,
+                                                itemstbl.SRP
+                                                FROM invtbl
+                                                LEFT JOIN itemstbl ON invtbl.ItemCode = itemstbl.ItemCode
+                                                WHERE invtbl.TransactionID = " . db_quote($TransactionID) . "
+                                                AND invtbl.BranchCode = " . db_quote($BranchCode) . "
+                                                AND invtbl.Status = 'Sold'
+                                                  ");
+                                                echo db_error();
+                                                foreach ($Items as $item) {
+                                                    $ModelName = $item['ModelName'];
+                                                    $ItemColor = $item['ItemColor'];
+                                                    $ImeiSN = $item['imeisn'];
+                                                    $ItemDescription = $item['ItemDescription'];
+                                                    $SRP = $item['SRP'];
+
+
+                                                    $countItem = db_select("SELECT * FROM `invtbl` WHERE `imeisn` = " . db_quote($ImeiSN) . " AND `Status` = 'Sold' AND `BranchCode` = " . db_quote($BranchCode));
+                                                    $Qty = count($countItem);
+
+                                                    $Total = $Qty * $SRP;
+                                                    $Total = number_format($Total, 2, '.', ',');
+                                                    $SRP = number_format($SRP, 2, '.', ',');
+                                                    ?>
+                                                    <tr>
+                                                        <td><?= @$Qty ?></td>
+                                                        <td><?= @$ModelName . " (" . $ItemColor . ")" ?></td>
+                                                        <td><?= @$ImeiSN ?></td>
+                                                        <td><?= @$ItemDescription ?> </td>
+                                                        <td>&#x20B1; <?= @$SRP ?></td>
+                                                        <td>&#x20B1; <?= @$Total ?></td>
+                                                    </tr>
+                                                    <?php
+                                                }
+                                                ?>
+
                                                 </tbody>
                                             </table>
                                         </div>
                                         <!-- /.col -->
                                     </div>
                                     <!-- /.row -->
-
+                                    &nbsp;
                                     <div class="row">
                                         <!-- accepted payments column -->
                                         <div class="col-xs-6">
-                                            <p class="lead">Payment Methods:</p>
-                                            <img src="images/visa.png" alt="Visa">
-                                            <img src="images/mastercard.png" alt="Mastercard">
-                                            <img src="images/american-express.png" alt="American Express">
-                                            <img src="images/paypal.png" alt="Paypal">
-                                            <p class="text-muted well well-sm no-shadow" style="margin-top: 10px;">
-                                                Etsy doostang zoodles disqus groupon greplin oooj voxy zoodles, weebly ning heekya handango imeem plugg dopplr jibjab, movity jajah plickers sifteo edmodo ifttt zimbra.
-                                            </p>
+                                            <h2><b>Payment Method:</b> <?= @$MOD ?></h2>
+                                            <?php
+                                            if ($MOD == "Credit Card" || $MOD == "Credit Card, Home Credit" || $MOD == "Cash, Credit Card" || $MOD == "Cash, Credit Card, Home Credit") {
+                                                ?>
+                                                <div id="CreditCardDetails">
+                                                    <h4><b>Credit Card Details</b></h4>
+                                                    <strong>Cardholder Name:</strong> <?= @$CustomerName ?> <br>
+                                                    <strong>Card #:</strong> <?= @$CreditCardNumber ?> <br>
+                                                    <strong>MID:</strong> <?= @$MID ?> <br>
+                                                    <strong>Batch #:</strong> <?= @$BatchNum ?> <br>
+                                                    <strong>Appr Code:</strong> <?= @$ApprCode ?> <br>
+                                                    <strong>Terms:</strong> <?= @$Terms ?> <br>
+                                                </div>
+                                                <br>
+                                                <?php
+                                            } elseif ($MOD == "Home Credit" || $MOD == "Credit Card, Home Credit" || $MOD == "Cash, Home Credit" || $MOD == "Cash, Credit Card, Home Credit") {
+                                                ?>
+                                                <div id="HomeCreditDetails">
+                                                    <h4><b>Home Credit Details</b></h4>
+                                                    <strong>Ref #:</strong> <?= @$HomeCredit ?><br>
+                                                </div>
+                                                <br>
+                                                <?php
+                                            }
+                                            ?>
                                         </div>
                                         <!-- /.col -->
                                         <div class="col-xs-6">
-                                            <p class="lead">Amount Due 2/22/2014</p>
+                                            <p class="lead">Total Amount Paid</p>
                                             <div class="table-responsive">
                                                 <table class="table">
                                                     <tbody>
                                                     <tr>
-                                                        <th style="width:50%">Subtotal:</th>
-                                                        <td>$250.30</td>
+                                                        <th style="width:50%">Cash:</th>
+                                                        <td align="right">&#x20B1; <?= @$Cash ?> </td>
                                                     </tr>
                                                     <tr>
-                                                        <th>Tax (9.3%)</th>
-                                                        <td>$10.34</td>
+                                                        <th>Credit Card</th>
+                                                        <td align="right">&#x20B1; <?= @$CreditCard ?></td>
                                                     </tr>
                                                     <tr>
-                                                        <th>Shipping:</th>
-                                                        <td>$5.80</td>
+                                                        <th>Home Credit:</th>
+                                                        <td align="right">&#x20B1; <?= @$HomeCredit ?></td>
                                                     </tr>
                                                     <tr>
                                                         <th>Total:</th>
-                                                        <td>$265.24</td>
+                                                        <td align="right">&#x20B1; <?= @$TotalAmountPaid ?></td>
                                                     </tr>
                                                     </tbody>
                                                 </table>
@@ -198,16 +303,8 @@
                                         <!-- /.col -->
                                     </div>
                                     <!-- /.row -->
-
-                                    <!-- this row will not appear when printing -->
-                                    <div class="row no-print">
-                                        <div class="col-xs-12">
-                                            <button class="btn btn-default" onclick="window.print();"><i class="fa fa-print"></i> Print</button>
-                                            <button class="btn btn-success pull-right"><i class="fa fa-credit-card"></i> Submit Payment</button>
-                                            <button class="btn btn-primary pull-right" style="margin-right: 5px;"><i class="fa fa-download"></i> Generate PDF</button>
-                                        </div>
-                                    </div>
                                 </section>
+                                <a href="addtrans.php" style="float: right" class="btn btn-dark"><i class="fa fa-mail-reply"></i> Back</a>
                             </div>
                         </div>
                     </div>
@@ -227,8 +324,18 @@
     </div>
 </div>
 
-<link rel="import" href="../js.html">
-<script src="js/function.js"></script>
+<?php
+include_once('../js.html');
+?>
 
+<script src="js/function.js"></script>
+<script>
+    new PNotify({
+        title: 'Transaction Successful',
+        type: 'success',
+        styling: 'bootstrap3',
+        delay: 5000
+    });
+</script>
 </body>
 </html>

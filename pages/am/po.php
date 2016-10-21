@@ -10,7 +10,9 @@
     <title>Purchase Request</title>
     <link rel="shortcut icon" href="../../img/B%20LOGO%20BLACK.png">
 
-    <link rel="import" href="../css.html">
+    <?php
+    include_once('../css.html');
+    ?>
 
 </head>
 
@@ -81,7 +83,7 @@
                                                 $Branch = $Order['BranchCode'];
                                                 $AMApproved = $Order['isAMApproved'];
                                                 $ContactPerson = $Order['Firstname'] . " " . $Order['Lastname'];
-                                                $srnd = rand(0, 9999);
+                                                $srnd = rand(1000, 9999);
                                                 $hashPONumber = encrypt_decrypt_rnd('encrypt', $PONumber, $srnd);
                                                 $Pending = "●";
                                                 ?>
@@ -267,7 +269,10 @@
     </div>
 </div>
 
-<link rel="import" href="../js.html">
+<?php
+include_once('../js.html');
+?>
+
 <script src="js/function.js"></script>
 
 <?php

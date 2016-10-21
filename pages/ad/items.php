@@ -9,10 +9,11 @@
 
     <title>Administrator</title>
 
-    <link rel="import" href="../css.html">
+    <?php
+    include_once('../css.html');
+    ?>
 
 </head>
-
 <body class="nav-md">
 <div class="container body">
     <div class="main_container">
@@ -77,7 +78,6 @@
 
                                                 $Itemsrnd = rand(0, 9999);
                                                 $hashItemCode = encrypt_decrypt_rnd('encrypt', $ItemCode, $Itemsrnd);
-
                                                 ?>
                                                 <tr>
                                                     <td><?php echo $ItemCode ?></td>
@@ -134,7 +134,6 @@
                                         <!-- /.modal-dialog -->
                                     </div>
                                     <!-- /.Modal -->
-
                                 </div>
                             </div>
                         </div>
@@ -201,15 +200,15 @@
                                     </div>
                                     <div class="form-group">
                                         <label>SRP <span class="red">(*)</span></label>
-                                        <input type="text" class="form-control" id="SRP" name="SRP">
+                                        <input type="text" class="form-control" id="SRP" name="SRP" onblur="NumberConvertToMoney()" onclick="this.setSelectionRange(0, this.value.length)" value="0.00">
                                     </div>
                                     <div class="form-group">
                                         <label>Dealer's Price<span class="red">(*)</span></label>
-                                        <input type="text" class="form-control" id="DP" name="DP">
+                                        <input type="text" class="form-control" id="DP" name="DP" onblur="NumberConvertToMoney()" onclick="this.setSelectionRange(0, this.value.length)" value="0.00">
                                     </div>
                                     <div class="form-group">
                                         <label>Critical Level<span class="red">(*)</span></label>
-                                        <input tytype="text" class="form-control" id="CriticalLevel" name="CriticalLevel">
+                                        <input TYPE="number" class="form-control" id="CriticalLevel" name="CriticalLevel">
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -223,8 +222,6 @@
                     <!-- /.modal-dialog -->
                 </div>
                 <!-- /.modal -->
-
-
             </div>
         </div>
         <!-- /page content -->
@@ -240,7 +237,10 @@
     </div>
 </div>
 
-<link rel="import" href="../js.html">
+<?php
+include_once('../js.html');
+?>
+
 <script src="js/function.js"></script>
 
 <!-- Datatables -->
@@ -411,6 +411,10 @@
                     validators: {
                         notEmpty: {
                             message: 'SRP is required.'
+                        },
+                        regexp: {
+                            regexp: /^[0-9\s]+$/i,
+                            message: "SRP can consist of positive numbers only"
                         }
                     }
                 },
@@ -418,6 +422,10 @@
                     validators: {
                         notEmpty: {
                             message: 'DP is required.'
+                        },
+                        regexp: {
+                            regexp: /^[0-9\s]+$/i,
+                            message: "DP can consist of positive numbers only"
                         }
                     }
                 },
@@ -425,6 +433,10 @@
                     validators: {
                         notEmpty: {
                             message: 'Critical Level is required.'
+                        },
+                        regexp: {
+                            regexp: /^[0-9\s]+$/i,
+                            message: "Critical Level can consist of positive numbers only"
                         }
                     }
                 }

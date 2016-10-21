@@ -1,11 +1,3 @@
-<?php
-include_once('../../functions/encryption.php');
-if (isset($_GET['id'])) {
-    $CurrentDate = $_GET['id'];
-} else {
-    $CurrentDate = date("Y-m-d");
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,7 +13,6 @@ if (isset($_GET['id'])) {
     <?php
     include_once('../css.html');
     ?>
-
 </head>
 
 <body class="nav-md">
@@ -29,6 +20,19 @@ if (isset($_GET['id'])) {
     <div class="main_container">
         <?php
         include('navigation.php');
+        include_once('../../functions/encryption.php');
+        $getBranches = db_select("SELECT `BranchCode` FROM `branchtbl` WHERE `AreaID` = " . db_quote($AreaID));
+
+        if (isset($_GET['id'])) {
+            $CurrentDate = $_GET['id'];
+            $CurrentBranch = substr($_GET['br'], 0, 32);
+            $Currentrnd = substr($_GET['br'], 32, 4);
+            $decryptBranch = encrypt_decrypt_rnd('decrypt', $CurrentBranch, $Currentrnd);
+        } else {
+            $CurrentDate = date("Y-m-d");
+            $CurrentBranch = "";
+            $decryptBranch = $getBranches[0]['BranchCode'];
+        }
         ?>
 
         <!-- page content -->
@@ -56,8 +60,22 @@ if (isset($_GET['id'])) {
                                             <div class="row">
                                                 <div class="col-md-4">
                                                     <form id="frmDate" method="GET" autocomplete="off">
-                                                        <label for="_Date">Select Date</label>
-                                                        <input type="date" class="form-control" name="id" id="id" value="<?= @$CurrentDate ?>" onchange="$('#frmDate').submit();">
+                                                        <label for="_Date">Branch</label>
+                                                        <select class="form-control" name="br" id="br" onchange="$('#frmDate').submit();">
+                                                            <?php
+                                                            foreach ($getBranches as $branch) {
+                                                                $BranchCode = $branch['BranchCode'];
+                                                                $rnd = rand(1000, 9999);
+                                                                $hashBranchCode = encrypt_decrypt_rnd('encrypt', $BranchCode, $rnd);
+                                                                ?>
+                                                                <option value="<?= @ $hashBranchCode . $rnd ?>" <?php if ($BranchCode == $decryptBranch) echo "selected='selected'" ?>><?= @$BranchCode ?></option>
+                                                                <?php
+                                                            }
+                                                            ?>
+                                                        </select>
+                                                        <br>
+                                                        <label for="_Date">Date</label>
+                                                        <input type="date" class="form-control" name="id" id="id" value="<?= @$CurrentDate ?>" onchange="$('#frmDate').submit();" onkeydown="return false" required="required">
                                                     </form>
                                                 </div>
                                             </div>
@@ -102,9 +120,10 @@ if (isset($_GET['id'])) {
                                                             LEFT JOIN credittransactiontbl ON transactiontbl.TransactionID = credittransactiontbl.TransactionID
                                                             LEFT JOIN homecredittransactiontbl ON transactiontbl.TransactionID = homecredittransactiontbl.TransactionID
                                                             WHERE transactiontbl._Date = " . db_quote($CurrentDate) . "
-                                                            AND transactiontbl.BranchCode = " . db_quote($BranchCode) . "
+                                                            AND transactiontbl.BranchCode = " . db_quote($decryptBranch) . "
                                                             ORDER BY transactiontbl._Time ASC
                                                             ");
+
                                                             foreach ($Transactiontbl as $Transaction) {
                                                                 $TransactionID = $Transaction['TransactionID'];
                                                                 $_Time = $Transaction['_Time'];
@@ -117,7 +136,7 @@ if (isset($_GET['id'])) {
                                                                 $HomeCredit = $Transaction['HomeCredit'];
                                                                 $Status = $Transaction['Status'];
 
-                                                                $trnd = rand(1000,9999);
+                                                                $trnd = rand(1000, 9999);
                                                                 $hashTID = encrypt_decrypt_rnd('encrypt', $TransactionID, $trnd);
 
                                                                 if ($Status == "Cancelled") {
@@ -134,7 +153,7 @@ if (isset($_GET['id'])) {
 
                                                                 ?>
                                                                 <tr>
-                                                                    <td><?= @$_Time  ?></td>
+                                                                    <td><?= @$_Time ?></td>
                                                                     <td><?= @$ORNumber ?></td>
                                                                     <td><?= @$CustomerName ?></td>
                                                                     <td><?= @$InitialsSC[0]['Initials']; ?></td>
@@ -142,7 +161,7 @@ if (isset($_GET['id'])) {
                                                                     <td align="right">&#x20B1; <?= @$AmountTendered ?></td>
                                                                     <td><?= @$Status ?></td>
                                                                     <td>
-                                                                        <button class="btn btn-dark" onclick="TransactionDetails(this.value, '<?= @$hashTID ?>', '<?= @$trnd ?>');" value="<?= @$TransactionID ?>" ><i class="fa fa-eye"></i></button>
+                                                                        <button class="btn btn-dark" onclick="TransactionDetails(this.value, '<?= @$hashTID ?>', '<?= @$trnd ?>','<?= @$CurrentBranch . $Currentrnd ?>');" value="<?= @$TransactionID ?>"><i class="fa fa-eye"></i></button>
                                                                     </td>
                                                                 </tr>
                                                                 <?php

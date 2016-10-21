@@ -13,7 +13,9 @@ include_once('../../functions/encryption.php');
     <title>Administrator</title>
     <link rel="shortcut icon" href="../../img/B%20LOGO%20BLACK.png">
 
-    <link rel="import" href="../css.html">
+    <?php
+    include_once('../css.html');
+    ?>
 
 </head>
 
@@ -69,7 +71,6 @@ include_once('../../functions/encryption.php');
                                                 if (count($countItem) <= $countCriticalLevel) {
                                                     $CriticalCount++;
                                                 }
-
                                             }
                                             ?>
                                             <label>Total Items: <?= @$CountItems ?></label>
@@ -104,6 +105,8 @@ include_once('../../functions/encryption.php');
                                                             $Brand = $item['Brand'];
                                                             $CriticalLevel = $item['CriticalLevel'];
                                                             $LowLevel = "●";
+                                                            $rand = rand(1000, 9999);
+                                                            $hashItemCode = encrypt_decrypt_rnd('encrypt', $ItemCode, $rand);
 
                                                             $countItem = db_select("SELECT * FROM `invtbl` WHERE `ItemCode` = " . db_quote($ItemCode) . "  AND `BranchCode` = " . db_quote($BranchCode) . " AND `Status` = 'On Hand'");
                                                             $StockOnHand = count($countItem);
@@ -117,25 +120,20 @@ include_once('../../functions/encryption.php');
                                                                 <td><?= @$Category ?></td>
                                                                 <td><?= @$StockOnHand ?></td>
                                                                 <td>
-                                                                    <button class="btn btn-dark"><i class="fa fa-eye"></i></button>
+                                                                    <button class="btn btn-dark" onclick="ItemDetails(this.value,'<?= @$hashItemCode ?>', '<?= @$rand ?>')" value="<?= @$ItemCode ?>"><i class="fa fa-eye"></i></button>
                                                                 </td>
                                                             </tr>
                                                             <?php
                                                         }
-
                                                         ?>
                                                         </tbody>
                                                     </table>
                                                 </div>
-                                                <!-- /.panel-body -->
-                                                <div class="panel-footer">
-
-                                                </div>
                                             </div>
                                             <!-- End Panel -->
                                         </div>
-                                        <!-- PO Details -->
-                                        <div class="modal fade" id="PODetails">
+                                        <!-- Add Item Modal -->
+                                        <div class="modal fade" id="ViewItemDetails">
 
                                         </div>
                                         <!-- /.modal -->
@@ -160,7 +158,10 @@ include_once('../../functions/encryption.php');
     </div>
 </div>
 
-<link rel="import" href="../js.html">
+<?php
+include_once('../js.html');
+?>
+
 <script src="js/function.js"></script>
 
 <?php

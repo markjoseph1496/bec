@@ -13,7 +13,9 @@ include_once('../../functions/encryption.php');
     <title>Administrator</title>
     <link rel="shortcut icon" href="../../img/B%20LOGO%20BLACK.png">
 
-    <link rel="import" href="../css.html">
+    <?php
+    include_once('../css.html');
+    ?>
 
 </head>
 
@@ -83,7 +85,7 @@ include_once('../../functions/encryption.php');
                                                 $Branch = $Order['BranchCode'];
                                                 $ContactPerson = $Order['Firstname'] . " " . $Order['Lastname'];
 
-                                                $rnd = rand(0, 9999);
+                                                $rnd = rand(1000, 9999);
                                                 $hashPONumber = encrypt_decrypt_rnd('encrypt', $PONumber, $rnd);
                                                 ?>
                                                 <tr>
@@ -131,41 +133,13 @@ include_once('../../functions/encryption.php');
     </div>
 </div>
 
-<!-- jQuery -->
-<script src="../../src/jquery/dist/jquery.min.js"></script>
-<!-- Bootstrap -->
-<script src="../../src/bootstrap/dist/js/bootstrap.min.js"></script>
-<!-- FastClick -->
-<script src="../../src/fastclick/lib/fastclick.js"></script>
-<!-- NProgress -->
-<script src="../../src/nprogress/nprogress.js"></script>
-<!-- validator -->
-<script src="../../src/validator/bootstrapValidator.min.js"></script>
-<!-- PNotify -->
-<script src="../../src/pnotify/dist/pnotify.js"></script>
-<script src="../../src/pnotify/dist/pnotify.buttons.js"></script>
-<script src="../../src/pnotify/dist/pnotify.nonblock.js"></script>
+<?php
+include_once('../js.html');
+?>
 
-<!-- Datatables -->
-<script src="../../src/datatables.net/js/jquery.dataTables.min.js"></script>
-<script src="../../src/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-<script src="../../src/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-<script src="../../src/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
-<script src="../../src/datatables.net-buttons/js/buttons.flash.min.js"></script>
-<script src="../../src/datatables.net-buttons/js/buttons.html5.min.js"></script>
-<script src="../../src/datatables.net-buttons/js/buttons.print.min.js"></script>
-<script src="../../src/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
-<script src="../../src/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
-<script src="../../src/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
-<script src="../../src/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
-<script src="../../src/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
-<script src="../../src/jszip/dist/jszip.min.js"></script>
-<script src="../../src/pdfmake/build/pdfmake.min.js"></script>
-<script src="../../src/pdfmake/build/vfs_fonts.js"></script>
 <!-- Function Script -->
 <script src="js/function.js"></script>
-<!-- Custom Theme Scripts -->
-<script src="../../build/js/custom.min.js"></script>
+
 
 <?php
 if (isset($_GET['error'])) {

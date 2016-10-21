@@ -9,7 +9,9 @@
 
     <title>Administrator</title>
 
-    <link rel="import" href="../css.html">
+    <?php
+    include_once('../css.html');
+    ?>
 
 </head>
 
@@ -142,7 +144,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <label>Branch Name <span class="red">(*)</span></label>
-                                                <input type="text" class="form-control" style="text-transform: uppercase" id="BranchName" name="BranchName">
+                                                <input type="text" class="form-control" style="text-transform: capitalize" id="BranchName" name="BranchName">
                                             </div>
                                             <div class="form-group">
                                                 <label>Brand <span class="red">(*)</span></label>
@@ -227,7 +229,10 @@
     </div>
 </div>
 
-<link rel="import" href="../js.html">
+<?php
+include_once('../js.html');
+?>
+
 <script src="js/function.js"></script>
 
 <!-- Datatables -->
@@ -325,19 +330,10 @@
             },
             fields: {
                 group: 'form-group',
-                BranchCode: {
+                AddBranchCode: {
                     validators: {
                         notEmpty: {
                             message: 'Branch Code is required.'
-                        },
-                        remote: {
-                            message: 'Branch Code already exists',
-                            url: 'function/check.php',
-                            data: {
-                                type: 'BranchCode'
-                            },
-                            type: 'POST'
-
                         }
                     }
                 },

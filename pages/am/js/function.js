@@ -235,3 +235,20 @@ function addItemsToModify() {
         updateTotal();
     }
 }
+
+function TransactionDetails(TransactionID, hash, rnd, Branch) {
+    $.ajax({
+        type: 'POST',
+        url: 'php/function.php',
+        data: {
+            TransactionID: TransactionID,
+            Hash: hash,
+            rnd: rnd,
+            sBranchCode: Branch
+        },
+        success: function (data) {
+            $('#TDetails').html(data);
+            $('#TDetails').modal('show');
+        }
+    })
+}

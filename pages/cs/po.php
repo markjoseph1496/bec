@@ -10,7 +10,9 @@
     <title>Purchase Request</title>
     <link rel="shortcut icon" href="../../img/B%20LOGO%20BLACK.png">
 
-    <link rel="import" href="../css.html">
+    <?php
+    include_once('../css.html');
+    ?>
 
 </head>
 
@@ -77,7 +79,7 @@
                                                 $Status = $purchase['Status'];
                                                 $Remarks = $purchase['Remarks'];
                                                 $ContactPerson = $purchase['Firstname'] . " " . $purchase['Lastname'];
-                                                $rnd = rand(0, 9999);
+                                                $rnd = rand(1000, 9999);
                                                 $hashPONumber = encrypt_decrypt_rnd('encrypt', $PONumber, $rnd);
                                                 ?>
                                                 <tr>
@@ -87,7 +89,7 @@
                                                     <td><?php echo $Remarks ?></td>
                                                     <td><?php echo $ContactPerson ?></td>
                                                     <td>
-                                                        <button class="btn btn-dark" onclick="PODetails(this.value, '<?= @$hashPONumber ?>', '<?= @$rnd ?>');" value="<?= @$PONumber ?>" data-toggle="modal" data-target="#PODetails"><i class="fa fa-eye"></i></button>
+                                                        <button class="btn btn-dark" onclick="PODetails(this.value, '<?= @$hashPONumber ?>', '<?= @$rnd ?>');" value="<?= @$PONumber ?>" ><i class="fa fa-eye"></i></button>
                                                     </td>
                                                 </tr>
                                                 <?php
@@ -196,7 +198,10 @@
     <!-- /footer content -->
 </div>
 
-<link rel="import" href="../js.html">
+<?php
+include_once('../js.html');
+?>
+
 <script src="js/function.js"></script>
 <?php
 if (isset($_GET['error'])) {

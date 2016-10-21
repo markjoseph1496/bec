@@ -1,4 +1,4 @@
-function addAccount(EmpID, hash, rnd){
+function addAccount(EmpID, hash, rnd) {
     $.ajax({
         type: 'POST',
         url: 'function/functions.php',
@@ -40,7 +40,7 @@ function ItemsDetails(ItemCode, hashItemCode, Itemsrnd) {
 }
 
 //Dito niya kukunin yung ipinasa galing kay update button tapos ipapasa niya sa functions.php yung tatlong data.
-function EmployeeDetails(EmpID,hash,rnd) {
+function EmployeeDetails(EmpID, hash, rnd) {
     $.ajax({
         type: 'POST',
         url: 'function/functions.php',
@@ -88,7 +88,7 @@ function BrandDelete(BrandID) {
     $.ajax({
         type: 'POST',
         url: 'function/admin-delete.php',
-        data: 'BrandID=' +BrandID,
+        data: 'BrandID=' + BrandID,
         success: function (data) {
             $('#BrandDeleteModal').html(data);
             $('#BrandDeleteModal').modal(show);
@@ -168,13 +168,13 @@ function CategoryDelete(CategoryID) {
     })
 }
 // Dito niya yun ipapasa yung Button Delete Iseset niya yung data sa input papunta kay employee.php dun sa DeleteModal
-function EmployeeDelete(EmpID,hashEmpID,rnd) {
+function EmployeeDelete(EmpID, hashEmpID, rnd) {
     $('#EmpID').val(EmpID);
     $('#hashEmpID').val(hashEmpID);
     $('#rnd').val(rnd);
 }
 
-function BranchDelete(BranchCode,hashBranchCode,Branchrnd) {
+function BranchDelete(BranchCode, hashBranchCode, Branchrnd) {
     $('#BranchCode').val(BranchCode);
     $('#hashBranchCode').val(hashBranchCode);
     $('#Branchrnd').val(Branchrnd);
@@ -250,4 +250,28 @@ function BranchAndAreaModal(Position) {
         $('#DivBranchModal').hide();
         $('#DivBrandModal').hide();
     }
+}
+
+function UpdateConvertToMoney() {
+    if ($('#EditSRP').length == 0) {
+        EditSRP.value = "0.00";
+    }
+    if ($('#EditDP').length == 0) {
+        EditDP.value = "0.00";
+    }
+
+    $('#EditSRP').val(accounting.formatNumber($('#EditSRP').val(), 2, ",", "."));
+    $("#EditDP").val(accounting.formatNumber($('#EditDP').val(), 2, ",", "."));
+}
+
+function NumberConvertToMoney() {
+    if ($('#SRP').length == 0) {
+        SRP.value = "0.00";
+    }
+    if  ($('#DP').length == 0) {
+        DP.value = "0.00";
+    }
+
+    $('#SRP').val(accounting.formatNumber($('#SRP').val(), 2, ",", "."));
+    $('#DP').val(accounting.formatNumber($('#DP').val(), 2, ",", "."));
 }
