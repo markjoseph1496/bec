@@ -55,18 +55,28 @@
                                             <tbody>
                                             <?php
                                             $BranchQuery = db_select("
-                                                SELECT branchtbl.BranchCode, branchtbl.BranchName, brandtbl.Brand, areatbl.Area
+                                                SELECT 
+                                                branchtbl.BranchID,
+                                                branchtbl.BranchCode, 
+                                                branchtbl.BranchName, 
+                                                brandtbl.Brand, 
+                                                areatbl.Area
                                                 FROM branchtbl
                                                 LEFT JOIN brandtbl ON branchtbl.BrandID = brandtbl.BrandID
-                                                LEFT  JOIN areatbl ON branchtbl.AreaID = areatbl.AreaID");
+                                                LEFT  JOIN areatbl ON branchtbl.AreaID = areatbl.AreaID ORDER BY branchtbl.BranchCode DESC");
                                             foreach ($BranchQuery as $Branch) {
+
+                                                $BranchID = $Branch['BranchID'];
                                                 $BranchCode = $Branch['BranchCode'];
                                                 $BranchName = $Branch['BranchName'];
                                                 $Brand = $Branch['Brand'];
                                                 $BranchArea = $Branch['Area'];
 
-                                                $Branchrnd = rand(0, 9999);
-                                                $hashBranchCode = encrypt_decrypt_rnd('encrypt', $BranchCode, $Branchrnd);
+                                                if ($Brand == "") {
+                                                    $Brand = "Berlein Mobile";
+                                                }
+                                                $Branchrnd = rand(1000, 9999);
+                                                $hashBranchID = encrypt_decrypt_rnd('encrypt', $BranchID, $Branchrnd);
                                                 ?>
                                                 <tr>
                                                     <td><?php echo $BranchCode ?></td>
@@ -74,9 +84,8 @@
                                                     <td><?php echo $Brand ?></td>
                                                     <td><?php echo $BranchArea ?></td>
                                                     <td>
-                                                        <button class="btn btn-dark" onclick="BranchDetails('<?= @$BranchCode; ?>','<?= @$hashBranchCode; ?>','<?= @$Branchrnd; ?>')" data-toggle="modal" data-target="#BranchUpdateModal"><i class="fa fa-eye"></i></button>
-                                                        <button class="btn btn-danger" onclick="BranchDelete('<?= @$BranchCode; ?>','<?= @$hashBranchCode; ?>','<?= @$Branchrnd; ?>')" data-toggle="modal" data-target="#BranchDeleteModal"><i
-                                                                class="fa fa-trash"></i></button>
+                                                        <button class="btn btn-dark" onclick="BranchDetails(this.value,'<?= @$hashBranchID; ?>','<?= @$Branchrnd; ?>')" value="<?= @$BranchID ?>"><i class="fa fa-eye"></i></button>
+                                                        <button class="btn btn-danger" onclick="BranchDelete(this.value,'<?= @$hashBranchID; ?>','<?= @$Branchrnd; ?>')" value="<?= @$BranchID ?>"><i class="fa fa-trash"></i></button>
                                                     </td>
                                                 </tr>
                                                 <?php
@@ -94,29 +103,8 @@
                                     <!-- /.modal -->
 
                                     <!-- Modal Delete Branch -->
-                                    <div class="modal fade" id="BranchDeleteModal" role="dialog">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <form method="POST" action="function/admin-delete.php">
-                                                    <div class="modal-header modal-header-danger">
-                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                        <h4 class="modal-title">Delete Branch</h4>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <input type="hidden" name="BranchCode" id="BranchCode">
-                                                        <input type="hidden" name="hashBranchCode" id="hashBranchCode">
-                                                        <input type="hidden" name="Branchrnd" id="Branchrnd">
-                                                        <label>Are you sure you want to remove this Branch? This cannot be undone.</label>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="submit" class="btn btn-dark">Delete</button>
-                                                        <button class="btn btn-default" data-dismiss="modal">Close</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                            <!-- /.modal-content -->
-                                        </div>
-                                        <!-- /.modal-dialog -->
+                                    <div class="modal fade" id="BranchDeleteModal">
+
                                     </div>
                                     <!-- End Modal Delete Branch -->
                                 </div>
@@ -150,8 +138,9 @@
                                                 <label>Brand <span class="red">(*)</span></label>
                                                 <select class="form-control" id="bBrand" name="bBrand">
                                                     <option value="" selected="selected"> - Choose Brand -</option>
+                                                    <option value="All">Berlein Mobile</option>
                                                     <?php
-                                                    $brandtbl = db_select("SELECT `BrandID`,`Brand` FROM `brandtbl`");
+                                                    $brandtbl = db_select("SELECT `BrandID`,`Brand` FROM `brandtbl` ORDER BY `Brand` ASC");
 
                                                     foreach ($brandtbl as $vBrand) {
                                                         $BrandID = $vBrand['BrandID'];
@@ -168,7 +157,7 @@
                                                 <select class="form-control" id="BranchArea" name="BranchArea">
                                                     <option value="" selected="selected"> - Choose Branch Area -</option>
                                                     <?php
-                                                    $areatbl = db_select("SELECT `AreaID`,`Area` FROM `areatbl`");
+                                                    $areatbl = db_select("SELECT `AreaID`,`Area` FROM `areatbl` ORDER BY `Area` ASC");
 
                                                     foreach ($areatbl as $vArea) {
                                                         $AreaID = $vArea['AreaID'];
@@ -235,50 +224,47 @@ include_once('../js.html');
 
 <script src="js/function.js"></script>
 
+
+<?php
+if (isset($_GET['error'])) {
+    echo "<script type='text/javascript'>
+    new PNotify({
+        title: 'Error :(',
+        text: 'There was an error, Please try again.',
+        type: 'error',
+        styling: 'bootstrap3',
+        delay:3000
+    });
+</script>";
+} elseif (isset($_GET['success'])) {
+    echo "<script type='text/javascript'>
+    new PNotify({
+        title: 'Success',
+        text: 'Employee Updated',
+        type: 'success',
+        styling: 'bootstrap3',
+        delay:3000
+    });
+</script>";
+} elseif (isset($_GET['deleted'])) {
+    echo "<script type='text/javascript'>
+    new PNotify({
+        title: 'Success',
+        text: 'Employee Deleted',
+        type: 'success',
+        styling: 'bootstrap3',
+        delay:3000
+    });
+</script>";
+}
+?>
+
 <!-- Datatables -->
 <script>
     $(document).ready(function () {
-        var handleDataTableButtons = function () {
-            if ($("#datatable-buttons").length) {
-                $("#datatable-buttons").DataTable({
-                    dom: "Bfrtip",
-                    buttons: [
-                        {
-                            extend: "copy",
-                            className: "btn-sm"
-                        },
-                        {
-                            extend: "csv",
-                            className: "btn-sm"
-                        },
-                        {
-                            extend: "excel",
-                            className: "btn-sm"
-                        },
-                        {
-                            extend: "pdfHtml5",
-                            className: "btn-sm"
-                        },
-                        {
-                            extend: "print",
-                            className: "btn-sm"
-                        }
-                    ],
-                    responsive: true
-                });
-            }
-        };
-
-        TableManageButtons = function () {
-            "use strict";
-            return {
-                init: function () {
-                    handleDataTableButtons();
-                }
-            };
-        }();
-
-        $('#datatable').dataTable();
+        $('#datatable').dataTable({
+            "order": [[3, "asc"]]
+        });
 
         $('#datatable-keytable').DataTable({
             keys: true
@@ -297,26 +283,9 @@ include_once('../js.html');
         $('#datatable-fixed-header').DataTable({
             fixedHeader: true
         });
-
-        var $datatable = $('#datatable-checkbox');
-
-        $datatable.dataTable({
-            'order': [[1, 'asc']],
-            'columnDefs': [
-                {orderable: false, targets: [0]}
-            ]
-        });
-        $datatable.on('draw.dt', function () {
-            $('input').iCheck({
-                checkboxClass: 'icheckbox_flat-green'
-            });
-        });
-
-        TableManageButtons.init();
     });
 </script>
 <!-- /Datatables -->
-
 
 <!-- validator -->
 <script type="text/javascript">
@@ -374,7 +343,10 @@ include_once('../js.html');
                 data: $('#AddBranch').serialize(),
                 success: function (data) {
                     if (data == "True") {
-                        window.location.href = "branch.php";
+                        window.location.href = "branch.php?success";
+                    }
+                    else {
+                        window.location.href = "branch.php?error";
                     }
                 }
             })

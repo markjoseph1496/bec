@@ -68,10 +68,11 @@
                                                 areatbl.Area
                                                 FROM employeetbl
                                                 LEFT JOIN branchtbl ON employeetbl.BranchID = branchtbl.BranchID
-                                                LEFT JOIN  areatbl ON employeetbl.AreaID = areatbl.AreaID
+                                                LEFT JOIN areatbl ON employeetbl.AreaID = areatbl.AreaID
                                                 WHERE employeetbl.Position != 'Admin'
                                                 ORDER BY employeetbl.EmpID ASC
                                                 ");
+                                            echo db_error();
                                             foreach ($employeetbl as $value) {
                                                 $EmpID = $value['EmpID'];
                                                 $Firstname = $value['Firstname'];
@@ -81,7 +82,7 @@
                                                 $BranchName = $value['BranchCode'];
                                                 $Area = $value['Area'];
 
-                                                $rnd = rand(0, 9999);
+                                                $rnd = rand(1000, 9999);
                                                 $hashEmpID = encrypt_decrypt_rnd('encrypt', $EmpID, $rnd);
 
                                                 ?>
@@ -192,6 +193,7 @@
                                             <option value="Area Manager">Area Manager</option>
                                             <option value="OIC">Officer In Charge</option>
                                             <option value="Cashier">Cashier</option>
+                                            <option value="Sales Clerk">Sales Clerk</option>
                                         </select>
                                     </div>
                                     <div class="form-group" style="display:none" id="DivBranch">
@@ -199,13 +201,14 @@
                                         <select class="form-control" id="Branch" name="Branch">
                                             <option value="" selected="selected">- Select Branch -</option>
                                             <?php
-                                            $branchtbl = db_select("SELECT `BranchName`,`BranchID` FROM `branchtbl`");
+                                            $branchtbl = db_select("SELECT `BranchName`,`BranchID`, `BranchCode` FROM `branchtbl`");
 
                                             foreach ($branchtbl as $value) {
                                                 $BranchName = $value['BranchName'];
+                                                $BranchCode = $value['BranchCode'];
                                                 $BranchID = $value['BranchID'];
                                                 ?>
-                                                <option value="<?php echo $BranchID; ?>"><?php echo $BranchName; ?></option>
+                                                <option value="<?php echo $BranchID; ?>"><?php echo "(" . $BranchCode .") " . $BranchName; ?></option>
                                                 <?php
                                             }
                                             ?>
@@ -288,7 +291,7 @@ if (isset($_GET['error'])) {
          delay:3000
          });
          </script>";
-} elseif (isset($_GET['Updated'])) {
+} elseif (isset($_GET['success'])) {
     echo "<script type='text/javascript'>
          new PNotify({
          title: 'Success',
@@ -498,10 +501,7 @@ if (isset($_GET['error'])) {
                 data: $('#AddEmployee').serialize(),
                 success: function (data) {
                     if (data == "True") {
-                        window.location.href = "employee.php?Updated";
-                    }
-                    else if (data == "False") {
-                        window.location.href = "employee.php?error";
+                        window.location.href = "employee.php?success";
                     }
                     else {
                         window.location.href = "employee.php?error";

@@ -56,14 +56,14 @@ function EmployeeDetails(EmpID, hash, rnd) {
     });
 }
 
-function BranchDetails(BranchCode, hashBranchCode, Branchrnd) {
+function BranchDetails(BranchID, hashBranchID, Branchrnd) {
     $.ajax({
         type: 'POST',
         url: 'function/functions.php',
         data: {
-            BranchCode: BranchCode,
-            hashBranchCode: hashBranchCode,
-            Branchrnd: Branchrnd
+            BranchID: BranchID,
+            hash: hashBranchID,
+            rand: Branchrnd
         },
         success: function (data) {
             $('#BranchUpdateModal').html(data);
@@ -72,26 +72,50 @@ function BranchDetails(BranchCode, hashBranchCode, Branchrnd) {
     })
 }
 
-function BrandDetails(BrandID) {
+function BranchDelete(BranchID, hash, rnd) {
     $.ajax({
-        type: 'POST',
-        url: 'function/functions.php',
-        data: 'BrandID=' + BrandID,
+        type: "POST",
+        url: 'function/admin-delete.php',
+        data: {
+            dBranch: BranchID,
+            dhash: hash,
+            drnd: rnd
+        },
         success: function (data) {
-            $('#BrandUpdateModal').html(data);
-            $('#BrandUpdateModal').modal(show);
+            $('#BranchDeleteModal').html(data);
+            $('#BranchDeleteModal').modal('show');
         }
     })
 }
 
-function BrandDelete(BrandID) {
+function BrandDetails(BrandID, hash, rnd) {
+    $.ajax({
+        type: 'POST',
+        url: 'function/functions.php',
+        data: {
+            BrandID: BrandID,
+            hash: hash,
+            rnd: rnd
+        },
+        success: function (data) {
+            $('#BrandUpdateModal').html(data);
+            $('#BrandUpdateModal').modal('show');
+        }
+    })
+}
+
+function BrandDelete(BrandID, hash, rnd) {
     $.ajax({
         type: 'POST',
         url: 'function/admin-delete.php',
-        data: 'BrandID=' + BrandID,
+        data: {
+            dBrandID: BrandID,
+            dhash: hash,
+            drnd: rnd
+        },
         success: function (data) {
             $('#BrandDeleteModal').html(data);
-            $('#BrandDeleteModal').modal(show);
+            $('#BrandDeleteModal').modal('show');
         }
     })
 }
@@ -120,11 +144,15 @@ function ColorDelete(ColorID) {
     })
 }
 
-function AreaDetails(AreaID) {
+function AreaDetails(AreaID, hash, rnd) {
     $.ajax({
         type: 'POST',
         url: 'function/functions.php',
-        data: 'AreaID=' + AreaID,
+        data: {
+            AreaID: AreaID,
+            hash: hash,
+            rnd: rnd
+        },
         success: function (data) {
             $('#AreaUpdateModal').html(data);
             $('#AreaUpdateModal').modal(show);
@@ -132,11 +160,15 @@ function AreaDetails(AreaID) {
     })
 }
 
-function AreaDelete(AreaID) {
+function AreaDelete(AreaID, hash, rnd) {
     $.ajax({
         type: "POST",
         url: 'function/admin-delete.php',
-        data: 'AreaID=' + AreaID,
+        data: {
+            dAreaID: AreaID,
+            dhash: hash,
+            drnd: rnd
+        },
         success: function (data) {
             $('#AreaDeleteModal').html(data);
             $('#AreaDeleteModal').modal(show);
@@ -174,12 +206,6 @@ function EmployeeDelete(EmpID, hashEmpID, rnd) {
     $('#rnd').val(rnd);
 }
 
-function BranchDelete(BranchCode, hashBranchCode, Branchrnd) {
-    $('#BranchCode').val(BranchCode);
-    $('#hashBranchCode').val(hashBranchCode);
-    $('#Branchrnd').val(Branchrnd);
-}
-
 function ItemsDelete(ItemCode, hashItemCode, Itemsrnd) {
     $('#ItemCode').val(ItemCode);
     $('#hashItemCode').val(hashItemCode);
@@ -202,12 +228,7 @@ function BranchAndArea(Position) {
         $('#DivBranch').hide();
         $('#DivBrand').hide();
     }
-    else if (Position == "OIC") {
-        $('#DivArea').hide();
-        $('#DivBranch').show();
-        $('#DivBrand').hide();
-    }
-    else if (Position == "Cashier") {
+    else if (Position == "OIC" || Position == "Cashier" || Position == "Sales Clerk") {
         $('#DivArea').hide();
         $('#DivBranch').show();
         $('#DivBrand').hide();
@@ -240,7 +261,7 @@ function BranchAndAreaModal(Position) {
         $('#DivBranchModal').show();
         $('#DivBrandModal').hide();
     }
-    else if (Position == "Cashier") {
+    else if (Position == "OIC" || Position == "Cashier" || Position == "Sales Clerk") {
         $('#DivAreaModal').hide();
         $('#DivBranchModal').show();
         $('#DivBrandModal').hide();

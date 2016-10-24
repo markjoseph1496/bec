@@ -8,7 +8,7 @@ if (isset($_POST['Username'])) {
     $Username = db_quote($_POST['Username']);
     $Password = db_quote($_POST['Password']);
 
-    $rnd = rand(0,9999);
+    $rnd = rand(1000,9999);
 
     $CheckAccount = db_select("
             SELECT 

@@ -243,6 +243,40 @@ include_once('../js.html');
 
 <script src="js/function.js"></script>
 
+<?php
+if (isset($_GET['error'])) {
+    echo "<script type='text/javascript'>
+    new PNotify({
+        title: 'Error :(',
+        text: 'There was an error, Please try again.',
+        type: 'error',
+        styling: 'bootstrap3',
+        delay:3000
+    });
+</script>";
+} elseif (isset($_GET['success'])) {
+    echo "<script type='text/javascript'>
+    new PNotify({
+        title: 'Success',
+        text: 'Employee Updated',
+        type: 'success',
+        styling: 'bootstrap3',
+        delay:3000
+    });
+</script>";
+} elseif (isset($_GET['deleted'])) {
+    echo "<script type='text/javascript'>
+    new PNotify({
+        title: 'Success',
+        text: 'Employee Deleted',
+        type: 'success',
+        styling: 'bootstrap3',
+        delay:3000
+    });
+</script>";
+}
+?>
+
 <!-- Datatables -->
 <script>
     $(document).ready(function () {

@@ -33,6 +33,67 @@
             $CurrentBranch = "";
             $decryptBranch = $getBranches[0]['BranchCode'];
         }
+
+        $getCash = db_select("
+        SELECT
+        cashtransactiontbl.TransactionID,
+        cashtransactiontbl.Amount Cash,
+        transactiontbl.TransactionID
+        FROM cashtransactiontbl, transactiontbl
+        WHERE cashtransactiontbl.TransactionID = transactiontbl.TransactionID
+        AND transactiontbl.BranchCode = " . db_quote($decryptBranch) . "
+        AND transactiontbl._Date = " . db_quote($CurrentDate)
+        );
+
+        $TotalCash = 0;
+        $TotalCredit = 0;
+        $TotalHomeCredit = 0;
+
+        foreach ($getCash as $CashValue) {
+            $Cash = $CashValue['Cash'];
+            $TotalCash = $TotalCash + $Cash;
+        }
+
+        $getCreditCard = db_select("
+        SELECT
+        credittransactiontbl.TransactionID,
+        credittransactiontbl.Amount Credit,
+        transactiontbl.TransactionID
+        FROM credittransactiontbl, transactiontbl
+        WHERE credittransactiontbl.TransactionID = transactiontbl.TransactionID
+        AND transactiontbl.BranchCode = " . db_quote($decryptBranch) . "
+        AND transactiontbl._Date = " . db_quote($CurrentDate)
+        );
+
+        foreach ($getCreditCard as $CreditValue) {
+            $Credit = $CreditValue['Credit'];
+            $TotalCredit = $TotalCredit + $Credit;
+        }
+
+        $getHomeCredit = db_select("
+        SELECT
+        homecredittransactiontbl.TransactionID,
+        homecredittransactiontbl.Amount HomeCredit,
+        transactiontbl.TransactionID
+        FROM homecredittransactiontbl, transactiontbl
+        WHERE homecredittransactiontbl.TransactionID = transactiontbl.TransactionID
+        AND transactiontbl.BranchCode = " . db_quote($decryptBranch) . "
+        AND transactiontbl._Date = " . db_quote($CurrentDate)
+        );
+
+        foreach ($getHomeCredit as $HomeCreditValue) {
+            $HomeCredit = $HomeCreditValue['Credit'];
+            $TotalHomeCredit = $TotalHomeCredit + $HomeCredit;
+        }
+
+        $getTransactions = db_select("SELECT * FROM `transactiontbl` WHERE `_Date` = " . db_quote($CurrentDate) . " AND `BranchCode` = " . db_quote($decryptBranch));
+
+        $CountTransactions = count($getTransactions);
+        $GrandTotal = $TotalCash + $TotalCredit + $TotalHomeCredit;
+        $GrandTotal = number_format($GrandTotal, 2, ".", ",");
+        $TotalCash = number_format($TotalCash, 2, ".", ",");
+        $TotalCredit = number_format($TotalCredit, 2, ".", ",");
+        $TotalHomeCredit = number_format($TotalHomeCredit, 2, ".", ",");
         ?>
 
         <!-- page content -->
@@ -58,7 +119,7 @@
                                     <div class="row">
                                         <div class="col-lg-12">
                                             <div class="row">
-                                                <div class="col-md-4">
+                                                <div class="col-md-12 col-lg-4">
                                                     <form id="frmDate" method="GET" autocomplete="off">
                                                         <label for="_Date">Branch</label>
                                                         <select class="form-control" name="br" id="br" onchange="$('#frmDate').submit();">
@@ -77,6 +138,13 @@
                                                         <label for="_Date">Date</label>
                                                         <input type="date" class="form-control" name="id" id="id" value="<?= @$CurrentDate ?>" onchange="$('#frmDate').submit();" onkeydown="return false" required="required">
                                                     </form>
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <h2>Total Transactions: <?= @$CountTransactions ?></h2>
+                                                    <h2>Total Cash: <?= @$TotalCash ?></h2>
+                                                    <h2>Total Credit Card: <?= @$TotalCredit ?></h2>
+                                                    <h2>Total Home Credit: <?= @$TotalHomeCredit ?></h2>
+                                                    <h2><b>Grand Total: <?= @$GrandTotal ?></b></h2>
                                                 </div>
                                             </div>
                                             <br>

@@ -97,29 +97,12 @@
                 <div class="modal fade" id="AddCategoryModal">
                     <div class="modal-dialog">
                         <div class="modal-content">
-                            <form method="POST" name="AddCategory" id="AddCategory" autocomplete="off">
+                            <form method="POST" name="frmCategory" id="frmCategory" autocomplete="off">
                                 <div class="modal-header modal-header-dark">
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                                     <h4 class="modal-title">Add Category</h4>
                                 </div>
                                 <div class="modal-body">
-                                    <div class="form-group">
-                                        <?php
-                                        $GeneratingCategoryID = db_query("SELECT * FROM `categorytbl`");
-                                        $num = mysqli_num_rows($GeneratingCategoryID);
-                                        $IdFormat = "CT-00";
-                                        $start = '1';
-                                        if ($num > 0) {
-                                            while ($ID = mysqli_fetch_array($GeneratingCategoryID)) {
-                                                $areaID = $ID['CategoryID'];
-                                                $start++;
-                                            }
-                                            echo '<input type="hidden" readonly class="form-control" value="' . $IdFormat . '' . $start . '" name="AddCategoryID" id="AddCategoryID">';
-                                        } else {
-                                            echo '<input type="hidden" readonly class="form-control" value="' . $IdFormat . '' . $start . '" name="AddCategoryID" id="AddCategoryID">';
-                                        }
-                                        ?>
-                                    </div>
                                     <div class="form-group">
                                         <label>Category Code <span class="red">(*)</span></label>
                                         <input type="text" class="form-control" style="text-transform: capitalize" id="CategoryCode" name="CategoryCode">
@@ -140,8 +123,6 @@
                     <!-- /.modal-dialog -->
                 </div>
                 <!-- /.modal -->
-
-
             </div>
         </div>
         <!-- /page content -->
@@ -162,6 +143,41 @@ include_once('../js.html');
 ?>
 
 <script src="js/function.js"></script>
+
+<?php
+if (isset($_GET['error'])) {
+    echo "<script type='text/javascript'>
+    new PNotify({
+        title: 'Error :(',
+        text: 'There was an error, Please try again.',
+        type: 'error',
+        styling: 'bootstrap3',
+        delay:3000
+    });
+</script>";
+} elseif (isset($_GET['success'])) {
+    echo "<script type='text/javascript'>
+    new PNotify({
+        title: 'Success',
+        text: 'Employee Updated',
+        type: 'success',
+        styling: 'bootstrap3',
+        delay:3000
+    });
+</script>";
+} elseif (isset($_GET['deleted'])) {
+    echo "<script type='text/javascript'>
+    new PNotify({
+        title: 'Success',
+        text: 'Employee Deleted',
+        type: 'success',
+        styling: 'bootstrap3',
+        delay:3000
+    });
+</script>";
+}
+?>
+
 
 <!-- Datatables -->
 <script>
@@ -248,7 +264,7 @@ include_once('../js.html');
 <!-- validator -->
 <script type="text/javascript">
     $(document).ready(function () {
-        $('#AddCategory').bootstrapValidator({
+        $('#frmCategory').bootstrapValidator({
             message: 'This value is not valid',
             feedbackIcons: {
                 valid: "glyphicon glyphicon-ok",
@@ -277,10 +293,13 @@ include_once('../js.html');
             $.ajax({
                 type: 'POST',
                 url: 'function/functions.php',
-                data: $('#AddCategory').serialize(),
+                data: $('#frmCategory').serialize(),
                 success: function (data) {
                     if (data == "True") {
-                        window.location.href = "category.php";
+                        window.location.href = "category.php?success";
+                    }
+                    else{
+                        window.location.href = "category.php?error";
                     }
                 }
             })

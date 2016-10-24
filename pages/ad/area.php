@@ -55,12 +55,14 @@
                                             foreach ($AreaQuery as $Area) {
                                                 $AreaID = $Area['AreaID'];
                                                 $bArea = $Area['Area'];
+                                                $Rand = rand(1000, 9999);
+                                                $hashAreaID = encrypt_decrypt_rnd('encrypt', $AreaID, $Rand);
                                                 ?>
                                                 <tr>
                                                     <td><?php echo $bArea ?></td>
                                                     <td>
-                                                        <button class="btn btn-dark" onclick="AreaDetails(this.value);" value="<?= @$AreaID; ?>" data-toggle="modal" data-target="#AreaUpdateModal"><i class="fa fa-eye"></i></button>
-                                                        <button class="btn btn-danger" onclick="AreaDelete(this.value);" value="<?= @$AreaID; ?>" data-toggle="modal" data-target="#AreaDeleteModal"><i class="fa fa-trash"></i></button>
+                                                        <button class="btn btn-dark" onclick="AreaDetails(this.value,'<?= @$hashAreaID ?>','<?= @$Rand ?>');" value="<?= @$AreaID; ?>" data-toggle="modal" data-target="#AreaUpdateModal"><i class="fa fa-eye"></i></button>
+                                                        <button class="btn btn-danger" onclick="AreaDelete(this.value,'<?= @$hashAreaID ?>','<?= @$Rand ?>');" value="<?= @$AreaID; ?>" data-toggle="modal" data-target="#AreaDeleteModal"><i class="fa fa-trash"></i></button>
                                                     </td>
                                                 </tr>
 
@@ -83,7 +85,6 @@
 
                                     </div>
                                     <!-- /.modal -->
-
                                 </div>
                             </div>
                         </div>
@@ -94,29 +95,12 @@
                 <div class="modal fade" id="AddAreaModal">
                     <div class="modal-dialog">
                         <div class="modal-content">
-                            <form method="POST" name="AddArea" id="AddArea" autocomplete="off">
+                            <form method="POST" name="frmArea" id="frmArea" autocomplete="off">
                                 <div class="modal-header modal-header-dark">
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                                     <h4 class="modal-title">Add Area</h4>
                                 </div>
                                 <div class="modal-body">
-                                    <div class="form-group">
-                                        <?php
-                                        $GeneratingAreaID = db_query("SELECT * FROM `areatbl`");
-                                        $num = mysqli_num_rows($GeneratingAreaID);
-                                        $IdFormat = "AR-00";
-                                        $start = '1';
-                                        if ($num > 0) {
-                                            while ($ID = mysqli_fetch_array($GeneratingAreaID)) {
-                                                $areaID = $ID['AreaID'];
-                                                $start++;
-                                            }
-                                            echo '<input type="hidden" readonly class="form-control" value="' . $IdFormat . '' . $start . '" name="AddAreaID" id="AddAreaID">';
-                                        } else {
-                                            echo '<input type="hidden" readonly class="form-control" value="' . $IdFormat . '' . $start . '" name="AddAreaID" id="AddAreaID">';
-                                        }
-                                        ?>
-                                    </div>
                                     <div class="form-group">
                                         <label>Area <span class="red">(*)</span></label>
                                         <input type="text" class="form-control" style="text-transform: capitalize" id="AddArea" name="AddArea">
@@ -133,8 +117,6 @@
                     <!-- /.modal-dialog -->
                 </div>
                 <!-- /.modal -->
-
-
             </div>
         </div>
         <!-- /page content -->
@@ -155,6 +137,40 @@ include_once('../js.html');
 ?>
 
 <script src="js/function.js"></script>
+
+<?php
+if (isset($_GET['error'])) {
+echo "<script type='text/javascript'>
+    new PNotify({
+        title: 'Error :(',
+        text: 'There was an error, Please try again.',
+        type: 'error',
+        styling: 'bootstrap3',
+        delay:3000
+    });
+</script>";
+} elseif (isset($_GET['success'])) {
+echo "<script type='text/javascript'>
+    new PNotify({
+        title: 'Success',
+        text: 'Employee Updated',
+        type: 'success',
+        styling: 'bootstrap3',
+        delay:3000
+    });
+</script>";
+} elseif (isset($_GET['deleted'])) {
+echo "<script type='text/javascript'>
+    new PNotify({
+        title: 'Success',
+        text: 'Employee Deleted',
+        type: 'success',
+        styling: 'bootstrap3',
+        delay:3000
+    });
+</script>";
+}
+?>
 
 <!-- Datatables -->
 <script>
@@ -241,7 +257,7 @@ include_once('../js.html');
 <!-- validator -->
 <script type="text/javascript">
     $(document).ready(function () {
-        $('#AddArea').bootstrapValidator({
+        $('#frmArea').bootstrapValidator({
             message: 'This value is not valid',
             feedbackIcons: {
                 valid: "glyphicon glyphicon-ok",
@@ -263,10 +279,12 @@ include_once('../js.html');
             $.ajax({
                 type: 'POST',
                 url: 'function/functions.php',
-                data: $('#AddArea').serialize(),
+                data: $('#frmArea').serialize(),
                 success: function (data) {
                     if (data == "True") {
-                        window.location.href = "area.php";
+                        window.location.href = "area.php?success";
+                    } else {
+                        window.location.href = "area.php?error";
                     }
                 }
             })

@@ -82,6 +82,8 @@
                                                 $Remarks = $Order['Remarks'];
                                                 $Branch = $Order['BranchCode'];
                                                 $ContactPerson = $Order['Firstname'] . " " . $Order['Lastname'];
+                                                $rnd = rand(1000, 9999);
+                                                $hashPONumber = encrypt_decrypt_rnd('encrypt', $PONumber, $rnd);
                                                 ?>
                                                 <tr>
                                                     <td>
@@ -94,7 +96,7 @@
                                                     <td><?php echo $Branch ?></td>
                                                     <td><?php echo $ContactPerson ?></td>
                                                     <td>
-                                                        <button class="btn btn-dark" onclick="PODetails(this);"><i class="fa fa-eye"></i></button>
+                                                        <button class="btn btn-dark" onclick="PODetails(this.value, '<?= @$hashPONumber ?>', '<?= @$rnd ?>');" value="<?= @$PONumber ?>"><i class="fa fa-eye"></i></button>
                                                     </td>
                                                 </tr>
                                                 <?php

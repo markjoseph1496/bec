@@ -2,15 +2,64 @@
 include('../../../connection.php');
 include('../../../functions/encryption.php');
 
+function generateBranchID()
+{
+    $generateBranchID = db_select("SELECT `BranchID` FROM `branchtbl` ORDER BY BranchID DESC LIMIT 1");
+
+    if ($generateBranchID === false) {
+        echo db_error();
+    }
+    if (count($generateBranchID) == 0) {
+        return str_replace("'", "", "BH-" . "001");
+    } else {
+        $pCount = substr($generateBranchID[0]['BranchID'], 3);
+        $gBranchID = "BH-" . sprintf("%03s", (int)$pCount + 1);
+        return $gBranchID;
+    }
+}
+
+function generateAreaID()
+{
+    $generateAreaID = db_select("SELECT `AreaID` FROM `areatbl` ORDER BY AreaID DESC LIMIT 1");
+
+    if ($generateAreaID === false) {
+        echo db_error();
+    }
+    if (count($generateAreaID) == 0) {
+        return str_replace("'", "", "AR-" . "001");
+    } else {
+        $pCount = substr($generateAreaID[0]['AreaID'], 3);
+        $gAreaID = "AR-" . sprintf("%03s", (int)$pCount + 1);
+        return $gAreaID;
+    }
+}
+
+function generateCatergoryID()
+{
+    $generateID = db_select("SELECT `CategoryID` FROM `categorytbl` ORDER BY `CategoryID` DESC LIMIT 1");
+
+    if ($generateID === false) {
+        echo db_error();
+    }
+    if (count($generateID) == 0) {
+        return str_replace("'", "", "CT-" . "001");
+    } else {
+        $pCount = substr($generateID[0]['CategoryID'], 3);
+        $gID = "CT-" . sprintf("%03s", (int)$pCount + 1);
+        return $gID;
+    }
+}
+
 //Add Branches
 if (isset($_POST['AddBranchCode'])) {
 
+    $BranchID = db_quote(generateBranchID());
     $AddBranchCode = strtoupper(db_quote($_POST['AddBranchCode']));
-    $BranchName = strtoupper(db_quote($_POST['BranchName']));
+    $BranchName = db_quote(ucwords($_POST['BranchName']));
     $bBrand = db_quote($_POST['bBrand']);
     $BranchArea = db_quote($_POST['BranchArea']);
 
-    $AddBranch = db_query("INSERT INTO `branchtbl` (`BranchCode`,`BranchName`,`BrandID`,`AreaID`) VALUES ($AddBranchCode, $BranchName, $bBrand , $BranchArea)");
+    $AddBranch = db_query("INSERT INTO `branchtbl` (`BranchID`, `BranchCode`,`BranchName`,`BrandID`,`AreaID`) VALUES ($BranchID, $AddBranchCode, $BranchName, $bBrand , $BranchArea)");
 
     if ($AddBranch === false) {
         echo "False";
@@ -21,7 +70,7 @@ if (isset($_POST['AddBranchCode'])) {
 // End add branch
 
 //Add Item
-if (isset($_POST['btnAddItem'])) {
+elseif (isset($_POST['btnAddItem'])) {
 
     $CategoryPOST = db_quote($_POST['CategoryID']);
     $ItemBrand = db_quote($_POST['ItemBrand']);
@@ -38,13 +87,18 @@ if (isset($_POST['btnAddItem'])) {
 		VALUES
         ($CategoryPOST, $ItemBrand, $AddItemCode, $ModelName, $ItemDescription, $ItemBrandID, $Category, $SRP, $DP,$CriticalLevel)");
 
-    header("location: ../items.php");
+    if ($AddItem === false) {
+        header("location: ../items.php?error");
+    } else {
+        header("location: ../items.php?success");
+    }
+
 
 }
 //End Add Item
 
 //Add Employee
-if (isset($_POST['AddEmpID'])) {
+elseif (isset($_POST['AddEmpID'])) {
 
     $AddEmpID = db_quote(strtoupper($_POST['AddEmpID']));
     $Firstname = db_quote(ucwords($_POST['Firstname']));
@@ -72,15 +126,15 @@ if (isset($_POST['AddEmpID'])) {
 // End Add Employee
 
 // Add Area
-if (isset($_POST['AddAreaID'])) {
+elseif (isset($_POST['AddArea'])) {
 
-    $AddAreaID = db_quote($_POST['AddAreaID']);
+    $AddAreaID = db_quote(generateAreaID());
     $AddArea = db_quote(ucwords($_POST['AddArea']));
 
-    $AddArea = db_query("INSERT INTO `areatbl` (`AreaID`,`Area`) VALUES  ($AddAreaID,$AddArea)");
+    $QueryAdd = db_query("INSERT INTO `areatbl` (`AreaID`,`Area`) VALUES  ($AddAreaID,$AddArea)");
 
-    if ($AddArea === false) {
-        echo "False";
+    if ($QueryAdd === false) {
+        echo "asdsa";
     } else {
         echo "True";
     }
@@ -88,11 +142,11 @@ if (isset($_POST['AddAreaID'])) {
 // End of Add Area
 
 //Add Brand
-if (isset($_POST['AddBrandID'])) {
+elseif (isset($_POST['AddBrandID'])) {
 
     $AddBrandID = db_quote($_POST['AddBrandID']);
     $BrandCode = db_quote($_POST['BrandCode']);
-    $AddBrand = strtoupper(db_quote($_POST['AddBrand']));
+    $AddBrand = db_quote(ucwords($_POST['AddBrand']));
 
     $AddBrand = db_query("INSERT INTO `brandtbl` (`BrandID`,`BrandCode`,`Brand`) VALUES ($AddBrandID,$BrandCode,$AddBrand)");
 
@@ -105,10 +159,10 @@ if (isset($_POST['AddBrandID'])) {
 // End Add Brand
 
 // Add Color
-if (isset($_POST['AddColor'])) {
+elseif (isset($_POST['AddColor'])) {
 
     $AddColorID = db_quote($_POST['AddColorID']);
-    $AddColor = strtoupper(db_quote($_POST['AddColor']));
+    $AddColor = db_quote(ucwords($_POST['AddColor']));
 
     $AddColor = db_query("INSERT INTO `colortbl` (`ColorID`,`Color`) VALUES ($AddColorID,$AddColor)");
 
@@ -120,11 +174,11 @@ if (isset($_POST['AddColor'])) {
 }
 
 // Add Category
-if (isset($_POST['AddCategoryID'])) {
+elseif (isset($_POST['CategoryCode'])) {
 
-    $AddCategoryID = db_quote($_POST['AddCategoryID']);
+    $AddCategoryID = db_quote(generateCatergoryID());
     $CategoryCode = strtoupper(db_quote($_POST['CategoryCode']));
-    $AddCategory = strtoupper(db_quote($_POST['AddCategory']));
+    $AddCategory = db_quote(ucwords($_POST['AddCategory']));
 
     $AddCategory = db_query("INSERT INTO `categorytbl` (`CategoryID`,`CategoryCode`,`Category`)  VALUES ($AddCategoryID,$CategoryCode,$AddCategory)");
 
@@ -136,7 +190,7 @@ if (isset($_POST['AddCategoryID'])) {
 }
 
 // Add account
-if (isset($_POST['btnfaddAccount'])) {
+elseif (isset($_POST['btnfaddAccount'])) {
 
     $aUsername = db_quote($_POST['aUsername']);
     $aPassword = $_POST['aPassword'];
@@ -160,43 +214,53 @@ if (isset($_POST['btnfaddAccount'])) {
 
 //Update Branch
 
-if (isset($_POST['btnUpdateBranch'])) {
+elseif (isset($_POST['EditBranchID'])) {
+    $BranchID = $_POST['EditBranchID'];
+    $hash = substr($_POST['key'], 0, 32);
+    $rand = substr($_POST['key'], 32, 4);
 
-    $EditBranchCode = db_quote(strtoupper($_POST['EditBranchCode']));
-    $EditBranchName = db_quote(ucwords($_POST['EditBranchName']));
-    $EditBrand = db_quote($_POST['EditBrand']);
-    $EditBranchArea = db_quote($_POST['EditBranchArea']);
+    if (encrypt_decrypt_rnd('decrypt', $hash, $rand) == $BranchID) {
+        $EditBranchCode = db_quote(strtoupper($_POST['EditBranchCode']));
+        $EditBranchName = db_quote(ucwords($_POST['EditBranchName']));
+        $EditBrand = db_quote($_POST['EditBrand']);
+        $EditBranchArea = db_quote($_POST['EditBranchArea']);
 
+        $UpdateBranch = db_query("
+        UPDATE 
+        `branchtbl` SET 
+        `BranchCode` = $EditBranchCode,
+        `BranchName` = $EditBranchName, 
+        `BrandID` = $EditBrand, 
+        `AreaID` = $EditBranchArea 
+        WHERE `BranchID` = " . db_quote($BranchID));
 
-    $UpdateBranch = db_query("
-    UPDATE 
-    `branchtbl` 
-    SET 
-    `BranchName` = $EditBranchName, 
-    `BrandID` = $EditBrand, 
-    `AreaID` = $EditBranchArea 
-    WHERE `BranchCode` = $EditBranchCode");
+        if ($UpdateBranch === false) {
+            header("location: ../branch.php?error");
+        } else {
+            header("location: ../branch.php?success");
+        }
+    } else {
+        header("location: ../branch.php?error");
+    }
+} // Update modal of Branch
+elseif (isset($_POST['BranchID'])) {
+    $BranchID = $_POST['BranchID'];
+    $hash = $_POST['hash'];
+    $rand = $_POST['rand'];
 
-    header("location: ../branch.php?Updated");
-} //End Update branch
-
-// Update modal of Branch
-elseif (isset($_POST['BranchCode'])) {
-    $UPBrandCode = $_POST['BranchCode'];
-    $hashBranchCode = $_POST['hashBranchCode'];
-    $Branchrnd = $_POST['Branchrnd'];
-
-    if (encrypt_decrypt_rnd('decrypt', $hashBranchCode, $Branchrnd)) {
+    if (encrypt_decrypt_rnd('decrypt', $hash, $rand) == $BranchID) {
         $UpdateBranchtbl = db_select("
         SELECT 
         branchtbl.BranchCode,
         branchtbl.BranchName,
         brandtbl.Brand,
+        brandtbl.BrandID,
+        areatbl.AreaID,
         areatbl.Area
         FROM branchtbl
         LEFT JOIN brandtbl ON branchtbl.BrandID = brandtbl.BrandID
         LEFT JOIN areatbl ON branchtbl.AreaID = areatbl.AreaID
-        WHERE branchtbl.BranchCode =" . db_quote($UPBrandCode));
+        WHERE branchtbl.BranchID =" . db_quote($BranchID));
 
         if ($UpdateBranchtbl === false) {
             include_once('errormodal.php');
@@ -204,7 +268,9 @@ elseif (isset($_POST['BranchCode'])) {
             $BranchCode = $UpdateBranchtbl[0]['BranchCode'];
             $UpdateBranchName = $UpdateBranchtbl[0]['BranchName'];
             $UpdateBBrand = $UpdateBranchtbl[0]['Brand'];
+            $UpdateBBrandID = $UpdateBranchtbl[0]['BrandID'];
             $UpdateBArea = $UpdateBranchtbl[0]['Area'];
+            $UpdateBAreaID = $UpdateBranchtbl[0]['AreaID'];
             ?>
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -214,9 +280,11 @@ elseif (isset($_POST['BranchCode'])) {
                             <h4 class="modal-title">Update Branch</h4>
                         </div>
                         <div class="modal-body">
+                            <input type="hidden" value="<?= @$BranchID ?>" name="EditBranchID">
+                            <input type="hidden" value="<?= @$hash . $rand ?>" name="key">
                             <div class="form-group">
                                 <label>Branch Code <span class="red">(*)</span></label>
-                                <input type="text" class="form-control" id="EditBranchCode" name="EditBranchCode" value="<?php echo $BranchCode ?>" readonly>
+                                <input type="text" class="form-control" id="EditBranchCode" name="EditBranchCode" value="<?php echo $BranchCode ?>">
                             </div>
                             <div class="form-group">
                                 <label>Branch Name <span class="red">(*)</span></label>
@@ -225,15 +293,16 @@ elseif (isset($_POST['BranchCode'])) {
                             <div class="form-group">
                                 <label>Brand <span class="red">(*)</span></label>
                                 <select class="form-control" name="EditBrand" id="EditBrand">
-                                    <option selected="selected" value=""><?= @$UpdateBBrand; ?></option>
+                                    <option value="" <?php if ($UpdateBBrandID == "") echo "selected='selected'" ?>>- Select Brand -</option>
+                                    <option value="All" <?php if ($UpdateBBrandID == "") echo "selected='selected'" ?>>Berlein Mobile</option>
                                     <?php
-                                    $Brandtbl = db_select("SELECT `BrandID`,`Brand` FROM `brandtbl`");
+                                    $Brandtbl = db_select("SELECT `BrandID`,`Brand` FROM `brandtbl` ORDER BY `Brand` ASC");
 
                                     foreach ($Brandtbl as $valueBrand) {
                                         $BrandID = $valueBrand['BrandID'];
                                         $Brand = $valueBrand['Brand'];
                                         ?>
-                                        <option value="<?= @$BrandID; ?>"><?= @$Brand; ?></option>
+                                        <option value="<?= @$BrandID; ?>" <?php if ($BrandID == $UpdateBBrandID) echo "selected='selected'" ?>><?= @$Brand; ?></option>
                                         <?php
                                     }
                                     ?>
@@ -242,15 +311,15 @@ elseif (isset($_POST['BranchCode'])) {
                             <div class="form-group">
                                 <label>Branch Area <span class="red">(*)</span></label>
                                 <select class="form-control" name="EditBranchArea" id="EditBranchArea">
-                                    <option value="" selected="selected"><?= @$UpdateBArea; ?></option>
+                                    <option value="">- Select Area -</option>
                                     <?php
-                                    $Areatbl = db_select("SELECT `AreaID`,`Area` FROM `areatbl`");
+                                    $Areatbl = db_select("SELECT `AreaID`,`Area` FROM `areatbl` ORDER BY `Area` ASC");
 
                                     foreach ($Areatbl as $valueArea) {
                                         $AreaID = $valueArea['AreaID'];
                                         $Area = $valueArea['Area'];
                                         ?>
-                                        <option value="<?= @$AreaID; ?>"><?= @$Area; ?></option>
+                                        <option value="<?= @$AreaID; ?>" <?php if ($AreaID == $UpdateBAreaID) echo "selected='selected'" ?>><?= @$Area; ?></option>
                                         <?php
                                     }
                                     ?>
@@ -310,10 +379,8 @@ elseif (isset($_POST['BranchCode'])) {
     } else {
         include_once('errormodal.php');
     }
-}
-
-//Update Item
-if (isset($_POST['btnUpdateItems'])) {
+} //Update Item
+elseif (isset($_POST['btnUpdateItems'])) {
 
     $EditItemCode = strtoupper(db_quote($_POST['EditItemCode']));
     $EditModelName = db_quote(ucwords($_POST['EditModelName']));
@@ -333,7 +400,13 @@ if (isset($_POST['btnUpdateItems'])) {
     `CriticalLevel` = $EditCriticalLevel
     WHERE `ItemCode` = $EditItemCode");
 
-    header('location: ../items.php?Updated');
+
+    if ($UpdateItem === false) {
+        header('location: ../items.php?error');
+    } else {
+        header('location: ../items.php?success');
+    }
+
 }
 //End Update Items
 
@@ -505,10 +578,8 @@ elseif (isset($_POST['ItemCode'])) {
             <?php
         }
     }
-}
-
-//Update Employee
-if (isset($_POST['btnupdateEmployee'])) {
+} //Update Employee
+elseif (isset($_POST['btnupdateEmployee'])) {
 
     $uEmpID = db_quote(strtoupper($_POST['uEmpID']));
     $uFirstname = db_quote(ucwords($_POST['uFirstname']));
@@ -530,9 +601,11 @@ if (isset($_POST['btnupdateEmployee'])) {
     } elseif ($uPosition == db_quote("Area Manager")) {
         $uBranch = db_quote("");
         $uBrand = db_quote("");
-    } elseif ($uPosition == db_quote("OIC") || $uPosition == db_quote("Cashier")) {
+    } elseif ($uPosition == db_quote("OIC") || $uPosition == db_quote("Cashier" || $uPosition == db_quote("Sales Clerk"))) {
         $ueArea = db_quote("");
         $uBrand = db_quote("");
+    } else {
+        header('location: ../employee.php?error');
     }
 
     $UpdateEmployee = db_query("
@@ -548,12 +621,17 @@ if (isset($_POST['btnupdateEmployee'])) {
     `BrandID` = $uBrand
     WHERE `EmpID` = $uEmpID");
 
-    header('location: ../employee.php?Updated');
+    if ($UpdateEmployee === false) {
+        header('location: ../employee.php?error');
+    } else {
+        header('location: ../employee.php?success');
+    }
+
 }
 //End Update Employee
 
 //Modal of update employee
-if (isset($_POST['EmpID'])) {
+elseif (isset($_POST['EmpID'])) {
     $UpdateEmpID = $_POST['EmpID'];
     $hashEmpID = $_POST['hashEmpID'];
     $rnd = $_POST['rnd'];
@@ -635,6 +713,7 @@ if (isset($_POST['EmpID'])) {
                                     <option value="Area Manager" <?php if ($UpdatePosition == "Area Manager") echo "selected='selected'" ?>>Area Manager</option>
                                     <option value="OIC" <?php if ($UpdatePosition == "OIC") echo "selected='selected'" ?>>Officer In Charge</option>
                                     <option value="Cashier" <?php if ($UpdatePosition == "Cashier") echo "selected='selected'" ?>>Cashier</option>
+                                    <option value="Sales Clerk" <?php if ($UpdatePosition == "Sales Clerk") echo "selected='selected'" ?>>Sales Clerk</option>
                                 </select>
                             </div>
                             <div class="form-group" style="display:none" id="DivBranchModal">
@@ -642,13 +721,14 @@ if (isset($_POST['EmpID'])) {
                                 <select class="form-control" name="uBranch" id="uBranch">
                                     <option value="" selected="selected">- Select Branch -</option>
                                     <?php
-                                    $Branchtbl = db_select("SELECT `BranchID`,`BranchName` FROM `branchtbl`");
+                                    $Branchtbl = db_select("SELECT `BranchID`,`BranchName`, `BranchCode` FROM `branchtbl`");
 
                                     foreach ($Branchtbl as $valueBranch) {
                                         $BranchID = $valueBranch['BranchID'];
+                                        $BranchCode = $valueBranch['BranchCode'];
                                         $BranchName = $valueBranch['BranchName'];
                                         ?>
-                                        <option value="<?= @$BranchID; ?>" <?php if ($BranchID == $UpdateBranchID) echo "selected='selected'" ?>><?= @$BranchName; ?></option>
+                                        <option value="<?= @$BranchID; ?>" <?php if ($BranchID == $UpdateBranchID) echo "selected='selected'" ?>><?= @"(" . $BranchCode .") " . $BranchName; ?></option>
                                         <?php
                                     }
                                     ?>
@@ -800,174 +880,206 @@ if (isset($_POST['EmpID'])) {
 // End of Update Modal
 
 //Update Area
-if (isset($_POST['btnUpdateArea'])) {
+elseif (isset($_POST['btnUpdateArea'])) {
+    $AreaID = $_POST['EditAreaID'];
+    $hashAreaID = substr($_POST['key'], 0, 32);
+    $Rand = substr($_POST['key'], 32, 4);
 
-    $EditAreaID = db_quote($_POST['EditAreaID']);
-    $EditArea = db_quote(ucwords($_POST['EditArea']));
+    if (encrypt_decrypt_rnd('decrypt', $hashAreaID, $Rand) == $AreaID) {
+        $EditAreaID = db_quote($AreaID);
+        $EditArea = db_quote(ucwords($_POST['EditArea']));
 
-    $updateArea = db_query("UPDATE areatbl SET `Area` = $EditArea WHERE AreaID = $EditAreaID");
+        $updateArea = db_query("UPDATE areatbl SET `Area` = $EditArea WHERE AreaID = $EditAreaID");
 
-    header("location: ../area.php?Updated");
+        if ($updateArea === false) {
+            header("location: ../area.php?error");
+        } else {
+            header("location: ../area.php?success");
+        }
+    } else {
+        header("location: ../area.php?error");
+    }
 }
 // End of Update Area
 
 //Modal Update Area
 elseif (isset($_POST['AreaID'])) {
-    $upAreaID = db_quote($_POST['AreaID']);
+    $AreaID = $_POST['AreaID'];
+    $hashAreaID = $_POST['hash'];
+    $Rand = $_POST['rnd'];
 
-    $UpdateAreatbl = db_select("
-    SELECT
-    `AreaID`,
-    `Area`
-    FROM `areatbl` WHERE `AreaID` = $upAreaID");
+    if (encrypt_decrypt_rnd('decrypt', $hashAreaID, $Rand) == $AreaID) {
+        $getArea = db_select("SELECT `Area` FROM `areatbl` WHERE `AreaID` = " . db_quote($AreaID));
 
-    $AreaID = $UpdateAreatbl[0]['AreaID'];
-    $UpdateArea = $UpdateAreatbl[0]['Area'];
-    ?>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form action="function/functions.php" method="POST" name="EditArea" id="EditArea" autocomplete="off">
-                <div class="modal-header modal-header-dark">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Edit Area</h4>
+        if ($getArea === false) {
+            include_once('errormodal.php');
+        } else {
+            $Area = $getArea[0]['Area'];
+            ?>
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form action="function/functions.php" method="POST" name="EditArea" id="EditArea" autocomplete="off">
+                        <div class="modal-header modal-header-dark">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Edit Area</h4>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="EditAreaID" value="<?= @$AreaID ?>">
+                            <input type="hidden" name="key" value="<?= @$hashAreaID . $Rand ?>">
+                            <div class="form-group">
+                                <label>Area <span class="red">(*)</span></label>
+                                <input type="text" class="form-control" style="text-transform: capitalize" id="EditArea" name="EditArea" value="<?php echo $Area; ?>">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-dark" id="btnUpdateArea" name="btnUpdateArea">Update</button>
+                            <button class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <input type="hidden" class="form-control" readonly id="EditAreaID" name="EditAreaID" value="<?php echo $AreaID; ?>">
-                    </div>
-                    <div class="form-group">
-                        <label>Area <span class="red">(*)</span></label>
-                        <input type="text" class="form-control" style="text-transform: capitalize" id="EditArea" name="EditArea" value="<?php echo $UpdateArea; ?>">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-dark" id="btnUpdateArea" name="btnUpdateArea">Update</button>
-                    <button class="btn btn-default" data-dismiss="modal">Cancel</button>
-                </div>
-            </form>
-        </div>
-        <!-- /.modal-content -->
-    </div>
-    <!-- /.modal-dialog -->
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
 
-    <!-- validator -->
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $('#EditArea').bootstrapValidator({
-                message: 'This value is not valid',
-                feedbackIcons: {
-                    valid: "glyphicon glyphicon-ok",
-                    invalid: "glyphicon glyphicon-remove",
-                    validating: "glyphicon glyphicon-refresh"
-                },
-                fields: {
-                    group: 'form-group',
-                    EditArea: {
-                        validators: {
-                            notEmpty: {
-                                message: 'Area is required.'
+            <!-- validator -->
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('#EditArea').bootstrapValidator({
+                        message: 'This value is not valid',
+                        feedbackIcons: {
+                            valid: "glyphicon glyphicon-ok",
+                            invalid: "glyphicon glyphicon-remove",
+                            validating: "glyphicon glyphicon-refresh"
+                        },
+                        fields: {
+                            group: 'form-group',
+                            EditArea: {
+                                validators: {
+                                    notEmpty: {
+                                        message: 'Area is required.'
+                                    }
+                                }
                             }
                         }
-                    }
-                }
-            });
-        });
-    </script>
-    <!-- /validator-->
-    <?php
-}
+                    });
+                });
+            </script>
+            <!-- /validator-->
+            <?php
+        }
+    } else {
+        include_once('errormodal.php');
+    }
+} //Update Brand
+elseif (isset($_POST['EditBrandID'])) {
+    $EditBrandID = $_POST['EditBrandID'];
+    $hash = $_POST['hash'];
+    $rand = $_POST['rnd'];
 
-//Update Brand
-if (isset($_POST['btnUpdateBrand'])) {
+    if (encrypt_decrypt_rnd('decrypt', $hash, $rand) == $EditBrandID) {
+        $EditBrandID = db_quote($_POST['EditBrandID']);
+        $EditBrandCode = db_quote($_POST['EditBrandCode']);
+        $EditBrand = db_quote(ucwords($_POST['EditBrand']));
 
-    $EditBrandID = db_quote($_POST['EditBrandID']);
-    $EditBrandCode = db_quote($_POST['EditBrandCode']);
-    $EditBrand = strtoupper(db_quote($_POST['EditBrand']));
+        $UpdateBrand = db_query("UPDATE brandtbl SET BrandCode = $EditBrandCode, Brand = $EditBrand WHERE  BrandID = $EditBrandID");
 
-    $UpdateBrand = db_query("UPDATE brandtbl SET BrandCode = $EditBrandCode, Brand = $EditBrand WHERE  BrandID = $EditBrandID");
-
-    header("location: ../brand.php?Updated");
+        if ($UpdateBrand === false) {
+            header("location: ../brand.php?error");
+        } else {
+            header("location: ../brand.php?success");
+        }
+    }else{
+        header("location: ../brand.php?error");
+    }
 }
 //End of Update Brand
 
 //Modal of Update Brand
 elseif (isset($_POST['BrandID'])) {
-    $UpdateBrandID = db_quote($_POST['BrandID']);
+    $UpdateBrandID = $_POST['BrandID'];
+    $hash = $_POST['hash'];
+    $rand = $_POST['rnd'];
 
-    $UpdateBrandtbl = db_select("
-    SELECT 
-     BrandID,
-     BrandCode,
-     Brand
-     FROM 
-     `brandtbl` WHERE `BrandID` = $UpdateBrandID");
+    if (encrypt_decrypt_rnd('decrypt', $hash, $rand) == $UpdateBrandID) {
+        $UpdateBrandtbl = db_select("
+        SELECT 
+        BrandID,
+        BrandCode,
+        Brand
+        FROM `brandtbl` 
+        WHERE `BrandID` = " . db_quote($UpdateBrandID));
 
-    $BrandID = $UpdateBrandtbl[0]['BrandID'];
-    $UpdateBrandCode = $UpdateBrandtbl[0]['BrandCode'];
-    $UpdateBrand = $UpdateBrandtbl[0]['Brand'];
-    ?>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form action="function/functions.php" method="POST" name="EditBrand" id="EditBrand" autocomplete="off">
-                <div class="modal-header modal-header-dark">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Edit Area</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <input type="hidden" class="form-control" readonly id="EditBrandID" name="EditBrandID" value="<?= @$BrandID; ?>">
+        $BrandID = $UpdateBrandtbl[0]['BrandID'];
+        $UpdateBrandCode = $UpdateBrandtbl[0]['BrandCode'];
+        $UpdateBrand = $UpdateBrandtbl[0]['Brand'];
+        ?>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="function/functions.php" method="POST" name="EditBrand" id="EditBrand" autocomplete="off">
+                    <div class="modal-header modal-header-dark">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Edit Area</h4>
                     </div>
-                    <div class="form-group">
-                        <label>Brand Code <span class="red">(*)</span></label>
-                        <input type="text" class="form-control" style="text-transform: capitalize" id="EditBrandCode" name="EditBrandCode" value="<?= @$UpdateBrandCode; ?>">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <input type="hidden" name="EditBrandID" value="<?= @$BrandID; ?>">
+                            <input type="hidden" name="hash" value="<?= @$hash ?>">
+                            <input type="hidden" name="rnd" value="<?= @$rand ?>">
+                        </div>
+                        <div class="form-group">
+                            <label>Brand Code <span class="red">(*)</span></label>
+                            <input type="text" class="form-control" style="text-transform: uppercase" id="EditBrandCode" name="EditBrandCode" value="<?= @$UpdateBrandCode; ?>">
+                        </div>
+                        <div class="form-group">
+                            <label>Brand <span class="red">(*)</span></label>
+                            <input type="text" class="form-control" style="text-transform: capitalize" id="EditBrand" name="EditBrand" value="<?= @$UpdateBrand; ?>">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Brand <span class="red">(*)</span></label>
-                        <input type="text" class="form-control" style="text-transform: capitalize" id="EditBrand" name="EditBrand" value="<?= @$UpdateBrand; ?>">
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-dark" id="btnUpdateBrand" name="btnUpdateBrand">Update</button>
+                        <button class="btn btn-default" data-dismiss="modal">Cancel</button>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-dark" id="btnUpdateBrand" name="btnUpdateBrand">Update</button>
-                    <button class="btn btn-default" data-dismiss="modal">Cancel</button>
-                </div>
-            </form>
+                </form>
+            </div>
+            <!-- /.modal-content -->
         </div>
-        <!-- /.modal-content -->
-    </div>
-    <!-- /.modal-dialog -->
+        <!-- /.modal-dialog -->
 
-    <!-- validator -->
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $('#EditBrand').bootstrapValidator({
-                message: 'This value is not valid',
-                feedbackIcons: {
-                    valid: "glyphicon glyphicon-ok",
-                    invalid: "glyphicon glyphicon-remove",
-                    validating: "glyphicon glyphicon-refresh"
-                },
-                fields: {
-                    group: 'form-group',
-                    EditBrandCode: {
-                        validators: {
-                            notEmpty: {
-                                message: 'Brand Code is required.'
-                            }
-                        }
+        <!-- validator -->
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $('#EditBrand').bootstrapValidator({
+                    message: 'This value is not valid',
+                    feedbackIcons: {
+                        valid: "glyphicon glyphicon-ok",
+                        invalid: "glyphicon glyphicon-remove",
+                        validating: "glyphicon glyphicon-refresh"
                     },
-                    EditBrand: {
-                        validators: {
-                            notEmpty: {
-                                message: 'Brand is required.'
+                    fields: {
+                        group: 'form-group',
+                        EditBrandCode: {
+                            validators: {
+                                notEmpty: {
+                                    message: 'Brand Code is required.'
+                                }
+                            }
+                        },
+                        EditBrand: {
+                            validators: {
+                                notEmpty: {
+                                    message: 'Brand is required.'
+                                }
                             }
                         }
                     }
-                }
+                });
             });
-        });
-    </script>
-    <!-- /validator-->
-    <?php
+        </script>
+        <!-- /validator-->
+        <?php
+    } else {
+        include_once('errormodal.php');
+    }
 }
 
 //Update Color
@@ -978,7 +1090,12 @@ if (isset($_POST['btnUpdateColor'])) {
 
     $UpdateColor = db_query("UPDATE colortbl SET `Color` = $EditColor WHERE `ColorID` = $EditColorID");
 
-    header("location: ../colors.php?Updated");
+    if ($UpdateColor === false) {
+        header("location: ../colors.php?error");
+    } else {
+        header("location: ../colors.php?success");
+    }
+
 }
 // End of Update Color
 
@@ -1046,10 +1163,8 @@ elseif (isset($_POST['ColorID'])) {
     </script>
     <!-- /validator-->
     <?php
-}
-
-// Update Category
-if (isset($_POST['btnUpdateCategory'])) {
+} // Update Category
+elseif (isset($_POST['btnUpdateCategory'])) {
 
     $EditCategoryID = db_quote($_POST['EditCategoryID']);
     $EditCategoryCode = db_quote(ucwords($_POST['EditCategoryCode']));
@@ -1057,7 +1172,12 @@ if (isset($_POST['btnUpdateCategory'])) {
 
     $UpdateCategory = db_query("UPDATE `categorytbl` SET `CategoryCode` = $EditCategoryCode, `Category` = $EditCategory WHERE  `CategoryID` = $EditCategoryID");
 
-    header("location: ../category.php?Updated");
+    if ($UpdateCategory === false) {
+        header("location: ../category.php?error");
+    } else {
+        header("location: ../category.php?success");
+    }
+
 
 } //modal update Category
 elseif (isset($_POST['CategoryID'])) {
@@ -1136,9 +1256,7 @@ elseif (isset($_POST['CategoryID'])) {
     </script>
     <!-- /validator-->
     <?php
-}
-
-if (isset($_POST['dBranchCode'])) {
+} elseif (isset($_POST['dBranchCode'])) {
     $dBranchCode = db_quote($_POST['dBranchCode']);
 
     $Branches = db_select("SELECT * FROM `branchtbl` WHERE `BranchCode` =" . $dBranchCode);
@@ -1209,9 +1327,7 @@ if (isset($_POST['dBranchCode'])) {
     </script>
     <!-- /validator-->
     <?php
-}
-
-if (isset($_POST['addAccountEmpID'])) {
+} elseif (isset($_POST['addAccountEmpID'])) {
     $EmpID = $_POST['addAccountEmpID'];
     $hashEmpID = $_POST['hashEmpID'];
     $rnd = $_POST['rnd'];
@@ -1440,6 +1556,7 @@ if (isset($_POST['addAccountEmpID'])) {
     } else {
         include_once('errormodal.php');
     }
+
 } //Adding of accounts to
 elseif (isset($_POST['AddAccEmpID'])) {
     $EmpID = $_POST['AddAccEmpID'];
@@ -1459,7 +1576,7 @@ elseif (isset($_POST['AddAccEmpID'])) {
             if ($addAccount === false) {
                 header('location: ../employee.php?error');
             } else {
-                header('location: ../employee.php?Updated');
+                header('location: ../employee.php?success');
             }
         } else {
             header('location: ../employee.php?error');
@@ -1489,7 +1606,7 @@ elseif (isset($_POST['updateaccEmpID'])) {
             if ($updateAccount === false) {
                 header('location: ../employee.php?error');
             } else {
-                header('location: ../employee.php?Updated');
+                header('location: ../employee.php?success');
             }
         } else {
             header('location: ../employee.php?error');
@@ -1499,5 +1616,3 @@ elseif (isset($_POST['updateaccEmpID'])) {
     }
 
 }
-
-?>

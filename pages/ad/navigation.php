@@ -8,23 +8,16 @@ $rnd = $_SESSION['rnd'];
 
 if(encrypt_decrypt_rnd('decrypt', $hashEMPID, $rnd) == $EmpID){
     $checkAccount = db_select("
-    SELECT 
-    employeetbl.Firstname,
-    employeetbl.Lastname,
-    employeetbl.Position,
-    employeetbl.Initials,
-    branchtbl.BranchCode
+    SELECT Firstname,Lastname, Position, Initials
     FROM employeetbl
-    LEFT JOIN branchtbl ON employeetbl.BranchID = branchtbl.BranchID
-    WHERE EmpID =" . $EmpID);
+    WHERE EmpID =" . db_quote($EmpID));
 
     if ($checkAccount[0]['Position'] != "Admin") {
         session_destroy();
-        header('location: ../../index.php');
+        header('location: ../../index.php?error');
     } else {
         $FirstName = $checkAccount[0]['Firstname'];
         $LastName = $checkAccount[0]['Lastname'];
-        $BranchCode = $checkAccount[0]['BranchCode'];
         $Initials = $checkAccount[0]['Initials'];
         $AccountType = $checkAccount[0]['Position'];
         $FullName = $FirstName . " " . $LastName;

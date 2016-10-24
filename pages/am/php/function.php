@@ -462,7 +462,6 @@ if (isset($_POST['BranchID'])) {
         AND transactiontbl.BranchCode = $BranchCode
         ");
 
-        
         $EmpSC = $transactionDetails[0]['SalesClerk'];
         $EmpCS = $transactionDetails[0]['Cashier'];
         $getSC = db_select("SELECT `Firstname`, `Lastname` FROM `employeetbl` WHERE `EmpID` = " . db_quote($EmpSC));
@@ -656,7 +655,7 @@ if (isset($_POST['BranchID'])) {
                                     ?>
                                     <div id="HomeCreditDetails">
                                         <h4><b>Home Credit Details</b></h4>
-                                        <strong>Ref #:</strong> <?= @$HomeCredit ?><br>
+                                        <strong>Ref #:</strong> <?= @$ReferenceNo ?><br>
                                     </div>
                                     <br>
                                     <?php

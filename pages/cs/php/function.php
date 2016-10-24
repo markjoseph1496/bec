@@ -855,7 +855,7 @@ elseif (isset($_POST['rItemCode'])) {
                                     ?>
                                     <div id="HomeCreditDetails">
                                         <h4><b>Home Credit Details</b></h4>
-                                        <strong>Ref #:</strong> <?= @$HomeCredit ?><br>
+                                        <strong>Ref #:</strong> <?= @$ReferenceNo ?><br>
                                     </div>
                                     <br>
                                     <?php

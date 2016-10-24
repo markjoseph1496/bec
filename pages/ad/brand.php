@@ -57,16 +57,18 @@
                                                 $BrandID = $vBrand['BrandID'];
                                                 $BrandCode = $vBrand['BrandCode'];
                                                 $Brand = $vBrand['Brand'];
+
+                                                $Brandrnd = rand(1000, 9999);
+                                                $hashBrandID = encrypt_decrypt_rnd('encrypt', $BrandID, $Brandrnd);
                                                 ?>
                                                 <tr>
                                                     <td><?= @$BrandCode ?></td>
                                                     <td><?= @$Brand ?></td>
                                                     <td>
-                                                        <button class="btn btn-dark" onclick="BrandDetails(this.value);" value="<?= @$BrandID; ?>" data-toggle="modal" data-target="#BrandUpdateModal"><i class="fa fa-eye"></i></button>
-                                                        <button class="btn btn-danger" onclick="BrandDelete(this.value);" value="<?= @$BrandID; ?>" data-toggle="modal" data-target="#BrandDeleteModal"><i class="fa fa-trash"></i></button>
+                                                        <button class="btn btn-dark" onclick="BrandDetails(this.value,'<?= @$hashBrandID; ?>','<?= @$Brandrnd; ?>');" value="<?= @$BrandID; ?>"><i class="fa fa-eye"></i></button>
+                                                        <button class="btn btn-danger" onclick="BrandDelete(this.value,'<?= @$hashBrandID; ?>','<?= @$Brandrnd; ?>');" value="<?= @$BrandID; ?>"><i class="fa fa-trash"></i></button>
                                                     </td>
                                                 </tr>
-
                                                 <?php
                                             }
                                             ?>
@@ -161,6 +163,40 @@ include_once('../js.html');
 ?>
 
 <script src="js/function.js"></script>
+
+<?php
+if (isset($_GET['error'])) {
+    echo "<script type='text/javascript'>
+    new PNotify({
+        title: 'Error :(',
+        text: 'There was an error, Please try again.',
+        type: 'error',
+        styling: 'bootstrap3',
+        delay:3000
+    });
+</script>";
+} elseif (isset($_GET['success'])) {
+    echo "<script type='text/javascript'>
+    new PNotify({
+        title: 'Success',
+        text: 'Employee Updated',
+        type: 'success',
+        styling: 'bootstrap3',
+        delay:3000
+    });
+</script>";
+} elseif (isset($_GET['deleted'])) {
+    echo "<script type='text/javascript'>
+    new PNotify({
+        title: 'Success',
+        text: 'Employee Deleted',
+        type: 'success',
+        styling: 'bootstrap3',
+        delay:3000
+    });
+</script>";
+}
+?>
 
 <!-- Datatables -->
 <script>
@@ -279,7 +315,9 @@ include_once('../js.html');
                 data: $('#AddBrand').serialize(),
                 success: function (data) {
                     if (data == "True") {
-                        window.location.href = "brand.php";
+                        window.location.href = "brand.php?success";
+                    }else{
+                        window.location.href = "brand.php?error";
                     }
                 }
             })

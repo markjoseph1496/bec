@@ -3,15 +3,15 @@ include('../../../connection.php');
 include('../../../functions/encryption.php');
 
 //Delete Branch
-if (isset($_POST['BranchCode'])) {
-    $BranchCode = $_POST['BranchCode'];
-    $hashBranchCode = $_POST['hashBranchCode'];
-    $Branchrnd= $_POST['Branchrnd'];
+if (isset($_POST['BranchID'])) {
+    $BranchID = $_POST['BranchID'];
+    $hashBranchID = $_POST['hashBranchID'];
+    $Branchrnd = $_POST['Branchrnd'];
 
-    if (encrypt_decrypt_rnd('decrypt', $hashBranchCode, $Branchrnd) == $BranchCode) {
-        $BranchCode = db_quote($_POST['BranchCode']);
+    if (encrypt_decrypt_rnd('decrypt', $hashBranchID, $Branchrnd) == $BranchID) {
+        $BranchID = db_quote($BranchID);
 
-        $branchtbl = db_query("DELETE FROM `branchtbl` WHERE BranchCode = $BranchCode");
+        $branchtbl = db_query("DELETE FROM `branchtbl` WHERE `BranchID` = $BranchID");
 
         if ($branchtbl === false) {
             header("location: ../branch.php?error");
@@ -21,8 +21,44 @@ if (isset($_POST['BranchCode'])) {
     } else {
         header("location: ../branch.php?error");
     }
-
 }
+
+//DeleteBranch
+if (isset($_POST['dBranch'])) {
+    $BranchID = $_POST['dBranch'];
+    $hashBranchID = $_POST['dhash'];
+    $Branchrnd = $_POST['drnd'];
+
+    if (encrypt_decrypt_rnd('decrypt', $hashBranchID, $Branchrnd) == $BranchID) {
+        ?>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="function/admin-delete.php">
+                    <div class="modal-header modal-header-dark">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Delete Branch</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="BranchID" value="<?= @$BranchID ?>">
+                        <input type="hidden" name="hashBranchID" value="<?= @$hashBranchID ?>">
+                        <input type="hidden" name="Branchrnd" value="<?= @$Branchrnd ?>">
+                        <label>Are you sure you want to remove this Branch? This cannot be undone.</label>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-dark">Delete</button>
+                        <button class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+        <?php
+    } else {
+        include_once('errormodal.php');
+    }
+}
+
 
 //Delete Item
 if (isset($_POST['ItemCode'])) {
@@ -126,92 +162,117 @@ elseif (isset($_POST['ColorID'])) {
 //End of modal delete Color
 
 // Delete Brand
-if (isset($_POST['btndeleteBrand'])) {
-    $BrandID = db_quote($_POST['BrandID']);
+if (isset($_POST['BrandID'])) {
+    $BrandID = $_POST['BrandID'];
+    $hash = substr($_POST['key'], 0, 32);
+    $rand = substr($_POST['key'], 32, 4);
 
-    $brandtbl = db_query("DELETE FROM `brandtbl` WHERE  BrandID = $BrandID");
+    if (encrypt_decrypt_rnd('decrypt', $hash, $rand) == $BrandID) {
+        $brandtbl = db_query("DELETE FROM `brandtbl` WHERE  BrandID = " . db_quote($BrandID));
 
-    header("location: ../brand.php?Deleted");
-} //Modal of Delete Brand
-elseif (isset($_POST['BrandID'])) {
-    $delBrandID = db_quote($_POST['BrandID']);
+        if ($brandtbl === false) {
+            header("location: ../brand.php?error");
+        } else {
+            header("location: ../brand.php?deleted");
+        }
 
-    $DeleteBrandtbl = db_select("
-    SELECT
-    `BrandID`,
-    `BrandCode`,
-    `Brand`
-    FROM `brandtbl` WHERE `BrandId` = $delBrandID");
+    } else {
+        header("location: ../brand.php?error");
+    }
 
-    $BrandID = $DeleteBrandtbl[0]['BrandID'];
-    $DeleteBrand = $DeleteBrandtbl[0]['Brand'];
-    ?>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form action="function/admin-delete.php" method="POST" name="DeleteBrand" id="DeleteBrand">
-                <div class="modal-header modal-header-danger">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title"> Delete Brand</h4>
-                </div>
-                <div class="modal-body">
-                    <label>Do you want to delete this Brand "<?= @$DeleteBrand; ?>"</label>
-                    <div class="form-group"></div>
-                </div>
-                <input type="hidden" name="BrandID" value="<?= @$BrandID; ?>">
-                <div class="modal-footer">
-                    <button class="btn btn-danger" name="btndeleteBrand" id="btndeleteBrand">Delete</button>
-                    <button class="btn btn-dark" data-dismiss="modal">Cancle</button>
-                </div>
-            </form>
+}
+
+//Modal of Delete Brand
+elseif (isset($_POST['dBrandID'])) {
+    $delBrandID = $_POST['dBrandID'];
+    $hash = $_POST['dhash'];
+    $rand = $_POST['drnd'];
+
+    if (encrypt_decrypt_rnd('decrypt', $hash, $rand) == $delBrandID) {
+        ?>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="function/admin-delete.php" method="POST" name="DeleteBrand" id="DeleteBrand">
+                    <div class="modal-header modal-header-dark">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title"> Delete Brand</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" value="<?= @$delBrandID ?>" name="BrandID">
+                        <input type="hidden" value="<?= @$hash . $rand ?>" name="key">
+                        <label>Do you want to delete this Brand. This cannot be undone.</label>
+                        <div class="form-group"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-dark" name="btndeleteBrand" id="btndeleteBrand">Delete</button>
+                        <button class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
         </div>
-        <!-- /.modal-content -->
-    </div>
-    <!-- /.modal-dialog -->
-    <?php
+        <!-- /.modal-dialog -->
+        <?php
+
+    } else {
+        include_once('errormodal.php');
+    }
 }
 
 //Delete Area
-if (isset($_POST['btnDeleteArea'])) {
-    $AreaID = db_quote($_POST['AreaID']);
+if (isset($_POST['AreaID'])) {
+    $AreaID = $_POST['AreaID'];
+    $hash = substr($_POST['key'], 0, 32);
+    $rand = substr($_POST['key'], 32, 4);
+    if (encrypt_decrypt_rnd('decrypt', $hash, $rand) === $AreaID) {
+        $AreaID = db_quote($AreaID);
+        $QueryDelete = db_query("DELETE FROM `areatbl` WHERE  AreaID = $AreaID");
+        if ($QueryDelete === false) {
+            header("location: ../area.php?error");
+        } else {
+            header("location: ../area.php?deleted");
+        }
+    } else {
+        header("location: ../area.php?error");
+    }
+}
 
-    $areatbl = db_query("DELETE FROM `areatbl` WHERE  AreaID = $AreaID");
+//Modal Delete Area
+elseif (isset($_POST['dAreaID'])) {
+    $AreaID = $_POST['dAreaID'];
+    $hash = $_POST['dhash'];
+    $rand = $_POST['drnd'];
 
-    header("location: ../area.php?Deleted");
-} //Modal Delete Area
-elseif (isset($_POST['AreaID'])) {
-    $delAreaID = db_quote($_POST['AreaID']);
-
-    $DeleteAreatbl = db_select("
-    SELECT 
-    `AreaID`,
-    `Area`
-    FROM `areatbl` WHERE `AreaID` = $delAreaID");
-
-    $AreaID = $DeleteAreatbl[0]['AreaID'];
-    $DeleteArea = $DeleteAreatbl[0]['Area'];
-    ?>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form action="function/admin-delete.php" method="POST" name="DeleteArea" id="DeleteArea">
-                <div class="modal-header modal-header-danger">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Delete Area</h4>
-                </div>
-                <div class="modal-body">
-                    <label>Do you want to delete this Area "<?= @$DeleteArea; ?>"</label>
-                    <div class="form-group"></div>
-                </div>
-                <input type="hidden" name="AreaID" value="<?= @$AreaID; ?>">
-                <div class="modal-footer">
-                    <button class="btn btn-danger" name="btnDeleteArea" id="btnDeleteArea">Delete</button>
-                    <button class="btn btn-dark" data-dismiss="modal">Cancel</button>
-                </div>
-            </form>
+    if (encrypt_decrypt_rnd('decrypt', $hash, $rand) === $AreaID) {
+        $getArea = db_select("SELECT `Area` FROM `areatbl` WHERE `AreaID` =" . db_quote($AreaID));
+        $Area = $getArea[0]['Area'];
+        ?>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="function/admin-delete.php" method="POST" name="DeleteArea" id="DeleteArea">
+                    <div class="modal-header modal-header-danger">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Delete Area</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" value="<?= @$AreaID ?>" name="AreaID">
+                        <input type="hidden" value="<?= @$hash . $rand ?>" name="key">
+                        <label>Do you want to delete <?= @$Area; ?>. This cannot be undone.</label>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-danger">Delete</button>
+                        <button class="btn btn-dark" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
         </div>
-        <!-- /.modal-content -->
-    </div>
-    <!-- /.modal-dialog -->
-    <?php
+        <!-- /.modal-dialog -->
+        <?php
+    } else {
+        include_once('errormodal.php');
+    }
+
 }
 
 //Delete Category
@@ -220,7 +281,7 @@ if (isset($_POST['btnDeleteCategory'])) {
 
     $categorytbl = db_query("DELETE FROM `categorytbl` WHERE CategoryID = $CategoryID");
 
-    header("location: ../category.php?Deleted");
+    header("location: ../category.php?deleted");
 } //Modal Delete Category
 elseif (isset($_POST['CategoryID'])) {
     $delCategoryID = db_quote($_POST['CategoryID']);
