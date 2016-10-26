@@ -433,7 +433,7 @@ if (isset($_POST['BranchID'])) {
     $Currentrnd = substr($_POST['sBranchCode'], 32, 4);
     $BranchCode = db_quote(encrypt_decrypt_rnd('decrypt', $BranchCode, $Currentrnd));
 
-    $BranchWQ = str_replace("'", "", $BranchCode);
+    $BranchWQ = strtolower(str_replace("'", "", $BranchCode));
     $invtblname = $BranchWQ . "invtbl";
     $cashtblname = $BranchWQ . "cashtransactiontbl";
     $credittblname = $BranchWQ . "credittransactiontbl";

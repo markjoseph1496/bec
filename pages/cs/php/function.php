@@ -41,7 +41,7 @@ function generatePONumber($Branch)
 
 function generateTransactionID($Branch)
 {
-    $BranchWQ = str_replace("'", "", $Branch);
+    $BranchWQ = strtolower(str_replace("'", "", $Branch));
     $transtblname = $BranchWQ . "transactiontbl";
     $_Date = db_quote(date("Y-m-d"));
     $generateTransactionID = db_select("SELECT `TransactionID` FROM $transtblname WHERE `_Date` = $_Date ORDER BY `TransactionID` DESC LIMIT 1");
