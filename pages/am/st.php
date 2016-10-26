@@ -34,8 +34,8 @@
             $decryptBranch = $getBranches[0]['BranchCode'];
         }
 
-        $BranchWQ = $decryptBranch;
-        $invtblname = strtolower($BranchWQ . "invtbl");
+        $BranchWQ = strtolower($decryptBranch);
+        $invtblname = $BranchWQ . "invtbl";
         $cashtblname = $BranchWQ . "cashtransactiontbl";
         $credittblname = $BranchWQ . "credittransactiontbl";
         $homecredittblname = $BranchWQ . "homecredittransactiontbl";
