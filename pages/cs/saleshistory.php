@@ -30,7 +30,7 @@ if (isset($_GET['id'])) {
         <?php
         include('navigation.php');
 
-        $BranchWQ = $BranchCode;
+        $BranchWQ = strtolower($BranchCode);
         $invtblname = $BranchWQ . "invtbl";
         $cashtblname = $BranchWQ . "cashtransactiontbl";
         $credittblname = $BranchWQ . "credittransactiontbl";
@@ -111,7 +111,7 @@ if (isset($_GET['id'])) {
                                                             LEFT JOIN $credittblname ON $transtblname.TransactionID = $credittblname.TransactionID
                                                             LEFT JOIN $homecredittblname ON $transtblname.TransactionID = $homecredittblname.TransactionID
                                                             WHERE $transtblname._Date = " . db_quote($CurrentDate) . " ORDER BY $transtblname._Time ASC");
-                                                            echo db_error();
+
                                                             foreach ($Transactiontbl as $Transaction) {
                                                                 $TransactionID = $Transaction['TransactionID'];
                                                                 $_Time = $Transaction['_Time'];

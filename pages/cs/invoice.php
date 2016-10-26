@@ -27,7 +27,7 @@
         $TransactionID = $_GET['tid'];
 
 
-        $BranchWQ = $BranchCode;
+        $BranchWQ = strtolower($BranchCode);
         $invtblname = $BranchWQ . "invtbl";
         $cashtblname = $BranchWQ . "cashtransactiontbl";
         $credittblname = $BranchWQ . "credittransactiontbl";
