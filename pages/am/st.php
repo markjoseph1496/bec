@@ -86,10 +86,9 @@
         WHERE $homecredittblname.TransactionID = $transtblname.TransactionID
         AND $transtblname._Date = " . db_quote($CurrentDate));
 
-        
-        echo db_error();
+
         foreach ($getHomeCredit as $HomeCreditValue) {
-            $HomeCredit = $HomeCreditValue['Credit'];
+            $HomeCredit = $HomeCreditValue['HomeCredit'];
             $TotalHomeCredit = $TotalHomeCredit + $HomeCredit;
         }
 
