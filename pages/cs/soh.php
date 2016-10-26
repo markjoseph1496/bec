@@ -49,6 +49,7 @@ include_once('../../functions/encryption.php');
                                     <div class="row">
                                         <div class="col-lg-12">
                                             <?php
+                                            $invtblname = strtolower($BranchCode . "invtbl");
                                             $itemstbl = db_select("
                                             SELECT 
                                             itemstbl.ItemCode,
@@ -66,14 +67,14 @@ include_once('../../functions/encryption.php');
                                             foreach ($itemstbl as $count) {
                                                 $countItemCode = $count['ItemCode'];
                                                 $countCriticalLevel = $count['CriticalLevel'];
-                                                $countItem = db_select("SELECT * FROM `invtbl` WHERE `ItemCode` = " . db_quote($countItemCode) . "  AND `BranchCode` = " . db_quote($BranchCode) . " AND `Status` = 'On Hand'");
+                                                $countItem = db_select("SELECT * FROM $invtblname WHERE `ItemCode` = " . db_quote($countItemCode));
 
                                                 if (count($countItem) <= $countCriticalLevel) {
                                                     $CriticalCount++;
                                                 }
                                             }
                                             ?>
-                                            <label>Total Items: <?= @$CountItems ?></label>
+                                            <label>Total Items: <?= @$CountItems; ?></label>
                                             <br>
                                             <label>Total Items on Critical Level: <span class="red"><?= @$CriticalCount ?></span> </label>
                                             <!-- Panel -->
@@ -108,8 +109,9 @@ include_once('../../functions/encryption.php');
                                                             $rand = rand(1000, 9999);
                                                             $hashItemCode = encrypt_decrypt_rnd('encrypt', $ItemCode, $rand);
 
-                                                            $countItem = db_select("SELECT * FROM `invtbl` WHERE `ItemCode` = " . db_quote($ItemCode) . "  AND `BranchCode` = " . db_quote($BranchCode) . " AND `Status` = 'On Hand'");
+                                                            $countItem = db_select("SELECT * FROM $invtblname WHERE `ItemCode` = " . db_quote($ItemCode));
                                                             $StockOnHand = count($countItem);
+
                                                             ?>
                                                             <tr <?php if ($StockOnHand <= $CriticalLevel) echo "class='red'" ?>>
                                                                 <td><?php if ($StockOnHand <= $CriticalLevel) echo $LowLevel; ?>

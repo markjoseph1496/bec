@@ -26,7 +26,9 @@
         $SelectedBrand = db_quote($_POST['Brand']);
         $getBranchCode = db_select("SELECT `BranchCode`, `BranchName` FROM `branchtbl` WHERE `BranchID` = $BranchID");
         $BranchCode = $getBranchCode[0]['BranchCode'];
-        $BranchName = $getBranchCode[0]['BranchName']
+        $BranchName = $getBranchCode[0]['BranchName'];
+
+
         ?>
         <!-- page content -->
         <div class="right_col" role="main">
@@ -73,6 +75,7 @@
                                                             <th>Item Name</th>
                                                             <th>Brand</th>
                                                             <th>SRP</th>
+                                                            <th>DP</th>
                                                             <th width="5%">Qty.</th>
                                                             <th width="10%">Total</th>
                                                             <th width="5%">Delete</th>
@@ -96,7 +99,7 @@
 
                                 <!-- Add Item Modal -->
                                 <div class="modal fade" id="AddItemModal">
-                                    <div class="modal-dialog modal-lg">
+                                    <div class="modal-dialog modal-lg" style="width: 90%;;">
                                         <div class="modal-content">
                                             <div class="modal-header modal-header-dark">
                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -113,6 +116,8 @@
                                                         <th>Brand</th>
                                                         <th>Category</th>
                                                         <th>SRP</th>
+                                                        <th>DP</th>
+                                                        <th>On Hand</th>
                                                         <th width="5%">Qty.</th>
                                                         <th width="5%">Add</th>
                                                     </tr>
@@ -124,20 +129,29 @@
                                                           itemstbl.ItemCode,
                                                           itemstbl.ModelName,
                                                           itemstbl.ItemDescription,
+                                                          itemstbl.AvailableColor,
                                                           itemstbl.Category,
                                                           itemstbl.SRP,
+                                                          itemstbl.DP,
+                                                          itemstbl.CriticalLevel,
                                                           brandtbl.Brand
                                                           FROM itemstbl
                                                           LEFT JOIN brandtbl ON itemstbl.BrandID = brandtbl.BrandID
                                                           WHERE itemstbl.BrandID =  $SelectedBrand ");
 
+                                                    echo db_error() . $SelectedBrand;
                                                     foreach ($itemstbl as $item) {
                                                         $ItemCode = $item['ItemCode'];
                                                         $Model = $item['ModelName'];
                                                         $Description = $item['ItemDescription'];
+                                                        $Color = $item['AvailableColor'];
                                                         $Brand = $item['Brand'];
                                                         $Category = $item['Category'];
                                                         $SRP = number_format($item['SRP'], 2, ".", ",");
+                                                        $DP = number_format($item['DP'], 2, ".", ",");
+                                                        $Color = explode(", ", $Color);
+                                                        $CriticalLevel = $item['CriticalLevel'];
+
                                                         ?>
                                                         <tr>
                                                             <td>
@@ -152,12 +166,11 @@
                                                                 <select class="form-control" name="tColor[]">
                                                                     <option value="">- Select Color -</option>
                                                                     <?php
-                                                                    $colortbl = db_select("SELECT `Color` FROM `colortbl`");
 
-                                                                    foreach($colortbl as $color){
-                                                                        $Color = $color['Color'];
+                                                                    foreach($Color as $color){
+                                                                        $aColor = $color;
                                                                         ?>
-                                                                        <option value="<?= @$Color ?>"><?= @$Color ?></option>
+                                                                        <option value="<?= @$aColor ?>"><?= @$aColor ?></option>
                                                                         <?php
                                                                     }
                                                                     ?>
@@ -178,6 +191,18 @@
                                                             <td>
                                                                 <?= @$SRP ?>
                                                                 <input type="hidden" disabled name="tSRP[]" value="<?= @$SRP ?>">
+                                                            </td>
+                                                            <td>
+                                                                <?= @$DP ?>
+                                                                <input type="hidden" disabled name="tDP[]" value="<?= @$DP ?>">
+                                                            </td>
+                                                            <?php
+                                                            $invtblname = $BranchCode . "invtbl";
+                                                            $getOnHand = db_select("SELECT count(*) as onHand FROM $invtblname WHERE `ItemCode` = " . $ItemCode);
+                                                            $OnHand = $getOnHand[0]['onHand'];
+                                                            ?>
+                                                            <td align="center" <?php if($OnHand <= $CriticalLevel) echo "style='color: red'" ?>>
+                                                                <?= @ $OnHand; ?>
                                                             </td>
                                                             <td>
                                                                 <input type="number" name="tQty[]" id="tQty" max="1000" min="0" class="form-control" style="width: 80px;" value="0">

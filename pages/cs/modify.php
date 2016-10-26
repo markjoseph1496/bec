@@ -2,9 +2,9 @@
 include('../../functions/encryption.php');
 $hashPRNumber = substr($_GET['id'], 0, 32);
 $PONumber = $_GET['pr'];
-$rnd = substr($_GET['id'], 32, 36);
+$srnd = substr($_GET['id'], 32, 4);
 
-if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
+if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $srnd) != $PONumber) {
     header('location: po.php?error');
 }
 ?>
@@ -86,7 +86,7 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
                             </div>
                             <form method="POST" name="frmPurchaseOrder" id="frmPurchaseOrder" action="php/function.php">
                                 <input type="hidden" name="aEmpID" value="<?= @$EmpID ?>">
-                                <input type="hidden" name="HashPRNumber" value="<?= @$hashPRNumber ?>">
+                                <input type="hidden" name="HashPRNumber" value="<?= @$hashPRNumber . $srnd ?>">
                                 <input type="hidden" name="PRNumber" value="<?= @$PONumber ?>">
                                 <input type="hidden" name="BrandID" value="<?= @$BrandID ?>">
                                 <input type="hidden" name="Branch" value="<?= @$Branch ?>">
@@ -143,6 +143,7 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
                                                     purchaserequestsitemstbl.Qty,
                                                     purchaserequestsitemstbl.Color,
                                                     itemstbl.ModelName,
+                                                    itemstbl.DP,
                                                     itemstbl.SRP,
                                                     brandtbl.Brand
                                                     FROM purchaserequestsitemstbl
@@ -151,7 +152,7 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
                                                     WHERE purchaserequestsitemstbl.PONumber = " . db_quote($PONumber) . "
                                                     AND purchaserequestsitemstbl.ModifyCode = " . db_quote($ModifyCode) . "
                                                     ORDER BY itemstbl.ModelName ASC");
-                                            echo db_error();
+
                                             $TotalItems = 0;
                                             foreach ($OrderedItems as $item) {
                                                 $ItemCode = $item['ItemCode'];
@@ -159,6 +160,7 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
                                                 $Color = $item['Color'];
                                                 $ModelName = $item['ModelName'];
                                                 $Brand = $item['Brand'];
+                                                $DP = $item['DP'];
                                                 $SRP = $item['SRP'];
                                                 $TotalItems = $TotalItems + ($Qty * $SRP);
                                                 $Total = number_format($Qty * $SRP, 2, '.', ',');
@@ -168,6 +170,7 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
                                                 <input type="hidden" name="aModelName[]" value="<?= @$ModelName ?>">
                                                 <input type="hidden" name="aColor[]" value="<?= @$Color?>">
                                                 <input type="hidden" name="aBrand[]" value="<?= @$Brand ?>">
+                                                <input type="hidden" name="aDP[]" value="<?= @$DP ?>">
                                                 <input type="hidden" name="aSRP[]" value="<?= @$SRP ?>">
                                                 <input type="hidden" name="aQty[]" value="<?= @$Qty ?>">
                                                 <input type="hidden" name="aTotalPrice[]" value='<?= @$Total ?>'>
@@ -183,6 +186,7 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
                                                         <th>Item Name</th>
                                                         <th>Brand</th>
                                                         <th>SRP</th>
+                                                        <th>DP</th>
                                                         <th width="5%">Qty.</th>
                                                         <th width="10%">Total</th>
                                                         <th width="5%">Delete</th>
@@ -204,7 +208,7 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
                                 </div>
                                 <!-- Add Item Modal -->
                                 <div class="modal fade" id="AddItemModal">
-                                    <div class="modal-dialog modal-lg">
+                                    <div class="modal-dialog modal-lg" style="width: 90%;">
                                         <div class="modal-content">
                                             <div class="modal-header modal-header-dark">
                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -221,6 +225,8 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
                                                         <th>Brand</th>
                                                         <th>Category</th>
                                                         <th>SRP</th>
+                                                        <th>DP</th>
+                                                        <th>On Hand</th>
                                                         <th width="5%">Qty.</th>
                                                         <th width="5%">Add</th>
                                                     </tr>
@@ -232,8 +238,11 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
                                                         itemstbl.ItemCode,
                                                         itemstbl.ModelName,
                                                         itemstbl.ItemDescription,
+                                                        itemstbl.AvailableColor,
                                                         itemstbl.Category,
+                                                        itemstbl.DP,
                                                         itemstbl.SRP,
+                                                        itemstbl.CriticalLevel,
                                                         brandtbl.Brand
                                                         FROM itemstbl
                                                         LEFT JOIN brandtbl ON itemstbl.BrandID = brandtbl.BrandID
@@ -243,9 +252,13 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
                                                         $ItemCode = $item['ItemCode'];
                                                         $Model = $item['ModelName'];
                                                         $Description = $item['ItemDescription'];
+                                                        $Color = $item['AvailableColor'];
                                                         $Brand = $item['Brand'];
                                                         $Category = $item['Category'];
                                                         $SRP = number_format($item['SRP'], 2, ".", ",");
+                                                        $DP = number_format($item['DP'], 2, ".", ",");
+                                                        $Color = explode(", ", $Color);
+                                                        $CriticalLevel = $item['CriticalLevel'];
                                                         ?>
                                                         <tr>
                                                             <td>
@@ -260,12 +273,11 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
                                                                 <select class="form-control" name="tColor[]">
                                                                     <option value="">- Select Color -</option>
                                                                     <?php
-                                                                    $colortbl = db_select("SELECT `Color` FROM `colortbl`");
 
-                                                                    foreach($colortbl as $color){
-                                                                        $Color = $color['Color'];
+                                                                    foreach($Color as $color){
+                                                                        $aColor = $color;
                                                                         ?>
-                                                                        <option value="<?= @$Color ?>"><?= @$Color ?></option>
+                                                                        <option value="<?= @$aColor ?>"><?= @$aColor ?></option>
                                                                         <?php
                                                                     }
                                                                     ?>
@@ -286,6 +298,18 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd) != $PONumber) {
                                                             <td>
                                                                 <?= @$SRP ?>
                                                                 <input type="hidden" disabled name="tSRP[]" value="<?= @$SRP ?>">
+                                                            </td>
+                                                            <td>
+                                                                <?= @$DP ?>
+                                                                <input type="hidden" disabled name="tDP[]" value="<?= @$DP ?>">
+                                                            </td>
+                                                            <?php
+                                                            $invtblname = $Branch . "invtbl";
+                                                            $getOnHand = db_select("SELECT count(*) as onHand FROM $invtblname WHERE `ItemCode` = " . $ItemCode);
+                                                            $OnHand = $getOnHand[0]['onHand'];
+                                                            ?>
+                                                            <td align="center" <?php if($OnHand <= $CriticalLevel) echo "style='color: red'" ?>>
+                                                                <?= @ $OnHand; ?>
                                                             </td>
                                                             <td>
                                                                 <input type="number" name="tQty[]" id="tQty" max="1000" min="0" class="form-control" style="width: 80px;" value="0">

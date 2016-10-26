@@ -107,9 +107,8 @@
                 success: function (data) {
                     var result = $.parseJSON(data);
                     if (result.Count == 0) {
-                        $('#Username').val("");
                         $('#Password').val("");
-                        $('#Username').focus();
+                        $('#Password').focus();
                         $('#LoginError').show();
                         $("#LoginError").fadeTo(5000, 500).slideUp(500, function () {
 

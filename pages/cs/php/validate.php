@@ -6,7 +6,15 @@ $EmpID = db_quote($_SESSION['EmpID']);
 
 $getBranchCode = db_select("SELECT branchtbl.BranchCode FROM branchtbl LEFT JOIN employeetbl ON branchtbl.BranchID = employeetbl.BranchID WHERE employeetbl.EmpID = $EmpID");
 $BranchCode = db_quote($getBranchCode[0]['BranchCode']);
+$BranchWQ = strtolower($getBranchCode[0]['BranchCode']);
 
+$invtblname = $BranchWQ . "invtbl";
+$cashtblname = $BranchWQ . "cashtransactiontbl";
+$credittblname = $BranchWQ . "credittransactiontbl";
+$homecredittblname = $BranchWQ . "homecredittransactiontbl";
+$transtblname = $BranchWQ . "transactiontbl";
+$soldtblname = $BranchWQ . "soldunitstbl";
+$receivedtblname = $BranchWQ . "receivedtbl";
 
 if (isset($_POST['rItemCode'])) {
     $isCorrect = false;
@@ -33,9 +41,13 @@ if (isset($_POST['ImeiSN'])) {
     $isCorrect = false;
     $ImeiSN = db_quote($_POST['ImeiSN']);
 
-    $CheckIMEI = db_select("SELECT `imeisn` FROM `invtbl` WHERE `imeisn` = $ImeiSN");
+    $CheckIMEI1 = db_select("SELECT `imeisn` FROM $receivedtblname WHERE `imeisn` = $ImeiSN");
+    $CheckIMEI2 = db_select("SELECT `imeisn` FROM $soldtblname WHERE `imeisn` = $ImeiSN");
+    $CheckIMEI3 = db_select("SELECT `imeisn` FROM $invtblname WHERE `imeisn` = $ImeiSN");
 
-    if (count($CheckIMEI) == 1) {
+    $TotalCount = count($CheckIMEI1) + count($CheckIMEI2) + count($CheckIMEI3);
+
+    if ($TotalCount >= 1) {
         $isCorrect = false;
     } else {
         $isCorrect = true;
@@ -55,13 +67,10 @@ if (isset($_POST['sImeiSN'])) {
     itemstbl.ItemDescription,
     itemstbl.SRP,
     itemstbl.Category,
-    invtbl.ItemColor
-    FROM invtbl
-    LEFT JOIN itemstbl ON invtbl.ItemCode = itemstbl.ItemCode
-    WHERE invtbl.imeisn = $ImeiSN
-    AND invtbl.Status = 'On Hand'
-    AND invtbl.BranchCode = $BranchCode
-    ");
+    $invtblname.ItemColor
+    FROM $invtblname
+    LEFT JOIN itemstbl ON $invtblname.ItemCode = itemstbl.ItemCode
+    WHERE $invtblname.imeisn = $ImeiSN");
 
     if ($CheckIMEI === false) {
         $data = array(

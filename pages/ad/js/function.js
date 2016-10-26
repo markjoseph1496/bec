@@ -206,6 +206,26 @@ function EmployeeDelete(EmpID, hashEmpID, rnd) {
     $('#rnd').val(rnd);
 }
 
+function DeleteAccount(EmpID, hashEmpID, rnd) {
+    $.ajax({
+        type: 'POST',
+        url: 'function/admin-delete.php',
+        data: {
+            dEmpID: EmpID,
+            dhashEmpID: hashEmpID,
+            drnd: rnd
+        },
+        success: function (data) {
+            if (data == "True") {
+                window.location.href = "employee.php?deleted";
+            } else {
+                window.location.href = "employee.php?deleted?error";
+            }
+        }
+
+    })
+}
+
 function ItemsDelete(ItemCode, hashItemCode, Itemsrnd) {
     $('#ItemCode').val(ItemCode);
     $('#hashItemCode').val(hashItemCode);
@@ -289,7 +309,7 @@ function NumberConvertToMoney() {
     if ($('#SRP').length == 0) {
         SRP.value = "0.00";
     }
-    if  ($('#DP').length == 0) {
+    if ($('#DP').length == 0) {
         DP.value = "0.00";
     }
 

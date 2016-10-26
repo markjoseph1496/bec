@@ -25,6 +25,16 @@
         $hashTransactionID = substr($_GET['id'], 0, 32);
         $trnd = substr($_GET['id'], 32, 4);
         $TransactionID = $_GET['tid'];
+
+
+        $BranchWQ = $BranchCode;
+        $invtblname = $BranchWQ . "invtbl";
+        $cashtblname = $BranchWQ . "cashtransactiontbl";
+        $credittblname = $BranchWQ . "credittransactiontbl";
+        $homecredittblname = $BranchWQ . "homecredittransactiontbl";
+        $transtblname = $BranchWQ . "transactiontbl";
+        $soldtblname = $BranchWQ . "soldunitstbl";
+        $receivedtblname = $BranchWQ . "receivedtbl";
         ?>
 
         <!-- page content -->
@@ -50,43 +60,40 @@
                                 if (encrypt_decrypt_rnd('decrypt', $hashTransactionID, $trnd) == $TransactionID) {
                                     $transactionDetails = db_select("
                                     SELECT
-                                    transactiontbl.ORNumber,
-                                    transactiontbl._Date,
-                                    transactiontbl._Time,
-                                    transactiontbl.CustomerName,
-                                    transactiontbl.SalesClerk,
-                                    transactiontbl.Cashier,
-                                    transactiontbl.ModeOfPayment,
-                                    branchtbl.BranchName,
-                                    cashtransactiontbl.Amount Cash,
-                                    credittransactiontbl.Amount CreditCard,
-                                    credittransactiontbl.CreditCardNumber,
-                                    credittransactiontbl.CardHolderName,
-                                    credittransactiontbl.MID,
-                                    credittransactiontbl.BatchNum,
-                                    credittransactiontbl.ApprCode,
-                                    credittransactiontbl.Term,
-                                    credittransactiontbl.IDPresented,
-                                    homecredittransactiontbl.Amount HomeCredit,
-                                    homecredittransactiontbl.ReferenceNo
-                                    FROM transactiontbl
-                                    LEFT JOIN cashtransactiontbl ON transactiontbl.TransactionID = cashtransactiontbl.TransactionID
-                                    LEFT JOIN credittransactiontbl ON transactiontbl.TransactionID = credittransactiontbl.TransactionID
-                                    LEFT JOIN homecredittransactiontbl ON transactiontbl.TransactionID = homecredittransactiontbl.TransactionID
-                                    LEFT JOIN branchtbl ON transactiontbl.BranchCode = branchtbl.BranchCode
-                                    WHERE transactiontbl.TransactionID = " . db_quote($TransactionID) . "
-                                    AND transactiontbl.BranchCode = ". db_quote($BranchCode));
+                                    $transtblname.ORNumber,
+                                    $transtblname._Date,
+                                    $transtblname._Time,
+                                    $transtblname.CustomerName,
+                                    $transtblname.SalesClerk,
+                                    $transtblname.Cashier,
+                                    $transtblname.ModeOfPayment,
+                                    $cashtblname.Amount Cash,
+                                    $credittblname.Amount CreditCard,
+                                    $credittblname.CreditCardNumber,
+                                    $credittblname.CardHolderName,
+                                    $credittblname.MID,
+                                    $credittblname.BatchNum,
+                                    $credittblname.ApprCode,
+                                    $credittblname.Term,
+                                    $credittblname.IDPresented,
+                                    $homecredittblname.Amount HomeCredit,
+                                    $homecredittblname.ReferenceNo
+                                    FROM $transtblname
+                                    LEFT JOIN $cashtblname ON $transtblname.TransactionID = $cashtblname.TransactionID
+                                    LEFT JOIN $credittblname ON $transtblname.TransactionID = $credittblname.TransactionID
+                                    LEFT JOIN $homecredittblname ON $transtblname.TransactionID = $homecredittblname.TransactionID
+                                    WHERE $transtblname.TransactionID = $TransactionID ");
 
                                     $EmpSC = $transactionDetails[0]['SalesClerk'];
                                     $EmpCS = $transactionDetails[0]['Cashier'];
                                     $getSC = db_select("SELECT `Firstname`, `Lastname` FROM `employeetbl` WHERE `EmpID` = " . db_quote($EmpSC));
                                     $getCS = db_select("SELECT `Firstname`, `Lastname` FROM `employeetbl` WHERE `EmpID` = " . db_quote($EmpCS));
-
+                                    $getBC = db_select("SELECT `BranchName` FROM `branchtbl` WHERE `BranchCode` = " . db_quote($BranchCode));
                                     $ORNumber = $transactionDetails[0]['ORNumber'];
                                     $_Date = $transactionDetails[0]['_Date'];
                                     $_Time = $transactionDetails[0]['_Time'];
                                     $CustomerName = $transactionDetails[0]['CustomerName'];
-                                    $Branch = $transactionDetails[0]['BranchName'];
+                                    $Branch = $getBC[0]['BranchName'];
                                     $SalesClerk = $getSC[0]['Firstname'] . " " . $getSC[0]['Lastname'];
                                     $Cashier = $getCS[0]['Firstname'] . " " . $getCS[0]['Lastname'];
                                     $ModeOfPayment = $transactionDetails[0]['ModeOfPayment'];
@@ -144,7 +151,7 @@
                                     <!-- title row -->
                                     <div class="row">
                                         <div class="col-xs-12 invoice-header">
-                                            <label>Transaction # <?= @$TransactionID ?></label>
+                                            <label>Transaction # <?= @ str_replace("'", "", $TransactionID); ?></label>
                                             <label class="pull-right">Date: <?= @$_Date ?></label>
                                         </div>
                                         <!-- /.col -->
@@ -199,17 +206,15 @@
                                                 <?php
                                                 $Items = db_select("
                                                 SELECT
-                                                invtbl.ItemColor,
-                                                invtbl.imeisn,
+                                                $soldtblname.ItemColor,
+                                                $soldtblname.imeisn,
                                                 itemstbl.ModelName,
                                                 itemstbl.ItemDescription,
                                                 itemstbl.SRP
-                                                FROM invtbl
-                                                LEFT JOIN itemstbl ON invtbl.ItemCode = itemstbl.ItemCode
-                                                WHERE invtbl.TransactionID = " . db_quote($TransactionID) . "
-                                                AND invtbl.BranchCode = " . db_quote($BranchCode) . "
-                                                AND invtbl.Status = 'Sold'
-                                                  ");
+                                                FROM $soldtblname
+                                                LEFT JOIN itemstbl ON $soldtblname.ItemCode = itemstbl.ItemCode
+                                                WHERE $soldtblname.TransactionID = $TransactionID");
+
                                                 echo db_error();
                                                 foreach ($Items as $item) {
                                                     $ModelName = $item['ModelName'];

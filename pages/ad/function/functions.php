@@ -60,6 +60,75 @@ if (isset($_POST['AddBranchCode'])) {
     $BranchArea = db_quote($_POST['BranchArea']);
 
     $AddBranch = db_query("INSERT INTO `branchtbl` (`BranchID`, `BranchCode`,`BranchName`,`BrandID`,`AreaID`) VALUES ($BranchID, $AddBranchCode, $BranchName, $bBrand , $BranchArea)");
+    $Branch = str_replace("'", "", strtolower($AddBranchCode));
+    $Inv = $Branch . "invtbl";
+    $Cash = $Branch . "cashtransactiontbl";
+    $Credit = $Branch . "credittransactiontbl";
+    $HomeCredit = $Branch . "homecredittransactiontbl";
+    $Transaction = $Branch . "transactiontbl";
+    $SoldUnits = $Branch . "soldunitstbl";
+    $ReceivedUnits = $Branch . "receivedtbl";
+
+    $CreateReceived = db_query("CREATE TABLE $ReceivedUnits (
+                          _count INT(7) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                          ItemCode VARCHAR (11) NOT NULL,
+                          ItemColor VARCHAR (15) NOT NULL,
+                          imeisn VARCHAR(30) NOT NULL,
+                          _DateReceived VARCHAR (15) NOT NULL,
+                          _TimeReceived VARCHAR (15) NOT NULL,
+                          ReceivedBy VARCHAR (15) NOT NULL,
+                          DRnumber VARCHAR(15) NOT NULL)");
+
+    $CreateInv = db_query("CREATE TABLE $Inv (
+                          _count INT(7) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                          ItemCode VARCHAR (11) NOT NULL,
+                          ItemColor VARCHAR (15) NOT NULL,
+                          imeisn VARCHAR(30) NOT NULL)");
+
+    $CreateCash = db_query("CREATE TABLE $Cash (
+                          _count INT(7) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                          TransactionID VARCHAR (20) NOT NULL,
+                          ORNumber VARCHAR (20) NOT NULL,
+                          Amount VARCHAR (7) NOT NULL)");
+
+    $CreateCredit = db_query("CREATE TABLE $Credit (
+                            _count INT(7) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                            TransactionID VARCHAR (20) NOT NULL,
+                            ORNumber VARCHAR (20) NOT NULL,
+                            CreditCardNumber VARCHAR (20) NOT NULL,
+                            CardHolderName VARCHAR (20) NOT NULL,
+                            MID VARCHAR (20) NOT NULL,
+                            BatchNum VARCHAR (20) NOT NULL,
+                            ApprCode VARCHAR (20) NOT NULL,
+                            Term VARCHAR (20) NOT NULL,
+                            IDPresented VARCHAR (20) NOT NULL,
+                            Amount VARCHAR (20) NOT NULL)");
+
+    $CreateHomeCredit = db_query("CREATE TABLE $HomeCredit (
+                                _count INT(7) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                TransactionID VARCHAR (20) NOT NULL,
+                                ORNumber VARCHAR (20) NOT NULL,
+                                ReferenceNo VARCHAR (20) NOT NULL,
+                                Amount VARCHAR (20) NOT NULL)");
+
+    $CreateTransaction = db_query("CREATE TABLE $Transaction (
+                                  _count INT(7) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                  TransactionID VARCHAR (20) NOT NULL,
+                                  ORNumber VARCHAR (20) NOT NULL,
+                                  _Date VARCHAR (20) NOT NULL,
+                                  _Time VARCHAR (20) NOT NULL,
+                                  CustomerName VARCHAR (20) NOT NULL,
+                                  SalesClerk VARCHAR (20) NOT NULL,
+                                  Cashier VARCHAR (20) NOT NULL,
+                                  ModeOfPayment VARCHAR (30) NOT NULL,
+                                  Status VARCHAR (15) NOT NULL)");
+
+    $CreateSoldUnit = db_query("CREATE TABLE $SoldUnits (
+                                _count INT(7) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                                ItemCode VARCHAR (11) NOT NULL,
+                                ItemColor VARCHAR (15) NOT NULL,
+                                imeisn VARCHAR(30) NOT NULL,
+                                TransactionID VARCHAR (20) NOT NULL)");
 
     if ($AddBranch === false) {
         echo "False";
@@ -77,23 +146,26 @@ elseif (isset($_POST['btnAddItem'])) {
     $AddItemCode = strtoupper(db_quote($_POST['AddItemCode']));
     $ModelName = db_quote(ucwords($_POST['ModelName']));
     $ItemDescription = db_quote(ucwords($_POST['ItemDescription']));
+    $AvailableColor = $_POST['color'];
     $ItemBrandID = db_quote($_POST['ItemBrandID']);
     $Category = db_quote($_POST['Category']);
-    $SRP = db_quote($_POST['SRP']);
-    $DP = db_quote($_POST['DP']);
+    $SRP = $_POST['SRP'];
+    $DP = $_POST['DP'];
     $CriticalLevel = db_quote($_POST['CriticalLevel']);
 
-    $AddItem = db_query("INSERT INTO `itemstbl` (`CategoryCode`,`BrandCode`,`ItemCode`,`ModelName`,`ItemDescription`,`BrandID`,`Category`,`SRP`,`DP`,`CriticalLevel`)
+    $AvailableColor = db_quote(ucwords(implode(", ", $AvailableColor)));
+    $SRP = db_quote((float)str_replace(',', '', $SRP));
+    $DP = db_quote((float)str_replace(',', '', $DP));
+
+    $AddItem = db_query("INSERT INTO `itemstbl` (`CategoryCode`,`BrandCode`,`ItemCode`,`ModelName`,`ItemDescription`,`AvailableColor`,`BrandID`,`Category`,`SRP`,`DP`,`CriticalLevel`)
 		VALUES
-        ($CategoryPOST, $ItemBrand, $AddItemCode, $ModelName, $ItemDescription, $ItemBrandID, $Category, $SRP, $DP,$CriticalLevel)");
+        ($CategoryPOST, $ItemBrand, $AddItemCode, $ModelName, $ItemDescription, $AvailableColor, $ItemBrandID, $Category, $SRP, $DP,$CriticalLevel)");
 
     if ($AddItem === false) {
         header("location: ../items.php?error");
     } else {
         header("location: ../items.php?success");
     }
-
-
 }
 //End Add Item
 
@@ -158,21 +230,6 @@ elseif (isset($_POST['AddBrandID'])) {
 }
 // End Add Brand
 
-// Add Color
-elseif (isset($_POST['AddColor'])) {
-
-    $AddColorID = db_quote($_POST['AddColorID']);
-    $AddColor = db_quote(ucwords($_POST['AddColor']));
-
-    $AddColor = db_query("INSERT INTO `colortbl` (`ColorID`,`Color`) VALUES ($AddColorID,$AddColor)");
-
-    if ($AddColor == false) {
-        echo "False";
-    } else {
-        echo "True";
-    }
-}
-
 // Add Category
 elseif (isset($_POST['CategoryCode'])) {
 
@@ -187,9 +244,7 @@ elseif (isset($_POST['CategoryCode'])) {
     } else {
         echo "True";
     }
-}
-
-// Add account
+} // Add account
 elseif (isset($_POST['btnfaddAccount'])) {
 
     $aUsername = db_quote($_POST['aUsername']);
@@ -382,12 +437,15 @@ elseif (isset($_POST['BranchID'])) {
 } //Update Item
 elseif (isset($_POST['btnUpdateItems'])) {
 
-    $EditItemCode = strtoupper(db_quote($_POST['EditItemCode']));
+    $EditItemCode = db_quote($_POST['EditItemCode']);
     $EditModelName = db_quote(ucwords($_POST['EditModelName']));
     $EditItemDescription = db_quote(ucwords($_POST['EditItemDescription']));
-    $EditSRP = db_quote($_POST['EditSRP']);
-    $EditDP = db_quote($_POST['EditDP']);
+    $EditSRP = $_POST['EditSRP'];
+    $EditDP = $_POST['EditDP'];
     $EditCriticalLevel = db_quote($_POST['EditCriticalLevel']);
+
+    $EditSRP = db_quote((float)str_replace(',', '', $EditSRP));
+    $EditDP = db_quote((float)str_replace(',', '', $EditDP));
 
     $UpdateItem = db_query("
     UPDATE 
@@ -422,6 +480,7 @@ elseif (isset($_POST['ItemCode'])) {
         itemstbl.ItemCode,
         itemstbl.ModelName,
         itemstbl.ItemDescription,
+        itemstbl.AvailableColor,
         categorytbl.Category,
         brandtbl.Brand,
         itemstbl.SRP,
@@ -438,11 +497,13 @@ elseif (isset($_POST['ItemCode'])) {
             $ItemCode = $UpdateItemstbl[0]['ItemCode'];
             $UpdateModelName = $UpdateItemstbl[0]['ModelName'];
             $UpdateItemDescription = $UpdateItemstbl[0]['ItemDescription'];
+            $UpdateAvailableColor = $UpdateItemstbl[0]['AvailableColor'];
             $UpdateICategory = $UpdateItemstbl[0]['Category'];
             $UpdateIBrand = $UpdateItemstbl[0]['Brand'];
             $UpdateSRP = $UpdateItemstbl[0]['SRP'];
             $UpdateDP = $UpdateItemstbl[0]['DP'];
             $UpdateCriticalLevel = $UpdateItemstbl[0]['CriticalLevel'];
+
             $UpdateSRP = number_format($UpdateSRP, 2, '.', ',');
             $UpdateDP = number_format($UpdateDP, 2, '.', ',');
             ?>
@@ -473,6 +534,18 @@ elseif (isset($_POST['ItemCode'])) {
                             <div class="form-group">
                                 <label>Item Description <span class="red">(*)</span></label>
                                 <input type="text" class="form-control" style="text-transform: capitalize" id="EditItemDescription" name="EditItemDescription" value="<?php echo $UpdateItemDescription; ?>">
+                            </div>
+                            <div class="form-group">
+                                <label>Available Color <span class="red">(*)</span></label>
+                                <?php
+                                $AvailColor = explode(",", $UpdateAvailableColor);
+                                foreach ($AvailColor as $ColorValue) {
+                                    $AvailColor = $ColorValue;
+                                    ?>
+                                    <input type="text" class="form-control" style="text-transform: capitalize" value="<?= @$AvailColor; ?>">
+                                    <?php
+                                }
+                                ?>
                             </div>
                             <div class="form-group">
                                 <label>SRP <span class="red">(*)</span></label>
@@ -509,20 +582,6 @@ elseif (isset($_POST['ItemCode'])) {
                         },
                         fields: {
                             group: 'form-group',
-                            EditCategory: {
-                                validators: {
-                                    notEmpty: {
-                                        message: 'Category is required.'
-                                    }
-                                }
-                            },
-                            EditItemBrand: {
-                                validators: {
-                                    notEmpty: {
-                                        message: 'Brand is required.'
-                                    }
-                                }
-                            },
                             EditModelName: {
                                 validators: {
                                     notEmpty: {
@@ -577,6 +636,8 @@ elseif (isset($_POST['ItemCode'])) {
             <!-- /validator-->
             <?php
         }
+    } else {
+        include_once('errormodal.php');
     }
 } //Update Employee
 elseif (isset($_POST['btnupdateEmployee'])) {
@@ -728,7 +789,7 @@ elseif (isset($_POST['EmpID'])) {
                                         $BranchCode = $valueBranch['BranchCode'];
                                         $BranchName = $valueBranch['BranchName'];
                                         ?>
-                                        <option value="<?= @$BranchID; ?>" <?php if ($BranchID == $UpdateBranchID) echo "selected='selected'" ?>><?= @"(" . $BranchCode .") " . $BranchName; ?></option>
+                                        <option value="<?= @$BranchID; ?>" <?php if ($BranchID == $UpdateBranchID) echo "selected='selected'" ?>><?= @"(" . $BranchCode . ") " . $BranchName; ?></option>
                                         <?php
                                     }
                                     ?>
@@ -988,7 +1049,7 @@ elseif (isset($_POST['EditBrandID'])) {
         } else {
             header("location: ../brand.php?success");
         }
-    }else{
+    } else {
         header("location: ../brand.php?error");
     }
 }
@@ -1080,89 +1141,6 @@ elseif (isset($_POST['BrandID'])) {
     } else {
         include_once('errormodal.php');
     }
-}
-
-//Update Color
-if (isset($_POST['btnUpdateColor'])) {
-
-    $EditColorID = db_quote($_POST['EditColorID']);
-    $EditColor = strtoupper(db_quote($_POST['EditColor']));
-
-    $UpdateColor = db_query("UPDATE colortbl SET `Color` = $EditColor WHERE `ColorID` = $EditColorID");
-
-    if ($UpdateColor === false) {
-        header("location: ../colors.php?error");
-    } else {
-        header("location: ../colors.php?success");
-    }
-
-}
-// End of Update Color
-
-//Modal of Udpate Color
-elseif (isset($_POST['ColorID'])) {
-    $UpdateColorID = db_quote($_POST['ColorID']);
-
-    $UpdateColortbl = db_select("
-    SELECT
-     `ColorID`,
-     `Color`
-     FROM `colortbl` WHERE ColorID = $UpdateColorID");
-
-    $ColorID = $UpdateColortbl[0]['ColorID'];
-    $UpdateColor = $UpdateColortbl[0]['Color'];
-    ?>
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form action="function/functions.php" method="POST" name="EditColor" id="EditColor" autocomplete="off">
-                <div class="modal-header modal-header-dark">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Edit Area</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <input type="hidden" class="form-control" readonly id="EditColorID" name="EditColorID" value="<?php echo $ColorID; ?>">
-                    </div>
-                    <div class="form-group">
-                        <label>Color <span class="red">(*)</span></label>
-                        <input type="text" class="form-control" style="text-transform: capitalize" id="EditColor" name="EditColor" value="<?php echo $UpdateColor; ?>">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-dark" id="btnUpdateColor" name="btnUpdateColor">Update</button>
-                    <button class="btn btn-default" data-dismiss="modal">Cancel</button>
-                </div>
-            </form>
-        </div>
-        <!-- /.modal-content -->
-    </div>
-    <!-- /.modal-dialog -->
-
-    <!-- validator -->
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $('#EditColor').bootstrapValidator({
-                message: 'This value is not valid',
-                feedbackIcons: {
-                    valid: "glyphicon glyphicon-ok",
-                    invalid: "glyphicon glyphicon-remove",
-                    validating: "glyphicon glyphicon-refresh"
-                },
-                fields: {
-                    group: 'form-group',
-                    EditColor: {
-                        validators: {
-                            notEmpty: {
-                                message: 'Color is required.'
-                            }
-                        }
-                    }
-                }
-            });
-        });
-    </script>
-    <!-- /validator-->
-    <?php
 } // Update Category
 elseif (isset($_POST['btnUpdateCategory'])) {
 
@@ -1486,6 +1464,8 @@ elseif (isset($_POST['CategoryID'])) {
                             <div class="modal-footer">
                                 <button type="submit" class="btn btn-dark">Save</button>
                                 <button class="btn btn-dark" data-dismiss="modal">Cancel</button>
+                                <br>
+                                <button type="button" onclick="DeleteAccount('<?= @$EmpID ?>','<?= @$hashEmpID ?>', '<?= @$rnd ?>')" class="btn btn-danger">Remove Account</button>
                             </div>
                         </form>
                     </div>

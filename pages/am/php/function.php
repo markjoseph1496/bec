@@ -72,10 +72,11 @@ if (isset($_POST['EmpID'])) {
 //Update Purchase Request
 if (isset($_POST['aEmpID'])) {
 
-    $hashPRNumber = $_POST['HashPRNumber'];
+    $hashPRNumber = substr($_POST['HashPRNumber'], 0, 32);
+    $rnd = substr($_POST['HashPRNumber'], 32, 4);
     $PRNumber = db_quote($_POST['PRNumber']);
 
-    if (db_quote(encrypt_decrypt('decrypt', $hashPRNumber)) != $PRNumber) {
+    if (db_quote(encrypt_decrypt_rnd('decrypt', $hashPRNumber, $rnd)) != $PRNumber) {
         header("location: ../po.php?error");
     } else {
         $sEmpID = db_quote($_POST['aEmpID']);
@@ -107,7 +108,7 @@ if (isset($_POST['aEmpID'])) {
                 if ($PurchasedItems === false) {
                     header("location: ../po.php?error");
                 } else {
-                    header("location: ../po.php?success" . $dColor);
+                    header("location: ../po.php?success");
                 }
             }
         }
@@ -162,7 +163,7 @@ if (isset($_POST['PONumber'])) {
         $ModifiedBy = $getName[0]['Firstname'] . " " . $getName[0]['Lastname'];
         $ModifyCode = $purchaserequesttbl[0]['ModifyCode'];
         $Status = $purchaserequesttbl[0]['Status'];
-        $rnd = rand(0, 9999);
+        $srnd = rand(1000, 9999);
 
         if ($Status == "Approved") {
             //Get Brand Coordinator Name
@@ -173,7 +174,7 @@ if (isset($_POST['PONumber'])) {
             $TimeApproved = $purchaserequesttbl[0]['TimeApproved'];
         }
 
-        $hashPRNumber = encrypt_decrypt('encrypt', $PONumber);
+        $hashPRNumber = encrypt_decrypt_rnd('encrypt', $PONumber, $srnd);
         ?>
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -290,6 +291,7 @@ if (isset($_POST['PONumber'])) {
                                             $TotalItems = $TotalItems + ($Qty * $SRP);
                                             $Total = number_format($Qty * $SRP, 2, '.', ',');
                                             $SRP = number_format($SRP, 2, '.', ',');
+
                                             ?>
                                             <tr>
                                                 <td><?php echo $ItemCode ?></td>
@@ -341,7 +343,7 @@ if (isset($_POST['PONumber'])) {
                             <?php
                         }
                         ?>
-                        <a href="modify.php?id=<?= @$hashPRNumber ?>&pr=<?= @$PONumber ?>" class="btn btn-dark" id="btnModify">Modify</a>
+                        <a href="modify.php?id=<?= @$hashPRNumber . $srnd ?>&pr=<?= @$PONumber ?>" class="btn btn-dark" id="btnModify">Modify</a>
                         <?php
                     }
                     ?>
@@ -431,47 +433,53 @@ if (isset($_POST['BranchID'])) {
     $Currentrnd = substr($_POST['sBranchCode'], 32, 4);
     $BranchCode = db_quote(encrypt_decrypt_rnd('decrypt', $BranchCode, $Currentrnd));
 
+    $BranchWQ = str_replace("'", "", $BranchCode);
+    $invtblname = $BranchWQ . "invtbl";
+    $cashtblname = $BranchWQ . "cashtransactiontbl";
+    $credittblname = $BranchWQ . "credittransactiontbl";
+    $homecredittblname = $BranchWQ . "homecredittransactiontbl";
+    $transtblname = $BranchWQ . "transactiontbl";
+    $soldtblname = $BranchWQ . "soldunitstbl";
+    $receivedtblname = $BranchWQ . "receivedtbl";
+
     if (encrypt_decrypt_rnd('decrypt', $hash, $rnd) == $TransactionID) {
         $transactionDetails = db_select("
         SELECT
-        transactiontbl.ORNumber,
-        transactiontbl._Date,
-        transactiontbl._Time,
-        transactiontbl.CustomerName,
-        transactiontbl.SalesClerk,
-        transactiontbl.Cashier,
-        transactiontbl.ModeOfPayment,
-        branchtbl.BranchName,
-        cashtransactiontbl.Amount Cash,
-        credittransactiontbl.Amount CreditCard,
-        credittransactiontbl.CreditCardNumber,
-        credittransactiontbl.CardHolderName,
-        credittransactiontbl.MID,
-        credittransactiontbl.BatchNum,
-        credittransactiontbl.ApprCode,
-        credittransactiontbl.Term,
-        credittransactiontbl.IDPresented,
-        homecredittransactiontbl.Amount HomeCredit,
-        homecredittransactiontbl.ReferenceNo
-        FROM transactiontbl
-        LEFT JOIN cashtransactiontbl ON transactiontbl.TransactionID = cashtransactiontbl.TransactionID
-        LEFT JOIN credittransactiontbl ON transactiontbl.TransactionID = credittransactiontbl.TransactionID
-        LEFT JOIN homecredittransactiontbl ON transactiontbl.TransactionID = homecredittransactiontbl.TransactionID
-        LEFT JOIN branchtbl ON transactiontbl.BranchCode = branchtbl.BranchCode
-        WHERE transactiontbl.TransactionID = " . db_quote($TransactionID) . "
-        AND transactiontbl.BranchCode = $BranchCode
-        ");
+        $transtblname.ORNumber,
+        $transtblname._Date,
+        $transtblname._Time,
+        $transtblname.CustomerName,
+        $transtblname.SalesClerk,
+        $transtblname.Cashier,
+        $transtblname.ModeOfPayment,
+        $cashtblname.Amount Cash,
+        $credittblname.Amount CreditCard,
+        $credittblname.CreditCardNumber,
+        $credittblname.CardHolderName,
+        $credittblname.MID,
+        $credittblname.BatchNum,
+        $credittblname.ApprCode,
+        $credittblname.Term,
+        $credittblname.IDPresented,
+        $homecredittblname.Amount HomeCredit,
+        $homecredittblname.ReferenceNo
+        FROM $transtblname
+        LEFT JOIN $cashtblname ON $transtblname.TransactionID = $cashtblname.TransactionID
+        LEFT JOIN $credittblname ON $transtblname.TransactionID = $credittblname.TransactionID
+        LEFT JOIN $homecredittblname ON $transtblname.TransactionID = $homecredittblname.TransactionID
+        WHERE $transtblname.TransactionID = " . db_quote($TransactionID));
 
         $EmpSC = $transactionDetails[0]['SalesClerk'];
         $EmpCS = $transactionDetails[0]['Cashier'];
         $getSC = db_select("SELECT `Firstname`, `Lastname` FROM `employeetbl` WHERE `EmpID` = " . db_quote($EmpSC));
         $getCS = db_select("SELECT `Firstname`, `Lastname` FROM `employeetbl` WHERE `EmpID` = " . db_quote($EmpCS));
+        $getBC = db_select("SELECT `BranchName` FROM `branchtbl` WHERE `BranchCode` = $BranchCode");
 
         $ORNumber = $transactionDetails[0]['ORNumber'];
         $_Date = $transactionDetails[0]['_Date'];
         $_Time = $transactionDetails[0]['_Time'];
         $CustomerName = $transactionDetails[0]['CustomerName'];
-        $Branch = $transactionDetails[0]['BranchName'];
+        $Branch = $getBC[0]['BranchName'];
         $SalesClerk = $getSC[0]['Firstname'] . " " . $getSC[0]['Lastname'];
         $Cashier = $getCS[0]['Firstname'] . " " . $getCS[0]['Lastname'];
         $ModeOfPayment = $transactionDetails[0]['ModeOfPayment'];
@@ -587,17 +595,15 @@ if (isset($_POST['BranchID'])) {
                                     <?php
                                     $Items = db_select("
                                     SELECT
-                                    invtbl.ItemColor,
-                                    invtbl.imeisn,
+                                    $soldtblname.ItemColor,
+                                    $soldtblname.imeisn,
                                     itemstbl.ModelName,
                                     itemstbl.ItemDescription,
                                     itemstbl.SRP
-                                    FROM invtbl
-                                    LEFT JOIN itemstbl ON invtbl.ItemCode = itemstbl.ItemCode
-                                    WHERE invtbl.TransactionID = " . db_quote($TransactionID) . "
-                                    AND invtbl.BranchCode = " . db_quote($BranchCode) . "
-                                    AND invtbl.Status = 'Sold'
-                                    ");
+                                    FROM $soldtblname
+                                    LEFT JOIN itemstbl ON $soldtblname.ItemCode = itemstbl.ItemCode
+                                    WHERE $soldtblname.TransactionID = " . db_quote($TransactionID));
+
                                     echo db_error();
                                     foreach ($Items as $item) {
                                         $ModelName = $item['ModelName'];

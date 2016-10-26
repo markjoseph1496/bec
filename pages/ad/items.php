@@ -47,6 +47,7 @@
                                                 <th>Item Code</th>
                                                 <th>Model Name</th>
                                                 <th>Item Description</th>
+                                                <th>Available Color</th>
                                                 <th>Brand</th>
                                                 <th>Category</th>
                                                 <th>SRP</th>
@@ -56,17 +57,18 @@
                                             </thead>
                                             <tbody>
                                             <?php
-                                            $ItemsQuery = db_select("SELECT itemstbl.ItemCode,itemstbl.ModelName,itemstbl.ItemDescription,
-                                                                      brandtbl.BrandCode,brandtbl.Brand,categorytbl.CategoryCode,categorytbl.Category,
-                                                                      itemstbl.SRP,itemstbl.DP
-                                                                      FROM itemstbl
-                                                                      LEFT JOIN brandtbl ON itemstbl.BrandID = brandtbl.BrandID
-                                                                      LEFT JOIN categorytbl ON itemstbl.Category = categorytbl.Category
+                                            $ItemsQuery = db_select("SELECT itemstbl.ItemCode,itemstbl.ModelName,itemstbl.ItemDescription,itemstbl.AvailableColor,
+                                                                    brandtbl.BrandCode,brandtbl.Brand,categorytbl.CategoryCode,categorytbl.Category,
+                                                                    itemstbl.SRP,itemstbl.DP
+                                                                    FROM itemstbl
+                                                                    LEFT JOIN brandtbl ON itemstbl.BrandID = brandtbl.BrandID
+                                                                    LEFT JOIN categorytbl ON itemstbl.Category = categorytbl.Category
                                                                      ");
                                             foreach ($ItemsQuery as $valueItems) {
                                                 $ItemCode = $valueItems['ItemCode'];
                                                 $ModelName = $valueItems['ModelName'];
                                                 $ItemDescription = $valueItems['ItemDescription'];
+                                                $AvailableColor = $valueItems['AvailableColor'];
                                                 $BrandCode = $valueItems['BrandCode'];
                                                 $Brand = $valueItems['Brand'];
                                                 $CategoryCode = $valueItems['CategoryCode'];
@@ -83,6 +85,7 @@
                                                     <td><?php echo $ItemCode ?></td>
                                                     <td><?php echo $ModelName ?></td>
                                                     <td><?php echo $ItemDescription ?></td>
+                                                    <td><?=@$AvailableColor ?></td>
                                                     <td><?php echo $Brand ?></td>
                                                     <td><?php echo $Category ?></td>
                                                     <td><?= @$SRP; ?></td>
@@ -152,21 +155,21 @@
                                 <div class="modal-body">
                                     <div class="form-group">
                                         <label>Category <span class="red">(*)</span></label>
-                                            <select class="form-control" name="Category" id="Category">
-                                                <option value=""> - Please Select Category -</option>
-                                                <?php
-                                                $Categorytbl = db_select("SELECT * FROM `categorytbl`");
+                                        <select class="form-control" name="Category" id="Category">
+                                            <option value=""> - Please Select Category -</option>
+                                            <?php
+                                            $Categorytbl = db_select("SELECT * FROM `categorytbl`");
 
-                                                foreach ($Categorytbl as $ValueCateg) {
-                                                    $CategoryID = $ValueCateg['CategoryID'];
-                                                    $CategoryCode = $ValueCateg['CategoryCode'];
-                                                    $Category = $ValueCateg['Category'];
-                                                    ?>
-                                                    <option value="<?= @$CategoryCode; ?>">(<?= @$CategoryCode; ?>) <?= @$Category; ?></option>
-                                                    <?php
-                                                }
+                                            foreach ($Categorytbl as $ValueCateg) {
+                                                $CategoryID = $ValueCateg['CategoryID'];
+                                                $CategoryCode = $ValueCateg['CategoryCode'];
+                                                $Category = $ValueCateg['Category'];
                                                 ?>
-                                            </select>
+                                                <option value="<?= @$CategoryCode; ?>">(<?= @$CategoryCode; ?>) <?= @$Category; ?></option>
+                                                <?php
+                                            }
+                                            ?>
+                                        </select>
                                     </div>
                                     <div class="form-group">
                                         <label>Brand <span class="red">(*)</span></label>
@@ -198,6 +201,64 @@
                                         <label>Item Description <span class="red">(*)</span></label>
                                         <input type="text" class="form-control" style="text-transform: capitalize" id="ItemDescription" name="ItemDescription">
                                     </div>
+                                    <div class="form-group">
+                                        <label>Available Color <span class="red">(*)</span></label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" style="text-transform: capitalize" id="available-color" name="Color">
+                                            <script>
+                                                var kl_index = -1;
+                                                function delete_Color(index) {
+                                                    $('#cl-span-' + index).remove();
+                                                    $('#cl-a-' + index).remove();
+                                                    $('#cl-input-' + index).remove();
+                                                }
+                                            </script>
+                                            <span class="input-group-btn">
+                                                <a class="btn btn-dark" onclick="
+                                                (function(){
+                                              var _requirements = $('#available-color').val();
+                                              if(_requirements==''){
+                                                  alert('Cannot add empty value.');
+                                              }
+                                              else{
+                                                  kl_index++;
+                                                  var cl = $('#Color-template');
+                                                  var cl_span = cl.find('span');
+                                                  var cl_a = cl.find('a');
+                                                  var cl_input = cl.find('input');
+
+                                                  cl_span.text($('#available-color').val());
+                                                  cl_span.attr('id', 'cl-span-' + kl_index);
+                                                  cl_a.attr('id', 'cl-a-' + kl_index);
+                                                  cl_a.attr('onclick', 'delete_Color(' + kl_index + ')');
+                                                  cl_input.attr('id', 'cl-input-' + kl_index);
+                                                  cl_input.attr('name', 'color[' + kl_index +']');
+                                                  cl_input.val(cl_span.text());
+                                                  $('#Color-list').append($('#Color-template').html());
+                                                  $('#available-color').val('');
+
+                                                  //disposal of used resource in #knowledge-template
+                                                  cl_span.removeAttr('id');
+                                                  cl_a.removeAttr('id');
+                                                  cl_a.removeAttr('onclick');
+                                                  cl_input.removeAttr('id');
+                                                  cl_input.removeAttr('name');
+                                                  cl_input.removeAttr('value');
+                                              }
+                                            })()">Add</a>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="hidden" id="Color-template">
+                                            <b><span>Dito_lalabas_yung_text</span></b>
+                                            <a href="javascript:void(0)">[remove]<br></a>
+                                            <input type="hidden">
+                                        </div>
+                                        <div class=" col-md-4" id="Color-list" style="width: 300px; word-wrap: break-word">
+                                        </div>
+                                    </div>
+                                    &nbsp;
                                     <div class="form-group">
                                         <label>SRP <span class="red">(*)</span></label>
                                         <input type="text" class="form-control" id="SRP" name="SRP" onblur="NumberConvertToMoney()" onclick="this.setSelectionRange(0, this.value.length)" value="0.00">
@@ -258,7 +319,7 @@ if (isset($_GET['error'])) {
     echo "<script type='text/javascript'>
     new PNotify({
         title: 'Success',
-        text: 'Employee Updated',
+        text: 'Items Updated',
         type: 'success',
         styling: 'bootstrap3',
         delay:3000
@@ -268,7 +329,7 @@ if (isset($_GET['error'])) {
     echo "<script type='text/javascript'>
     new PNotify({
         title: 'Success',
-        text: 'Employee Deleted',
+        text: 'Item Deleted',
         type: 'success',
         styling: 'bootstrap3',
         delay:3000

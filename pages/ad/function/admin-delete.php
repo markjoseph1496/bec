@@ -113,18 +113,7 @@ if (isset($_POST['btndeleteAccount'])) {
     $EmployeeAccounttbl = db_query("DELETE FROM employeetbl WHERE EmpID = $aUsername");
 
     header("location: ../accounts.php?Deleted");
-}
-
-//Delete Color
-if (isset($_POST['btnDeleteColor'])) {
-
-    $ColorID = db_quote($_POST['ColorID']);
-
-    $colortbl = db_query("DELETE FROM `colortbl` WHERE ColorID = $ColorID");
-
-    header("location: ../colors.php?Deleted");
-} //Modal Delete Color
-elseif (isset($_POST['ColorID'])) {
+} elseif (isset($_POST['ColorID'])) {
     $delColorID = db_quote($_POST['ColorID']);
 
     $DeleteColortbl = db_select("
@@ -180,9 +169,7 @@ if (isset($_POST['BrandID'])) {
         header("location: ../brand.php?error");
     }
 
-}
-
-//Modal of Delete Brand
+} //Modal of Delete Brand
 elseif (isset($_POST['dBrandID'])) {
     $delBrandID = $_POST['dBrandID'];
     $hash = $_POST['dhash'];
@@ -235,9 +222,7 @@ if (isset($_POST['AreaID'])) {
     } else {
         header("location: ../area.php?error");
     }
-}
-
-//Modal Delete Area
+} //Modal Delete Area
 elseif (isset($_POST['dAreaID'])) {
     $AreaID = $_POST['dAreaID'];
     $hash = $_POST['dhash'];
@@ -319,6 +304,22 @@ elseif (isset($_POST['CategoryID'])) {
     </div>
     <!-- /.modal-dialog -->
     <?php
+}
+
+elseif (isset($_POST['dEmpID'])) {
+    $EmpID = $_POST['dEmpID'];
+    $hash = $_POST['dhashEmpID'];
+    $rand = $_POST['drnd'];
+
+    if (encrypt_decrypt_rnd('decrypt', $hash, $rand) === $EmpID) {
+        $QueryDelete = db_query("DELETE FROM `accountstbl` WHERE `aEmpID` = " . db_quote($EmpID));
+
+        if($QueryDelete === false){
+            echo "False";
+        }else{
+            echo "True";
+        }
+    }
 }
 
 ?>

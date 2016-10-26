@@ -13,6 +13,15 @@ $getBranchCode = db_select("
     ");
 
 $BranchCode = db_quote($getBranchCode[0]['BranchCode']);
+$BranchWQ = strtolower($getBranchCode[0]['BranchCode']);
+
+$invtblname = $BranchWQ . "invtbl";
+$cashtblname = $BranchWQ . "cashtransactiontbl";
+$credittblname = $BranchWQ . "credittransactiontbl";
+$homecredittblname = $BranchWQ . "homecredittransactiontbl";
+$transtblname = $BranchWQ . "transactiontbl";
+$soldtblname = $BranchWQ . "soldunitstbl";
+$receivedtblname = $BranchWQ . "receivedtbl";
 
 function generatePONumber($Branch)
 {
@@ -32,8 +41,10 @@ function generatePONumber($Branch)
 
 function generateTransactionID($Branch)
 {
+    $BranchWQ = str_replace("'", "", $Branch);
+    $transtblname = $BranchWQ . "transactiontbl";
     $_Date = db_quote(date("Y-m-d"));
-    $generateTransactionID = db_select("SELECT `TransactionID` FROM `transactiontbl` WHERE `_Date` = $_Date  AND `BranchCode` = $Branch ORDER BY `TransactionID` DESC LIMIT 1");
+    $generateTransactionID = db_select("SELECT `TransactionID` FROM $transtblname WHERE `_Date` = $_Date ORDER BY `TransactionID` DESC LIMIT 1");
     $Branch = str_replace("'", "", $Branch);
     $_Date = str_replace("'", "", $_Date);
 
@@ -100,24 +111,24 @@ if (isset($_POST['EmpID'])) {
                 header("location: ../po.php?success");
             }
         }
-
     }
-
 }
 //End of Purchase Request
 
 //Update Purchase Request
 elseif (isset($_POST['aEmpID'])) {
 
-    $hashPRNumber = $_POST['HashPRNumber'];
-    $PRNumber = db_quote($_POST['PRNumber']);
+    $hashPRNumber = substr($_POST['HashPRNumber'], 0, 32);
+    $PRNumber = $_POST['PRNumber'];
+    $Rnd = substr($_POST['HashPRNumber'], 32, 4);
 
-    if (db_quote(encrypt_decrypt('decrypt', $hashPRNumber)) != $PRNumber) {
+    if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $Rnd) != $PRNumber) {
         header("location: ../po.php?error");
     } else {
-        $sEmpID = $_POST['aEmpID'];
+        $PRNumber = db_quote($PRNumber);
+        $sEmpID = db_quote($_POST['aEmpID']);
         $Qty = $_POST['oQty'];
-        $Color = $_POST['oColor'];
+        $Color = $_POST['aColor'];
         $ItemCode = $_POST['oItemCode'];
         $_Date = db_quote(date("Y-m-d"));
         $_Time = db_quote(date("h:i A"));
@@ -126,11 +137,10 @@ elseif (isset($_POST['aEmpID'])) {
         $ModifyCode = db_quote(rand(0, 9999999999));
         $Items = mergeArrays($ItemCode, $Qty, $Color);
 
-
+            echo $PRNumber;
         $PurchaseRequest = db_query("UPDATE `purchaserequeststbl` SET `ModifiedBy` = $sEmpID, `_Time` = $_Time, `LastModified` = $_Date, `ModifyCode` = $ModifyCode, `Remarks` = 'Waiting for Approval from Area Manager', `isAMApproved` = '0', `CheckedByAM` = ''  WHERE `PONumber` = $PRNumber");
 
         if ($PurchaseRequest === false) {
-
             header("location: ../po.php?error");
 
         } else {
@@ -147,7 +157,6 @@ elseif (isset($_POST['aEmpID'])) {
                     header("location: ../po.php?success");
                 }
             }
-
         }
     }
 }
@@ -283,7 +292,7 @@ elseif (isset($_POST['PONumber'])) {
                                             <th>Item Code</th>
                                             <th>Item Name</th>
                                             <th>Brand</th>
-                                            <th>SRP</th>
+                                            <th>DP</th>
                                             <th width="5%">Qty.</th>
                                             <th width="15%">Total Amount</th>
                                             <?php
@@ -305,7 +314,7 @@ elseif (isset($_POST['PONumber'])) {
                                         purchaserequestsitemstbl.Color,
                                         purchaserequestsitemstbl.Received,
                                         itemstbl.ModelName,
-                                        itemstbl.SRP,
+                                        itemstbl.DP,
                                         brandtbl.Brand
                                         FROM purchaserequestsitemstbl
                                         LEFT JOIN itemstbl ON purchaserequestsitemstbl.ItemCode = itemstbl.ItemCode
@@ -322,10 +331,10 @@ elseif (isset($_POST['PONumber'])) {
                                             $ModelName = $item['ModelName'];
                                             $Brand = $item['Brand'];
                                             $Received = $item['Received'];
-                                            $SRP = $item['SRP'];
-                                            $TotalItems = $TotalItems + ($Qty * $SRP);
-                                            $Total = number_format($Qty * $SRP, 2, '.', ',');
-                                            $SRP = number_format($SRP, 2, '.', ',');
+                                            $DP = $item['DP'];
+                                            $TotalItems = $TotalItems + ($Qty * $DP);
+                                            $Total = number_format($Qty * $DP, 2, '.', ',');
+                                            $DP = number_format($DP, 2, '.', ',');
 
                                             $rnd = rand(1000, 9999);
                                             $rnd = $rnd . $Color;
@@ -335,7 +344,7 @@ elseif (isset($_POST['PONumber'])) {
                                                 <td><?= @ $ItemCode; ?></td>
                                                 <td><?= @ $ModelName . " (" . $Color . ")" ?> </td>
                                                 <td><?= @ $Brand ?></td>
-                                                <td><?= @ $SRP ?></td>
+                                                <td><?= @ $DP ?></td>
                                                 <td><?= @ $Qty ?></td>
                                                 <td width="15%"><?= @ $Total ?></td>
                                                 <?php
@@ -412,6 +421,7 @@ elseif (isset($_POST['dPONumber'])) {
     }
 } //End of Archive PR
 
+//Receiving
 elseif (isset($_POST['rItemCode'])) {
     $ItemCode = $_POST['rItemCode'];
     $ItemColor = $_POST['rColor'];
@@ -442,9 +452,12 @@ elseif (isset($_POST['rItemCode'])) {
             $Item = db_quote($item);
             $ItemCount++;
 
+            $AddtoReceived = db_query("
+            INSERT INTO $receivedtblname (`ItemCode`, `ItemColor`, `imeisn`, `_DateReceived`, `_TimeReceived`, `ReceivedBy`) 
+            VALUES ($ItemCode, $ItemColor, $item, $_Date, $_Time, $EmpID)");
+
             $AddtoInventory = db_query("
-            INSERT INTO invtbl (`ItemCode`, `ItemColor`, `imeisn`, `BranchCode`, `_DateReceived`, `_TimeReceived`, `ReceivedBy`, `Status`) 
-            VALUES ($ItemCode, $ItemColor, $item, $BranchCode, $_Date, $_Time, $EmpID, 'On Hand')");
+            INSERT INTO $invtblname(`ItemCode`, `ItemColor`, `imeisn`) VALUES ($ItemCode, $ItemColor, $item)");
 
         }
 
@@ -468,13 +481,17 @@ elseif (isset($_POST['rItemCode'])) {
         if ($StatusCount == 0) {
             $ItemStatus = "Completed";
             $Remarks = "Already Shipped";
+            $DateCompleted = db_quote(date("Y-m-d"));
+            $TimeCompleted = db_quote(date("h:i A"));
+
         } else {
             $ItemStatus = "On Going";
             $Remarks = "For Delivery";
+            $DateCompleted = db_quote("");
+            $TimeCompleted = db_quote("");
         }
 
-        $UpdateStatus = db_query("UPDATE `purchaserequeststbl` SET `Status` = " . db_quote($ItemStatus) . ", `Remarks` = " . db_quote($Remarks) . " WHERE `PONumber` = " . db_quote($PRNumber) . "AND `ModifyCode` = $ModifyCode");
-
+        $UpdateStatus = db_query("UPDATE `purchaserequeststbl` SET `Status` = " . db_quote($ItemStatus) . ", `Remarks` = " . db_quote($Remarks) . ", `DateCompleted` = $DateCompleted, `TimeCompleted` = $TimeCompleted WHERE `PONumber` = " . db_quote($PRNumber) . "AND `ModifyCode` = $ModifyCode");
 
         header("location: ../receiving.php?success");
 
@@ -482,7 +499,9 @@ elseif (isset($_POST['rItemCode'])) {
         header("location: ../receiving.php?error");
     }
 
-} elseif (isset($_POST['sIMEISN'])) {
+}
+
+elseif (isset($_POST['sIMEISN'])) {
     $sIMEISN = $_POST['sIMEISN'];
     $sSRP = $_POST['sSRP'];
     $sQty = $_POST['sQty'];
@@ -509,7 +528,6 @@ elseif (isset($_POST['rItemCode'])) {
 
     $rnd = rand(1000, 9999);
 
-
     $Cash = db_quote((float)str_replace(',', '', $Cash));
     $CreditCard = db_quote((float)str_replace(',', '', $CreditCard));
     $HomeCredit = db_quote((float)str_replace(',', '', $HomeCredit));
@@ -523,63 +541,63 @@ elseif (isset($_POST['rItemCode'])) {
         $ModeOfPayment != "Cash Home Credit" ||
         $ModeOfPayment != "Cash CreditCard Home Credit"
     ) {
-        $addTransaction = db_query("INSERT INTO `transactiontbl` (`TransactionID`, `ORNumber`, `_Date`, `_Time`, `CustomerName`, `SalesClerk`, `Cashier`, `BranchCode`, `ModeOfPayment`, `Status`)
-                                                          VALUES ($TransactionID, $ORNumber, $_Date, $_Time, $CustomerName, $SalesClerk, $EmpID, $BranchCode, $ModeOfPayment, 'Active')");
+        $addTransaction = db_query("INSERT INTO $transtblname (`TransactionID`, `ORNumber`, `_Date`, `_Time`, `CustomerName`, `SalesClerk`, `Cashier`, `ModeOfPayment`, `Status`)
+                                                          VALUES ($TransactionID, $ORNumber, $_Date, $_Time, $CustomerName, $SalesClerk, $EmpID, $ModeOfPayment, 'Active')");
 
         if ($addTransaction === false) {
             $ErrorCount++;
             header("location: ../addtrans.php?error");
         } else {
             if ($ModeOfPayment == db_quote("Cash")) {
-                $queryCash = db_query("INSERT INTO `cashtransactiontbl` (`TransactionID`, `ORNumber`, `Amount`) VALUES ($TransactionID, $ORNumber, $Cash)");
+                $queryCash = db_query("INSERT INTO $cashtblname (`TransactionID`, `ORNumber`, `Amount`) VALUES ($TransactionID, $ORNumber, $Cash)");
                 if ($queryCash === false) {
                     $ErrorCount++;
                 }
             } elseif ($ModeOfPayment == db_quote("Credit Card")) {
-                $queryCreditCard = db_query("INSERT INTO `credittransactiontbl`  (`TransactionID`, `ORNumber`, `CreditCardNumber`, `CardHolderName`, `MID`, `BatchNum`, `ApprCode`, `Term`, `IDPresented`, `Amount`)
+                $queryCreditCard = db_query("INSERT INTO $credittblname  (`TransactionID`, `ORNumber`, `CreditCardNumber`, `CardHolderName`, `MID`, `BatchNum`, `ApprCode`, `Term`, `IDPresented`, `Amount`)
                                                                 VALUES ($TransactionID, $ORNumber, $CardNumber, $CardHolderName, $MID, $BatchNum, $ApprCode,$Terms, $IDPresented, $CreditCard)");
                 if ($queryCreditCard === false) {
                     $ErrorCount++;
                 }
             } elseif ($ModeOfPayment == db_quote("Home Credit")) {
-                $queryHomeCredit = db_query("INSERT INTO `homecredittransactiontbl` (`TransactionID`, `ORNumber`, `ReferenceNo`, `Amount`)
+                $queryHomeCredit = db_query("INSERT INTO $homecredittblname (`TransactionID`, `ORNumber`, `ReferenceNo`, `Amount`)
                                                                             VALUES  ($TransactionID, $ORNumber, $ReferenceNo, $HomeCredit)");
                 if ($queryHomeCredit === false) {
                     $ErrorCount++;
                 }
             } elseif ($ModeOfPayment == db_quote("HomeCredit Credit Card")) {
-                $queryCreditCard = db_query("INSERT INTO `credittransactiontbl`  (`TransactionID`, `ORNumber`, `CreditCardNumber`, `CardHolderName`, `MID`, `BatchNum`, `ApprCode`, `Term`, `IDPresented`, `Amount`)
+                $queryCreditCard = db_query("INSERT INTO $credittblname (`TransactionID`, `ORNumber`, `CreditCardNumber`, `CardHolderName`, `MID`, `BatchNum`, `ApprCode`, `Term`, `IDPresented`, `Amount`)
                                                                 VALUES ($TransactionID, $ORNumber, $CardNumber, $CardHolderName, $MID, $BatchNum, $ApprCode,$Terms, $IDPresented, $CreditCard)");
 
-                $queryHomeCredit = db_query("INSERT INTO `homecredittransactiontbl` (`TransactionID`, `ORNumber`, `ReferenceNo`, `Amount`)
+                $queryHomeCredit = db_query("INSERT INTO $homecredittblname (`TransactionID`, `ORNumber`, `ReferenceNo`, `Amount`)
                                                                             VALUES  ($TransactionID, $ORNumber, $ReferenceNo, $HomeCredit)");
                 if ($queryCreditCard === false || $queryHomeCredit === false) {
                     $ErrorCount++;
                 }
             } elseif ($ModeOfPayment == db_quote("Cash CreditCard")) {
-                $queryCash = db_query("INSERT INTO `cashtransactiontbl` (`TransactionID`, `ORNumber`, `Amount`) VALUES ($TransactionID, $ORNumber, $Cash)");
+                $queryCash = db_query("INSERT INTO $cashtblname (`TransactionID`, `ORNumber`, `Amount`) VALUES ($TransactionID, $ORNumber, $Cash)");
 
-                $queryCreditCard = db_query("INSERT INTO `credittransactiontbl`  (`TransactionID`, `ORNumber`, `CreditCardNumber`, `CardHolderName`, `MID`, `BatchNum`, `ApprCode`, `Term`, `IDPresented`, `Amount`)
+                $queryCreditCard = db_query("INSERT INTO $credittblname  (`TransactionID`, `ORNumber`, `CreditCardNumber`, `CardHolderName`, `MID`, `BatchNum`, `ApprCode`, `Term`, `IDPresented`, `Amount`)
                                                                 VALUES ($TransactionID, $ORNumber, $CardNumber, $CardHolderName, $MID, $BatchNum, $ApprCode,$Terms, $IDPresented, $CreditCard)");
                 if ($queryCreditCard === false || $queryCash === false) {
                     $ErrorCount++;
                 }
 
             } elseif ($ModeOfPayment == db_quote("Cash Home Credit")) {
-                $queryCash = db_query("INSERT INTO `cashtransactiontbl` (`TransactionID`, `ORNumber`, `Amount`) VALUES ($TransactionID, $ORNumber, $Cash)");
+                $queryCash = db_query("INSERT INTO $cashtblname (`TransactionID`, `ORNumber`, `Amount`) VALUES ($TransactionID, $ORNumber, $Cash)");
 
-                $queryHomeCredit = db_query("INSERT INTO `homecredittransactiontbl` (`TransactionID`, `ORNumber`, `ReferenceNo`, `Amount`)
+                $queryHomeCredit = db_query("INSERT INTO $homecredittblname(`TransactionID`, `ORNumber`, `ReferenceNo`, `Amount`)
                                                                             VALUES  ($TransactionID, $ORNumber, $ReferenceNo, $HomeCredit)");
                 if ($queryCash === false || $queryHomeCredit === false) {
                     $ErrorCount++;
                 }
             } elseif ($ModeOfPayment == db_quote("Cash CreditCard Home Credit")) {
-                $queryCash = db_query("INSERT INTO `cashtransactiontbl` (`TransactionID`, `ORNumber`, `Amount`) VALUES ($TransactionID, $ORNumber, $Cash)");
+                $queryCash = db_query("INSERT INTO $cashtblname (`TransactionID`, `ORNumber`, `Amount`) VALUES ($TransactionID, $ORNumber, $Cash)");
 
-                $queryCreditCard = db_query("INSERT INTO `credittransactiontbl`  (`TransactionID`, `ORNumber`, `CreditCardNumber`, `CardHolderName`, `MID`, `BatchNum`, `ApprCode`, `Term`, `IDPresented`, `Amount`)
+                $queryCreditCard = db_query("INSERT INTO $credittblname  (`TransactionID`, `ORNumber`, `CreditCardNumber`, `CardHolderName`, `MID`, `BatchNum`, `ApprCode`, `Term`, `IDPresented`, `Amount`)
                                                                 VALUES ($TransactionID, $ORNumber, $CardNumber, $CardHolderName, $MID, $BatchNum, $ApprCode,$Terms, $IDPresented, $CreditCard)");
 
-                $queryHomeCredit = db_query("INSERT INTO `homecredittransactiontbl` (`TransactionID`, `ORNumber`, `ReferenceNo`, `Amount`)
+                $queryHomeCredit = db_query("INSERT INTO $homecredittblname (`TransactionID`, `ORNumber`, `ReferenceNo`, `Amount`)
                                                                             VALUES  ($TransactionID, $ORNumber, $ReferenceNo, $HomeCredit)");
 
                 if ($queryCash === false || $queryHomeCredit === false || $queryCreditCard === false) {
@@ -601,27 +619,30 @@ elseif (isset($_POST['rItemCode'])) {
 
                     //$GrandTotal = number_format($GrandTotal, 2, '.', ',');
 
-                    $checkImei = db_select("SELECT `ItemCode` FROM `invtbl` WHERE `BranchCode` = $BranchCode AND `imeisn` = $IMEISN AND `Status` = 'On Hand'");
+                    $checkImei = db_select("SELECT `ItemCode`, `ItemColor` FROM $invtblname WHERE `imeisn` = $IMEISN");
                     $ItemCode = db_quote($checkImei[0]['ItemCode']);
+                    $ItemColor = db_quote($checkImei[0]['ItemColor']);
                     $checkSRP = db_select("SELECT `SRP` FROM `itemstbl` WHERE `ItemCode` = $ItemCode");
                     if ($checkImei === false || count($checkImei) == 0) {
-                        db_query("DELETE FROM `transactiontbl` WHERE `TransactionID` = $TransactionID");
+                        db_query("DELETE FROM $transtblname WHERE `TransactionID` = $TransactionID");
                         header("location: ../addtrans.php?error");
                     } else {
                         if ($checkSRP === false || count($checkSRP) == 0 || db_quote($checkSRP[0]['SRP']) != $SRP) {
-                            db_query("DELETE FROM `transactiontbl` WHERE `TransactionID` = $TransactionID");
+                            db_query("DELETE FROM $transtblname WHERE `TransactionID` = $TransactionID");
                             header("location: ../addtrans.php?error");
                         } else {
                             $TotalPrice = $TotalPrice + str_replace("'", "", $SRP);
-                            $UpdateInventory = db_query("UPDATE `invtbl` SET `Status` = 'Sold', `TransactionID` = $TransactionID WHERE `imeisn` = $IMEISN");
+                            $UpdateSoldUnits = db_query("INSERT INTO $soldtblname (`ItemCode`, `ItemColor`, `imeisn`, `TransactionID`) VALUES
+                                                        ($ItemCode, $ItemColor, $IMEISN, $TransactionID)");
+                            $DeleteItem = db_query("DELETE FROM $invtblname WHERE `imeisn` = $IMEISN");
+                            echo db_error();
                         }
                     }
                 }
-                $TransactionID = str_replace("'", "", $TransactionID);
                 $hashTransactionID = encrypt_decrypt_rnd('encrypt', $TransactionID, $rnd);
                 header("location: ../invoice.php?id=$hashTransactionID$rnd&tid=$TransactionID");
             } else {
-                db_query("DELETE FROM `transactiontbl` WHERE `TransactionID` = $TransactionID");
+                db_query("DELETE FROM $transtblname WHERE `TransactionID` = $TransactionID");
                 header("location: ../addtrans.php?error");
             }
         }
@@ -634,44 +655,40 @@ elseif (isset($_POST['rItemCode'])) {
     if (encrypt_decrypt_rnd('decrypt', $hash, $rnd) == $TransactionID) {
         $transactionDetails = db_select("
         SELECT
-        transactiontbl.ORNumber,
-        transactiontbl._Date,
-        transactiontbl._Time,
-        transactiontbl.CustomerName,
-        transactiontbl.SalesClerk,
-        transactiontbl.Cashier,
-        transactiontbl.ModeOfPayment,
-        branchtbl.BranchName,
-        cashtransactiontbl.Amount Cash,
-        credittransactiontbl.Amount CreditCard,
-        credittransactiontbl.CreditCardNumber,
-        credittransactiontbl.CardHolderName,
-        credittransactiontbl.MID,
-        credittransactiontbl.BatchNum,
-        credittransactiontbl.ApprCode,
-        credittransactiontbl.Term,
-        credittransactiontbl.IDPresented,
-        homecredittransactiontbl.Amount HomeCredit,
-        homecredittransactiontbl.ReferenceNo
-        FROM transactiontbl
-        LEFT JOIN cashtransactiontbl ON transactiontbl.TransactionID = cashtransactiontbl.TransactionID
-        LEFT JOIN credittransactiontbl ON transactiontbl.TransactionID = credittransactiontbl.TransactionID
-        LEFT JOIN homecredittransactiontbl ON transactiontbl.TransactionID = homecredittransactiontbl.TransactionID
-        LEFT JOIN branchtbl ON transactiontbl.BranchCode = branchtbl.BranchCode
-        WHERE transactiontbl.TransactionID = " . db_quote($TransactionID) . "
-        AND transactiontbl.BranchCode = $BranchCode
-        ");
+        $transtblname.ORNumber,
+        $transtblname._Date,
+        $transtblname._Time,
+        $transtblname.CustomerName,
+        $transtblname.SalesClerk,
+        $transtblname.Cashier,
+        $transtblname.ModeOfPayment,
+        $cashtblname.Amount Cash,
+        $credittblname.Amount CreditCard,
+        $credittblname.CreditCardNumber,
+        $credittblname.CardHolderName,
+        $credittblname.MID,
+        $credittblname.BatchNum,
+        $credittblname.ApprCode,
+        $credittblname.Term,
+        $credittblname.IDPresented,
+        $homecredittblname.Amount HomeCredit,
+       $homecredittblname.ReferenceNo
+        FROM $transtblname
+        LEFT JOIN $cashtblname ON $transtblname.TransactionID = $cashtblname.TransactionID
+        LEFT JOIN $credittblname ON $transtblname.TransactionID = $credittblname.TransactionID
+        LEFT JOIN $homecredittblname ON $transtblname.TransactionID = $homecredittblname.TransactionID
+        WHERE $transtblname.TransactionID = " . db_quote($TransactionID));
 
         $EmpSC = $transactionDetails[0]['SalesClerk'];
         $EmpCS = $transactionDetails[0]['Cashier'];
         $getSC = db_select("SELECT `Firstname`, `Lastname` FROM `employeetbl` WHERE `EmpID` = " . db_quote($EmpSC));
         $getCS = db_select("SELECT `Firstname`, `Lastname` FROM `employeetbl` WHERE `EmpID` = " . db_quote($EmpCS));
-
+        $getBC = db_select("SELECT `BranchName` FROM `branchtbl` WHERE `BranchCode` = $BranchCode");
         $ORNumber = $transactionDetails[0]['ORNumber'];
         $_Date = $transactionDetails[0]['_Date'];
         $_Time = $transactionDetails[0]['_Time'];
         $CustomerName = $transactionDetails[0]['CustomerName'];
-        $Branch = $transactionDetails[0]['BranchName'];
+        $Branch = $getBC[0]['BranchName'];
         $SalesClerk = $getSC[0]['Firstname'] . " " . $getSC[0]['Lastname'];
         $Cashier = $getCS[0]['Firstname'] . " " . $getCS[0]['Lastname'];
         $ModeOfPayment = $transactionDetails[0]['ModeOfPayment'];
@@ -787,18 +804,15 @@ elseif (isset($_POST['rItemCode'])) {
                                     <?php
                                     $Items = db_select("
                                     SELECT
-                                    invtbl.ItemColor,
-                                    invtbl.imeisn,
+                                    $soldtblname.ItemColor,
+                                    $soldtblname.imeisn,
                                     itemstbl.ModelName,
                                     itemstbl.ItemDescription,
                                     itemstbl.SRP
-                                    FROM invtbl
-                                    LEFT JOIN itemstbl ON invtbl.ItemCode = itemstbl.ItemCode
-                                    WHERE invtbl.TransactionID = " . db_quote($TransactionID) . "
-                                    AND invtbl.BranchCode = " . db_quote($BranchCode) . "
-                                    AND invtbl.Status = 'Sold'
-                                    ");
-                                    echo db_error();
+                                    FROM $soldtblname
+                                    LEFT JOIN itemstbl ON $soldtblname.ItemCode = itemstbl.ItemCode
+                                    WHERE $soldtblname.TransactionID = " . db_quote($TransactionID));
+
                                     foreach ($Items as $item) {
                                         $ModelName = $item['ModelName'];
                                         $ItemColor = $item['ItemColor'];
@@ -825,7 +839,6 @@ elseif (isset($_POST['rItemCode'])) {
                                         <?php
                                     }
                                     ?>
-
                                     </tbody>
                                 </table>
                             </div>
@@ -913,18 +926,14 @@ elseif (isset($_POST['rItemCode'])) {
 
         $getStocks = db_select("
         SELECT
-        invtbl.imeisn,
+        $invtblname.imeisn,
         itemstbl.ModelName,
-        invtbl.ItemColor,
-        brandtbl.Brand,
-        invtbl._DateReceived,
-        employeetbl.Firstname,
-        employeetbl.Lastname
-        FROM invtbl
-        LEFT JOIN itemstbl ON invtbl.ItemCode = itemstbl.ItemCode
+        $invtblname.ItemColor,
+        brandtbl.Brand
+        FROM $invtblname
+        LEFT JOIN itemstbl ON $invtblname.ItemCode = itemstbl.ItemCode
         LEFT JOIN brandtbl ON itemstbl.BrandID = brandtbl.BrandID
-        LEFT JOIN employeetbl ON invtbl.ReceivedBy = employeetbl.EmpID
-        WHERE invtbl.ItemCode = " . db_quote($ItemCode));
+        WHERE $invtblname.ItemCode = " . db_quote($ItemCode));
 
         ?>
         <div class="modal-dialog modal-lg">
@@ -940,25 +949,20 @@ elseif (isset($_POST['rItemCode'])) {
                             <th>IMEI / SN</th>
                             <th>Model</th>
                             <th>Brand</th>
-                            <th>Date Received</th>
-                            <th>Received By</th>
                         </tr>
                         </thead>
                         <tbody>
                         <?php
+                        echo db_error();
                         foreach ($getStocks as $stocks) {
                             $ImeiSN = $stocks['imeisn'];
                             $ModelName = $stocks['ModelName'] . " (" . $stocks['ItemColor'] . ")";
                             $Brand = $stocks['Brand'];
-                            $DateReceived = $stocks['_DateReceived'];
-                            $ReceivedBy = $stocks['Firstname'] . " " . $stocks['Lastname'];
                             ?>
                             <tr>
                                 <td><?= @$ImeiSN ?></td>
                                 <td><?= @$ModelName ?></td>
                                 <td><?= @$Brand ?></td>
-                                <td><?= @$DateReceived ?></td>
-                                <td><?= @$ReceivedBy ?></td>
                             </tr>
                             <?php
                         }

@@ -29,6 +29,15 @@ if (isset($_GET['id'])) {
     <div class="main_container">
         <?php
         include('navigation.php');
+
+        $BranchWQ = $BranchCode;
+        $invtblname = $BranchWQ . "invtbl";
+        $cashtblname = $BranchWQ . "cashtransactiontbl";
+        $credittblname = $BranchWQ . "credittransactiontbl";
+        $homecredittblname = $BranchWQ . "homecredittransactiontbl";
+        $transtblname = $BranchWQ . "transactiontbl";
+        $soldtblname = $BranchWQ . "soldunitstbl";
+        $receivedtblname = $BranchWQ . "receivedtbl";
         ?>
 
         <!-- page content -->
@@ -87,24 +96,22 @@ if (isset($_GET['id'])) {
                                                             <?php
                                                             $Transactiontbl = db_select("
                                                             SELECT
-                                                            transactiontbl.TransactionID,
-                                                            transactiontbl._Time,
-                                                            transactiontbl.ORNumber,
-                                                            transactiontbl.CustomerName,
-                                                            transactiontbl.SalesClerk,
-                                                            transactiontbl.Cashier,
-                                                            transactiontbl.Status,
-                                                            cashtransactiontbl.Amount Cash,
-                                                            credittransactiontbl.Amount CreditCard,
-                                                            homecredittransactiontbl.Amount HomeCredit
-                                                            FROM transactiontbl
-                                                            LEFT JOIN cashtransactiontbl ON transactiontbl.TransactionID = cashtransactiontbl.TransactionID
-                                                            LEFT JOIN credittransactiontbl ON transactiontbl.TransactionID = credittransactiontbl.TransactionID
-                                                            LEFT JOIN homecredittransactiontbl ON transactiontbl.TransactionID = homecredittransactiontbl.TransactionID
-                                                            WHERE transactiontbl._Date = " . db_quote($CurrentDate) . "
-                                                            AND transactiontbl.BranchCode = " . db_quote($BranchCode) . "
-                                                            ORDER BY transactiontbl._Time ASC
-                                                            ");
+                                                            $transtblname.TransactionID,
+                                                            $transtblname._Time,
+                                                            $transtblname.ORNumber,
+                                                            $transtblname.CustomerName,
+                                                            $transtblname.SalesClerk,
+                                                            $transtblname.Cashier,
+                                                            $transtblname.Status,
+                                                            $cashtblname.Amount Cash,
+                                                            $credittblname.Amount CreditCard,
+                                                            $homecredittblname.Amount HomeCredit
+                                                            FROM $transtblname
+                                                            LEFT JOIN $cashtblname ON $transtblname.TransactionID = $cashtblname.TransactionID
+                                                            LEFT JOIN $credittblname ON $transtblname.TransactionID = $credittblname.TransactionID
+                                                            LEFT JOIN $homecredittblname ON $transtblname.TransactionID = $homecredittblname.TransactionID
+                                                            WHERE $transtblname._Date = " . db_quote($CurrentDate) . " ORDER BY $transtblname._Time ASC");
+
                                                             foreach ($Transactiontbl as $Transaction) {
                                                                 $TransactionID = $Transaction['TransactionID'];
                                                                 $_Time = $Transaction['_Time'];

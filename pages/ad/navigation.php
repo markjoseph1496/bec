@@ -55,9 +55,8 @@ if(encrypt_decrypt_rnd('decrypt', $hashEMPID, $rnd) == $EmpID){
                     <li><a href="items.php"><i class="fa fa-cubes"></i> Items</a></li>
                     <li><a href="branch.php"><i class="fa fa-building"></i> Branch</a></li>
                     <li><a href="employee.php"><i class="fa fa-group"></i> Employee</a></li>
-                    <li><a href="colors.php"><i class="fa fa-eyedropper"></i> Color</a></li>
                     <li><a href="brand.php"><i class="fa fa-mobile-phone"></i> Brand</a></li>
-                    <li><a href="area.php"><i class="fa fa-area-chart"></i>Area</a></li>
+                    <li><a href="area.php"><i class="fa fa-area-chart"></i> Area</a></li>
                     <li><a href="category.php"><i class="fa fa-list"></i> Category</a></li>
                 </ul>
             </div>

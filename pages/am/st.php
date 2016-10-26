@@ -34,20 +34,29 @@
             $decryptBranch = $getBranches[0]['BranchCode'];
         }
 
-        $getCash = db_select("
-        SELECT
-        cashtransactiontbl.TransactionID,
-        cashtransactiontbl.Amount Cash,
-        transactiontbl.TransactionID
-        FROM cashtransactiontbl, transactiontbl
-        WHERE cashtransactiontbl.TransactionID = transactiontbl.TransactionID
-        AND transactiontbl.BranchCode = " . db_quote($decryptBranch) . "
-        AND transactiontbl._Date = " . db_quote($CurrentDate)
-        );
+        $BranchWQ = $decryptBranch;
+        $invtblname = $BranchWQ . "invtbl";
+        $cashtblname = $BranchWQ . "cashtransactiontbl";
+        $credittblname = $BranchWQ . "credittransactiontbl";
+        $homecredittblname = $BranchWQ . "homecredittransactiontbl";
+        $transtblname = $BranchWQ . "transactiontbl";
+        $soldtblname = $BranchWQ . "soldunitstbl";
+        $receivedtblname = $BranchWQ . "receivedtbl";
 
         $TotalCash = 0;
         $TotalCredit = 0;
         $TotalHomeCredit = 0;
+
+        $getCash = db_select("
+        SELECT
+        $cashtblname.TransactionID,
+        $cashtblname.Amount Cash,
+        $transtblname.TransactionID
+        FROM $cashtblname, $transtblname
+        WHERE $cashtblname.TransactionID = $transtblname.TransactionID
+        AND $transtblname._Date = " . db_quote($CurrentDate)
+        );
+
 
         foreach ($getCash as $CashValue) {
             $Cash = $CashValue['Cash'];
@@ -56,14 +65,12 @@
 
         $getCreditCard = db_select("
         SELECT
-        credittransactiontbl.TransactionID,
-        credittransactiontbl.Amount Credit,
-        transactiontbl.TransactionID
-        FROM credittransactiontbl, transactiontbl
-        WHERE credittransactiontbl.TransactionID = transactiontbl.TransactionID
-        AND transactiontbl.BranchCode = " . db_quote($decryptBranch) . "
-        AND transactiontbl._Date = " . db_quote($CurrentDate)
-        );
+        $credittblname.TransactionID,
+        $credittblname.Amount Credit,
+        $transtblname.TransactionID
+        FROM $credittblname, $transtblname
+        WHERE $credittblname.TransactionID = $transtblname.TransactionID
+        AND $transtblname._Date = " . db_quote($CurrentDate));
 
         foreach ($getCreditCard as $CreditValue) {
             $Credit = $CreditValue['Credit'];
@@ -72,13 +79,12 @@
 
         $getHomeCredit = db_select("
         SELECT
-        homecredittransactiontbl.TransactionID,
-        homecredittransactiontbl.Amount HomeCredit,
-        transactiontbl.TransactionID
-        FROM homecredittransactiontbl, transactiontbl
-        WHERE homecredittransactiontbl.TransactionID = transactiontbl.TransactionID
-        AND transactiontbl.BranchCode = " . db_quote($decryptBranch) . "
-        AND transactiontbl._Date = " . db_quote($CurrentDate)
+        $homecredittblname.TransactionID,
+        $homecredittblname.Amount HomeCredit,
+        $transtblname.TransactionID
+        FROM $homecredittblname, $transtblname
+        WHERE $homecredittblname.TransactionID = $transtblname.TransactionID
+        AND $transtblname._Date = " . db_quote($CurrentDate)
         );
 
         foreach ($getHomeCredit as $HomeCreditValue) {
@@ -86,7 +92,7 @@
             $TotalHomeCredit = $TotalHomeCredit + $HomeCredit;
         }
 
-        $getTransactions = db_select("SELECT * FROM `transactiontbl` WHERE `_Date` = " . db_quote($CurrentDate) . " AND `BranchCode` = " . db_quote($decryptBranch));
+        $getTransactions = db_select("SELECT * FROM $transtblname WHERE `_Date` = " . db_quote($CurrentDate));
 
         $CountTransactions = count($getTransactions);
         $GrandTotal = $TotalCash + $TotalCredit + $TotalHomeCredit;
@@ -173,23 +179,22 @@
                                                             <?php
                                                             $Transactiontbl = db_select("
                                                             SELECT
-                                                            transactiontbl.TransactionID,
-                                                            transactiontbl._Time,
-                                                            transactiontbl.ORNumber,
-                                                            transactiontbl.CustomerName,
-                                                            transactiontbl.SalesClerk,
-                                                            transactiontbl.Cashier,
-                                                            transactiontbl.Status,
-                                                            cashtransactiontbl.Amount Cash,
-                                                            credittransactiontbl.Amount CreditCard,
-                                                            homecredittransactiontbl.Amount HomeCredit
-                                                            FROM transactiontbl
-                                                            LEFT JOIN cashtransactiontbl ON transactiontbl.TransactionID = cashtransactiontbl.TransactionID
-                                                            LEFT JOIN credittransactiontbl ON transactiontbl.TransactionID = credittransactiontbl.TransactionID
-                                                            LEFT JOIN homecredittransactiontbl ON transactiontbl.TransactionID = homecredittransactiontbl.TransactionID
-                                                            WHERE transactiontbl._Date = " . db_quote($CurrentDate) . "
-                                                            AND transactiontbl.BranchCode = " . db_quote($decryptBranch) . "
-                                                            ORDER BY transactiontbl._Time ASC
+                                                            $transtblname.TransactionID,
+                                                            $transtblname._Time,
+                                                            $transtblname.ORNumber,
+                                                            $transtblname.CustomerName,
+                                                            $transtblname.SalesClerk,
+                                                            $transtblname.Cashier,
+                                                            $transtblname.Status,
+                                                            $cashtblname.Amount Cash,
+                                                            $credittblname.Amount CreditCard,
+                                                            $homecredittblname.Amount HomeCredit
+                                                            FROM $transtblname
+                                                            LEFT JOIN $cashtblname ON $transtblname.TransactionID = $cashtblname.TransactionID
+                                                            LEFT JOIN $credittblname ON $transtblname.TransactionID = $credittblname.TransactionID
+                                                            LEFT JOIN $homecredittblname ON $transtblname.TransactionID = $homecredittblname.TransactionID
+                                                            WHERE $transtblname._Date = " . db_quote($CurrentDate) . "
+                                                            ORDER BY $transtblname._Time ASC
                                                             ");
 
                                                             foreach ($Transactiontbl as $Transaction) {

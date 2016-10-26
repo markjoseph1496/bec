@@ -42,6 +42,7 @@ function addItemToOrder(r) {
                 var tModelName = document.getElementsByName('tModelName[]');
                 var tBrand = document.getElementsByName('tBrand[]');
                 var tCategory = document.getElementsByName('tCategory[]');
+                var tDP = document.getElementsByName('tDP[]');
                 var tSRP = document.getElementsByName('tSRP[]');
 
                 var tTotalPrice = parseFloat(tSRP[i].value.replace(/,/g, "")) * parseFloat(tQty[i].value.replace(/,/g, ""));
@@ -51,13 +52,14 @@ function addItemToOrder(r) {
                 $('<td>').text(tModelName[i].value + " (" + tColor[i].value + ")").appendTo(row);
                 $('<td>').text(tBrand[i].value).appendTo(row);
                 $('<td>').text(tSRP[i].value).appendTo(row);
+                $('<td>').text(tDP[i].value).appendTo(row);
                 $('<td><input type="number" onchange="updateTotalAmount(this);" onkeypress="return noenter(event);" name="oQty[]" max="1000" min="1" class="form-control" style="width: 80px;" value=' + tQty[i].value + '>').appendTo(row);
                 $('<td>').text(tTotalPrice).appendTo(row);
                 $('<td><a class="btn btn-danger" onclick="deleteItemOrder(this);"><i class="fa fa-trash"></i></a>').appendTo(row);
 
                 $('<input type="hidden" name="oColor[]" value=' + tColor[i].value + '>').appendTo(row);
                 $('<input type="hidden" name="oItemCode[]" value=' + tItemCode[i].value + '>').appendTo(row);
-                $('<input type="hidden" name="oSRP[]" value=' + tSRP[i].value + '>').appendTo(row);
+                $('<input type="hidden" name="oDP[]" value=' + tDP[i].value + '>').appendTo(row);
                 $('<input type="hidden" name="oTotalPrice[]" value=' + tTotalPrice + '>').appendTo(row);
 
                 row.appendTo('#ItemsToOrder');
@@ -92,14 +94,14 @@ function updateTotalAmount(r) {
     var i = r.parentNode.parentNode.rowIndex;
     i--;
     var stPrice = 0;
-    var oSRP = document.getElementsByName('oSRP[]');
+    var oDP = document.getElementsByName('oDP[]');
     var oQty = document.getElementsByName('oQty[]');
     var ordertable = document.getElementById('ItemsToOrder');
-    var tTotalPrice = parseFloat(oSRP[i].value.replace(/,/g, "")) * parseFloat(oQty[i].value.replace(/,/g, ""));
+    var tTotalPrice = parseFloat(oDP[i].value.replace(/,/g, "")) * parseFloat(oQty[i].value.replace(/,/g, ""));
 
     tTotalPrice = accounting.formatNumber(tTotalPrice, 2, ",", ".");
     document.getElementsByName('oTotalPrice[]')[i].value = tTotalPrice;
-    ordertable.rows[i + 1].cells[5].innerHTML = tTotalPrice;
+    ordertable.rows[i + 1].cells[6].innerHTML = tTotalPrice;
     var tPrice = document.getElementsByName('oTotalPrice[]'); //value of unit price on table
 
     for (var x = 0; x < tPrice.length; x++) {
@@ -115,11 +117,11 @@ function deleteItemOrder(r) {
     var i = r.parentNode.parentNode.rowIndex;
     var oQty = document.getElementsByName('oQty[]');
     var oItemCode = document.getElementsByName('oItemCode[]');
-    var oSRP = document.getElementsByName('oSRP[]');
+    var oDP = document.getElementsByName('oDP[]');
     var oTotalPrice = document.getElementsByName('oTotalPrice[]');
     var oColor = document.getElementsByName('oColor[]');
 
-    $("input").remove(oQty[i - 1], oItemCode[i - 1], oSRP[i - 1], oTotalPrice[i - 1], oColor[i - 1]);
+    $("input").remove(oQty[i - 1], oItemCode[i - 1], oDP[i - 1], oTotalPrice[i - 1], oColor[i - 1]);
     arrayItem.splice(i, 1);
     ItemsToOrder.deleteRow(i);
     new PNotify({
@@ -200,21 +202,23 @@ function addItemsToModify() {
         var tModelName = document.getElementsByName('aModelName[]');
         var tColor = document.getElementsByName('aColor[]');
         var tBrand = document.getElementsByName('aBrand[]');
+        var tDP = document.getElementsByName('aDP[]');
         var tSRP = document.getElementsByName('aSRP[]');
 
-        var tTotalPrice = parseFloat(tSRP[i].value.replace(/,/g, "")) * parseFloat(tQty[i].value.replace(/,/g, ""));
+        var tTotalPrice = parseFloat(tDP[i].value.replace(/,/g, "")) * parseFloat(tQty[i].value.replace(/,/g, ""));
         tTotalPrice = accounting.formatNumber(tTotalPrice, 2, ",", ".");
 
         $('<td>').text(tItemCode[i].value).appendTo(row);
         $('<td>').text(tModelName[i].value + " (" + tColor[i].value + ")").appendTo(row);
         $('<td>').text(tBrand[i].value).appendTo(row);
         $('<td>').text(tSRP[i].value).appendTo(row);
+        $('<td>').text(tDP[i].value).appendTo(row);
         $('<td><input type="number" onchange="updateTotalAmount(this);" onkeypress="return noenter(event);" name="oQty[]" max="1000" min="1" class="form-control" style="width: 80px;" value=' + tQty[i].value + '>').appendTo(row);
         $('<td>').text(tTotalPrice).appendTo(row);
         $('<td><a class="btn btn-danger" onclick="deleteItemOrder(this);"><i class="fa fa-trash"></i></a>').appendTo(row);
 
         $('<input type="hidden" name="oItemCode[]" value=' + tItemCode[i].value + '>').appendTo(row);
-        $('<input type="hidden" name="oSRP[]" value=' + tSRP[i].value + '>').appendTo(row);
+        $('<input type="hidden" name="oDP[]" value=' + tDP[i].value + '>').appendTo(row);
         $('<input type="hidden" name="oTotalPrice[]" value=' + tTotalPrice + '>').appendTo(row);
 
         row.appendTo('#ItemsToOrder');
@@ -226,6 +230,7 @@ function addItemsToModify() {
 
 function AddItem(e) {
     if (e && e.keyCode == 13) {
+        var Received = document.getElementById('rReceived');
         var ImeiSN = $('#ImeiSN').val();
         var Qty = document.getElementById('rQty');
         if (ImeiSN.replace(/ /g, '') == "") {
@@ -233,7 +238,7 @@ function AddItem(e) {
             $('#ImeiSN').val("");
             $('#ImeiSN').focus();
         } else {
-            if (imeisnArray.length <= Qty.value) {
+            if (imeisnArray.length <= Qty.value - Received.value) {
                 $.ajax({
                     type: 'POST',
                     url: 'php/validate.php',
@@ -309,7 +314,6 @@ function UpdateLabels() {
     var IMEISN = document.getElementById('ImeiSN');
 
     sQty.textContent = imeisnArray.length - 1 + parseInt(Received.value) + " / " + Qty.value;
-
 
 }
 
