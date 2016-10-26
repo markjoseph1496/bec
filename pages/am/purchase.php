@@ -197,7 +197,7 @@
                                                                 <input type="hidden" disabled name="tDP[]" value="<?= @$DP ?>">
                                                             </td>
                                                             <?php
-                                                            $invtblname = $BranchCode . "invtbl";
+                                                            $invtblname = strtolower($Branch . "invtbl");
                                                             $getOnHand = db_select("SELECT count(*) as onHand FROM $invtblname WHERE `ItemCode` = " . $ItemCode);
                                                             $OnHand = $getOnHand[0]['onHand'];
                                                             ?>

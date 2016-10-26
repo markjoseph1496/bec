@@ -304,7 +304,7 @@ if (encrypt_decrypt_rnd('decrypt', $hashPRNumber, $srnd) != $PONumber) {
                                                                 <input type="hidden" disabled name="tDP[]" value="<?= @$DP ?>">
                                                             </td>
                                                             <?php
-                                                            $invtblname = $Branch . "invtbl";
+                                                            $invtblname = strtolower($Branch . "invtbl");
                                                             $getOnHand = db_select("SELECT count(*) as onHand FROM $invtblname WHERE `ItemCode` = " . $ItemCode);
                                                             $OnHand = $getOnHand[0]['onHand'];
                                                             ?>
